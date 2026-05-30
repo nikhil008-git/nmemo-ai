@@ -1,0 +1,26 @@
+---
+description: BullMQ worker conventions for the async memory pipeline
+globs: apps/workers/**/*.ts
+alwaysApply: false
+---
+
+# Workers (BullMQ)
+
+The async write pipeline: `extract → embed → resolve`, plus scheduled `consolidate`.
+
+## Job conventions
+- One queue per stage (`extract`, `embed`, `resolve`, `consolidate`). Chain by enqueuing the next stage on success.
+- Jobs must be **idempotent** — assume they can be retried. Key on `eventId`/`memoryId`.
+- Set sane retries + backoff; on permanent failure, fail the job loudly with context (don't swallow).
+- All AI calls go through the Vercel AI SDK abstraction in `packages/core/ai` — never hardcode a provider.
+
+## Stage responsibilities
+- **extract** — LLM → atomic facts with `type`, `confidence`, provenance spans.
+- **embed** — vector + `tsvector` for hybrid search.
+- **resolve** — dedup/merge, build supersede chains for contradictions, set `importance`.
+- **consolidate** — repeatable/cron job: decay scores, compress episodics, forget noise, reinforce used memories.
+
+## Rules
+- Respect the per-tenant token budget — extraction/embedding cost is capped CoGS.
+- Emit Redis pub/sub events (`memory.updated`, etc.) after DB writes so live sessions stay in sync.
+- Write `AuditLog` for lifecycle transitions (`SUPERSEDED`, `FORGOTTEN`).

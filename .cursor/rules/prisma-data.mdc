@@ -1,0 +1,24 @@
+---
+description: Prisma + Postgres + pgvector data-layer conventions
+globs: packages/db/**/*.ts,packages/db/**/*.prisma
+alwaysApply: false
+---
+
+# Data Layer (Prisma + pgvector)
+
+Postgres is the single store of record (memories, embeddings, provenance, audit).
+
+## Rules
+- Every domain table carries `tenantId`; every query filters by it. Multi-tenant isolation is non-negotiable.
+- Memory `status` lifecycle: `PENDING → ACTIVE → (SUPERSEDED | FORGOTTEN | DELETED)`. Never hard-delete on user request — set `DELETED` + keep an audit tombstone.
+- Conflict resolution uses `supersedesId` chains, not in-place overwrites.
+- Store `provenance` JSON (source `eventIds`, model, spans) on every memory — this powers governance.
+- `embedding` (pgvector) and `keywords` (`tsvector`) are managed via raw SQL in migrations; keep them in sync when content changes.
+
+## Indexing
+- Composite indexes on `(tenantId, subjectId, type, status)` and `(tenantId, subjectId, lastUsedAt)`.
+- Vector index (IVFFlat/HNSW) chosen at implementation; abstract retrieval so the vector store is swappable.
+
+## Migrations
+- Use Prisma migrations; add pgvector/tsvector columns + indexes via the SQL escape hatch.
+- Never edit a shipped migration — add a new one.

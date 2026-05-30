@@ -1,176 +1,88 @@
-# Turborepo starter
+# Mnemo — Memory Layer as a Service
 
-## Environment Variables
+> **Auth0/Clerk, but for AI agent memory.**
+> Persistent, portable, self-maintaining memory for any AI application — in ~5 lines of code.
 
-You need to create a `.env` file in the following directories:
+---
 
-1. `packages/database`
-2. `apps/frontend`
+## What is Mnemo?
 
-Both `.env` files should include the following variables:
+Every AI app today re-implements the same painful stack: pgvector + summarization + dedup + decay + retrieval ranking + GDPR deletion. Mnemo is the **memory backend** that does all of this behind three API calls (`add`, `recall`, `delete`).
 
-```env
-DATABASE_URL=
-BETTER_AUTH_SECRET=
-BETTER_AUTH_URL=
+Mnemo is **infrastructure, not a framework**. It is framework-agnostic and works with the Vercel AI SDK, LangChain, raw OpenAI/Anthropic calls, or any agent runtime.
+
+```ts
+import { Mnemo } from "@mnemo/sdk";
+
+const mem = new Mnemo({ apiKey: process.env.MNEMO_API_KEY });
+
+// 1. Write — throw raw conversation at it; Mnemo extracts what's worth remembering (async)
+await mem.add({ subjectId: user.id, messages });
+
+// 2. Read — retrieval blends relevance + recency + importance, within a token budget
+const ctx = await mem.recall({ subjectId: user.id, query, budgetTokens: 2000 });
+
+// 3. Inject — a ready-to-use context block for your LLM
+const prompt = `${ctx.systemBlock}\n\nUser: ${userInput}`;
 ```
 
-You can find a template in `.env.example` at the root of the project.
+---
 
-This Turborepo starter is maintained by the Turborepo core team.
+## Why Mnemo exists
 
-## Using this example
+| Problem | Mnemo's answer |
+|---|---|
+| Memory is hand-rolled and fragile in every AI app | A drop-in backend behind 3 calls |
+| Memory is trapped per-app | **Portable** cross-app identity — memory follows the user |
+| You can't prove or delete what's stored | **Governed**: provenance, audit log, per-memory delete (GDPR) |
+| Memory grows into unbounded noise | **Self-maintaining**: decay + consolidation "sleep cycles" |
+| Costs spiral with token usage | Built-in **per-tenant token budgets + rate limiting** |
 
-Run the following command:
+**USP:** *Portable, governed memory for AI apps — your users' memory follows them across apps, stays consistent, and you can prove exactly what's stored and delete any single fact.*
 
-```sh
-npx create-turbo@latest
-```
+---
 
-## What's inside?
+## The three pillars (vs mem0 / Letta-MemGPT)
 
-This Turborepo includes the following packages/apps:
+1. **Portability** — shared memory identity across multiple apps/products.
+2. **Governance** — provenance, audit, PII redaction, per-memory deletion (SOC2/GDPR-ready).
+3. **Self-maintenance** — automatic decay, conflict resolution via supersede chains, consolidation.
 
-### Apps and Packages
+mem0 helps you *store* memory. Letta is a *framework* you build agents inside. **Mnemo is neutral memory infrastructure you trust and own.**
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+---
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## Tech stack
 
-### Utilities
+- **Next.js** — developer dashboard (memory explorer, usage, API keys)
+- **Express** — ingest/recall API
+- **BetterAuth** — API-key auth + multi-tenant
+- **Prisma + Postgres + pgvector** — storage, embeddings, provenance, audit
+- **BullMQ** — async extraction / resolution / embedding / consolidation jobs
+- **Redis** — pub/sub (live memory sync), rate limiter (cost guard), hot-memory cache
+- **Vercel AI SDK** — fact extraction & summarization (provider-agnostic)
+- **TypeScript** — end to end
 
-This Turborepo has some additional tools already setup for you:
+See [`docs/03-TECH-STACK.md`](docs/03-TECH-STACK.md).
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+---
 
-### Build
+## Documentation
 
-To build all apps and packages, run the following command:
+| Doc | Contents |
+|---|---|
+| [`docs/01-PRODUCT.md`](docs/01-PRODUCT.md) | Vision, USP, personas, differentiators |
+| [`docs/02-ARCHITECTURE.md`](docs/02-ARCHITECTURE.md) | System diagram, data flow, components |
+| [`docs/03-TECH-STACK.md`](docs/03-TECH-STACK.md) | Stack decisions & rationale |
+| [`docs/04-DATA-MODEL.md`](docs/04-DATA-MODEL.md) | Prisma schema, memory types |
+| [`docs/05-MEMORY-LIFECYCLE.md`](docs/05-MEMORY-LIFECYCLE.md) | Ingest → extract → resolve → decay → consolidate |
+| [`docs/06-RAG-RETRIEVAL.md`](docs/06-RAG-RETRIEVAL.md) | Hybrid retrieval & ranking |
+| [`docs/07-API-AND-SDK.md`](docs/07-API-AND-SDK.md) | REST API + TypeScript SDK |
+| [`docs/08-BUSINESS-MODEL.md`](docs/08-BUSINESS-MODEL.md) | Pricing, ARR/MRR, unit economics |
+| [`docs/09-ROADMAP.md`](docs/09-ROADMAP.md) | 2-week MVP + phased roadmap |
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
+---
 
-```sh
-cd my-turborepo
-turbo build
-```
+## Status
 
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+**Phase 1 — Documentation.** No application code yet. This repository currently contains the architecture and product specification only.
