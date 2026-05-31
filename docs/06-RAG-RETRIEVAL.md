@@ -1,6 +1,6 @@
 # 06 — RAG & Retrieval
 
-In Mnemo, **RAG is the read path of memory**. `recall()` is a retrieval-augmented step that assembles the most relevant memories into a context block for the caller's LLM. What makes it different from generic RAG: retrieval is **personalized** (per-subject importance + recency) and **governed** (every result carries provenance).
+In nmemo, **RAG is the read path of memory**. `recall()` is a retrieval-augmented step that assembles the most relevant memories into a context block for the caller's LLM. What makes it different from generic RAG: retrieval is **personalized** (per-subject importance + recency) and **governed** (every result carries provenance).
 
 ---
 
@@ -38,7 +38,7 @@ score(m) =  w_rel * relevance(query, m)         // hybrid similarity
 - This is *why retrieval improves over time*: as consolidation reinforces useful memories and forgets noise, ranking quality rises.
 
 ## 4. Budget packing
-- Caller passes `budgetTokens`. Mnemo greedily packs the highest-scoring memories until the budget is hit.
+- Caller passes `budgetTokens`. nmemo greedily packs the highest-scoring memories until the budget is hit.
 - Optionally compresses overflow into a short summary line ("+ 12 older preferences").
 - Returns a ready-to-use `systemBlock` string plus the structured `memories[]` (with provenance) for callers who want to render citations.
 

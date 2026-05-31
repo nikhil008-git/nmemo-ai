@@ -16,7 +16,7 @@ This split is *why* BullMQ + Redis are core to the stack, not decoration.
 ```mermaid
 flowchart TB
     subgraph Client["Developer's App"]
-        SDK["@mnemo/sdk (TypeScript)"]
+        SDK["@nmemo/sdk (TypeScript)"]
     end
 
     subgraph Edge["API Layer"]

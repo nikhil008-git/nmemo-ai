@@ -2,7 +2,7 @@
 
 ## 1. Vision
 
-AI applications are only as good as what they remember. Today, every team rebuilds memory from scratch — badly. Mnemo provides **persistent, portable, governed memory as a managed service**, so developers ship AI products with long-term memory the way they ship auth with Clerk or payments with Stripe.
+AI applications are only as good as what they remember. Today, every team rebuilds memory from scratch — badly. nmemo provides **persistent, portable, governed memory as a managed service**, so developers ship AI products with long-term memory the way they ship auth with Clerk or payments with Stripe.
 
 > **One-liner:** *The memory layer for AI apps — store, recall, and govern what your users tell your AI, across every app you build.*
 
@@ -22,7 +22,7 @@ AI applications are only as good as what they remember. Today, every team rebuil
 
 A managed memory backend exposed through a tiny SDK and REST API:
 
-- `add()` — ingest raw events/conversations; Mnemo asynchronously extracts atomic facts.
+- `add()` — ingest raw events/conversations; nmemo asynchronously extracts atomic facts.
 - `recall()` — hybrid retrieval (relevance + recency + importance) within a token budget.
 - `delete()` / `forget()` — per-memory deletion with audit trail.
 
@@ -57,7 +57,7 @@ Three pillars competitors don't nail *together*:
 
 ## 6. Differentiators vs mem0 / Letta (MemGPT)
 
-| Dimension | mem0 | Letta / MemGPT | **Mnemo** |
+| Dimension | mem0 | Letta / MemGPT | **nmemo** |
 |---|---|---|---|
 | Core model | Add/search facts to a vector store | Agent framework w/ OS-style context paging | **Memory *backend* (infra), framework-agnostic** |
 | Conflict resolution | Basic update | In-context self-editing | **Explicit supersede chains + provenance** |
@@ -68,7 +68,7 @@ Three pillars competitors don't nail *together*:
 | Cost control | None native | None | **Per-tenant token budget + rate limiting built in** |
 | Memory evals | None | None | **Memory quality scoring / regression detection** |
 
-**Positioning statement:** *mem0 helps you store memory; Letta is a framework you build agents inside; Mnemo is the neutral memory infrastructure you trust and own across your whole product suite.*
+**Positioning statement:** *mem0 helps you store memory; Letta is a framework you build agents inside; nmemo is the neutral memory infrastructure you trust and own across your whole product suite.*
 
 **Sharpest wedge to lead with:** **governance + portability** — exactly what enterprises (who pay) need and what mem0/Letta ignore.
 
@@ -76,7 +76,7 @@ Three pillars competitors don't nail *together*:
 
 ## 7. Where RAG fits
 
-RAG is not a separate product — it is the **read path** of memory. `recall()` is a retrieval-augmented step that assembles the most relevant memories into a context block. Mnemo's RAG is *personalized and governed*: retrieval is ranked by importance and recency per subject, and every retrieved memory carries provenance. See [`06-RAG-RETRIEVAL.md`](06-RAG-RETRIEVAL.md).
+RAG is not a separate product — it is the **read path** of memory. `recall()` is a retrieval-augmented step that assembles the most relevant memories into a context block. nmemo's RAG is *personalized and governed*: retrieval is ranked by importance and recency per subject, and every retrieved memory carries provenance. See [`06-RAG-RETRIEVAL.md`](06-RAG-RETRIEVAL.md).
 
 Expansion path: today RAG over *memories*; later **RAG-as-a-service over arbitrary documents** as a second product line (land-and-expand).
 

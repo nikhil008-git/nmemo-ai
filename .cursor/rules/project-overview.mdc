@@ -1,11 +1,11 @@
 ---
-description: Mnemo project overview, principles, and stack — core context for all work
+description: nmemo project overview, principles, and stack — core context for all work
 alwaysApply: true
 ---
 
-# Mnemo — Memory Layer as a Service
+# nmemo — Memory Layer as a Service
 
-Mnemo is **infrastructure, not a framework**: a persistent, portable, governed memory
+nmemo is **infrastructure, not a framework**: a persistent, portable, governed memory
 backend for AI apps, exposed via a small SDK + REST API (`add`, `recall`, `delete`).
 "Auth0/Clerk, but for AI agent memory." Framework-agnostic.
 

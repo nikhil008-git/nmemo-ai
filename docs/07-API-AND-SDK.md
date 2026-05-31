@@ -3,7 +3,7 @@
 > Interface contract for Phase 1. Endpoints/SDK are documented, not implemented.
 
 ## 1. Authentication
-- Every request carries an API key: `Authorization: Bearer mnemo_sk_...`.
+- Every request carries an API key: `Authorization: Bearer nmemo_sk_...`.
 - BetterAuth resolves the key → tenant. Rate limiting + token budget enforced per tenant in Redis.
 
 ---
@@ -67,12 +67,12 @@ Full dump of everything stored about a subject (governance tier).
 
 ---
 
-## 3. TypeScript SDK (`@mnemo/sdk`)
+## 3. TypeScript SDK (`@nmemo/sdk`)
 
 ```ts
-import { Mnemo } from "@mnemo/sdk";
+import { Nmemo } from "@nmemo/sdk";
 
-const mem = new Mnemo({ apiKey: process.env.MNEMO_API_KEY });
+const mem = new Nmemo({ apiKey: process.env.NMEMO_API_KEY });
 
 // add
 await mem.add({ subjectId: "user_123", messages });
@@ -97,10 +97,10 @@ const sub = mem.subscribe("user_123", (event) => {
 
 ### Convenience: AI SDK middleware
 ```ts
-import { withMnemo } from "@mnemo/sdk/ai";
+import { withNmemo } from "@nmemo/sdk/ai";
 
 // wraps a Vercel AI SDK model so recall/add happen automatically
-const model = withMnemo(openai("gpt-4o"), { mem, subjectId });
+const model = withNmemo(openai("gpt-4o"), { mem, subjectId });
 ```
 
 ---

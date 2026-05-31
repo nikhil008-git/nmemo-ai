@@ -1,6 +1,6 @@
 # 05 — Memory Lifecycle
 
-The lifecycle is what makes Mnemo *self-maintaining* — the differentiator mem0/Letta lack. Each stage runs as a BullMQ job (except retrieval, which is synchronous).
+The lifecycle is what makes nmemo *self-maintaining* — the differentiator mem0/Letta lack. Each stage runs as a BullMQ job (except retrieval, which is synchronous).
 
 ```mermaid
 flowchart LR
@@ -60,7 +60,7 @@ A scheduled BullMQ repeatable job per tenant/subject that keeps the store lean a
 3. **Forget** — memories below a forget-threshold move to `FORGOTTEN` (removed from retrieval, retained briefly for audit, then purged).
 4. **Reinforce** — frequently recalled memories get importance boosts (use it or lose it).
 
-> Analogy used in pitches: Mnemo "sleeps" and consolidates memories the way a brain does — short-term noise is discarded, important patterns are strengthened.
+> Analogy used in pitches: nmemo "sleeps" and consolidates memories the way a brain does — short-term noise is discarded, important patterns are strengthened.
 
 ## 7. Retrieve
 Synchronous; see [`06-RAG-RETRIEVAL.md`](06-RAG-RETRIEVAL.md). Retrieval reads `ACTIVE` memories ranked by `effectiveScore` + query relevance, packed into a token budget.

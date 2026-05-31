@@ -55,7 +55,7 @@ The rate limiter is not just abuse prevention — it is the **margin protection 
 ## 5. Moat
 
 1. **Data gravity** — accumulated, governed, consolidated memory is sticky; migrating it out is painful.
-2. **Cross-app portability** — once multiple of a customer's apps share one memory identity, Mnemo is load-bearing.
+2. **Cross-app portability** — once multiple of a customer's apps share one memory identity, nmemo is load-bearing.
 3. **Governance posture** — SOC2/GDPR tooling is a high-effort barrier that indie competitors won't match quickly.
 4. **Quality compounding** — consolidation makes retrieval *improve over time*, a hard-to-copy feedback loop.
 

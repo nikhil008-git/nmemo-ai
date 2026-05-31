@@ -16,7 +16,7 @@ erDiagram
     Memory ||--o{ Memory : supersedes
 ```
 
-- **Tenant** — a customer (developer/company) using Mnemo.
+- **Tenant** — a customer (developer/company) using nmemo.
 - **Subject** — the end-user a memory is *about* (portable across the tenant's apps).
 - **RawEvent** — the original ingested payload (messages); source for provenance.
 - **Memory** — an atomic, scored, embedded unit of memory.
@@ -181,4 +181,4 @@ model AuditLog {
 
 ## 5. Portability mechanism
 
-`Subject.externalId` is the tenant's own user id. Any of the tenant's apps that call `add`/`recall` with the same `externalId` read/write the **same** memory set — this is the cross-app portability that distinguishes Mnemo.
+`Subject.externalId` is the tenant's own user id. Any of the tenant's apps that call `add`/`recall` with the same `externalId` read/write the **same** memory set — this is the cross-app portability that distinguishes nmemo.
