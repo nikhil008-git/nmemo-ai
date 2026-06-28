@@ -1,0 +1,36 @@
+---
+description: Hybrid retrieval, reranking, and structured RAG answers
+globs: packages/agent/**/*
+alwaysApply: false
+---
+
+# Retrieval & RAG Pipeline
+
+## Hybrid search (`retrieval.ts`)
+
+1. BM25 keyword search + vector search against Qdrant.
+2. Merge/deduplicate candidates.
+3. Rerank top-k with Voyage `rerank-2` — this step is non-optional.
+
+Keyword search catches IDs, error codes, and proper nouns that embeddings blur.
+
+## Answer schema (Zod, strict)
+
+```ts
+{
+  answer: string,
+  citations: Array<{ source_url: string, title: string, snippet: string }>
+}
+```
+
+Every factual claim in `answer` must map to a citation. No orphan claims.
+
+## Agent wiring
+
+- Use Vercel AI SDK (`streamObject` or `streamText` + tools).
+- Langfuse spans around: retrieval, rerank, generation.
+- Citations must be renderable as clickable source chips in the UI.
+
+## Router (`router.ts`)
+
+Per message, decide: **retrieve only**, **tool only**, or **both** (retrieve context then act). See `docs/knowledge-agent/ARCHITECTURE.md` for routing heuristics.

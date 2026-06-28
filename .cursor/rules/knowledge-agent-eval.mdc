@@ -1,0 +1,36 @@
+---
+description: promptfoo evals and Langfuse observability standards
+globs: packages/eval/**/*
+alwaysApply: false
+---
+
+# Evaluation & Observability
+
+## Langfuse tracing (required spans)
+
+Every chat turn must produce an inspectable trace with:
+
+- Retrieval call (query, top-k, latency)
+- Rerank call (input count, output order)
+- Tool calls (name, args, result)
+- Final generation (model, tokens)
+
+## promptfoo suite
+
+- 15–20 test cases in `packages/eval/testcases/`.
+- Cover: retrieval accuracy, answer correctness, expected tool selection.
+- Each case: question, expected source doc and/or expected tool call.
+- Run via `pnpm eval` (or equivalent) — must print pass rate.
+
+## Test case format
+
+```yaml
+# retrieval-accuracy.yaml example shape
+- vars:
+    question: "How do I reset my API key?"
+  assert:
+    - type: contains
+      value: "api-keys"
+```
+
+Document methodology, pass rate, and failure modes in `docs/knowledge-agent/EVAL.md`.

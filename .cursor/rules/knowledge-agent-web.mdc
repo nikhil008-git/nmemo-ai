@@ -1,0 +1,28 @@
+---
+description: Next.js chat UI — streaming, citations, tool-call indicators
+globs: apps/web/**/*
+alwaysApply: false
+---
+
+# Web Chat UI
+
+## Required components
+
+- `chat.tsx` — streaming message list, input, loading states.
+- `citation.tsx` — clickable source chips from `{ source_url, title, snippet }`.
+- `tool-call-indicator.tsx` — visible record of MCP tool invocations and results.
+
+## API route
+
+`app/api/chat/route.ts` — streaming endpoint using Vercel AI SDK; delegates to `packages/agent`.
+
+## UX requirements
+
+- Stream tokens as they arrive.
+- Citations render inline or below the answer — always clickable to source.
+- Tool calls show name + outcome (not hidden in logs only).
+- Errors surface gracefully without leaking internal stack traces.
+
+## Stack
+
+Next.js App Router, Vercel AI SDK, shared types from `packages/shared`.

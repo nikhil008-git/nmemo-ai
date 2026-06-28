@@ -1,0 +1,38 @@
+---
+description: Internal Knowledge Agent — project context, goals, and non-negotiable design decisions
+alwaysApply: true
+---
+
+# Internal Knowledge Agent — Core Context
+
+This monorepo is building a **RAG + action agent**: answers from internal docs with citations, and executes tasks via a custom MCP server.
+
+## Two capabilities, one agent
+
+1. **Knowledge** — hybrid retrieval → rerank → answer with citations (`source_url`, `title`, `snippet`).
+2. **Action** — when the question implies doing something, call MCP tools (`create_ticket`, `lookup_order_status`, `escalate_to_human`).
+
+The agent decides per message: retrieve, tool-call, or both. That routing judgment is the core engineering problem.
+
+## Non-negotiable design decisions
+
+- **Mastra** for orchestration (not LangGraph) — TypeScript-native, built-in MCP support.
+- **Hybrid search** (BM25 + vector in Qdrant) + **Voyage rerank** — not pure vector search.
+- **MCP server is a standalone app** (`apps/mcp-server`) — pluggable into any MCP client, not embedded in web.
+- **Mock tool backends are fine** — focus on schemas, auth boundaries, and tool-selection.
+- **Structured output** — Zod schema for `{ answer, citations[] }`.
+- **Observability** — Langfuse traces every retrieval, rerank, tool call, generation.
+- **Evals** — promptfoo suite with pass-rate target; 15–20 cases.
+
+## Target repo layout (when built)
+
+```
+apps/web, apps/mcp-server
+packages/agent, packages/ingestion, packages/eval, packages/shared
+```
+
+## Build order
+
+Phase 1 ingestion → Phase 2 RAG pipeline → Phase 3 MCP + routing → Phase 4 observability/evals → Phase 5 polish/docs.
+
+Full spec and topic docs live in `docs/knowledge-agent/`. Do not regress on citations, hybrid search, or MCP separation.
