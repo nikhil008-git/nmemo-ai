@@ -1,1 +1,1 @@
-{"root":["./src/index.ts"],"version":"6.0.2"}
+{"root":["./src/index.ts","./src/lib/auth.ts","./src/middleware/requiresession.ts"],"version":"6.0.2"}
