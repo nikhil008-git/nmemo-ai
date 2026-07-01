@@ -231,7 +231,7 @@ Each tool call renders in chat as:
    → Ticket #4821 created (high priority)
 ```
 
-Implementation: `apps/web/components/tool-call-indicator.tsx`
+Implementation: `apps/web/components/tool-call-indicator.tsx` (target). Current repo: `apps/frontend` until chat UI is built.
 
 ---
 

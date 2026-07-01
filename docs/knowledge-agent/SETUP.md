@@ -1,21 +1,51 @@
 # Setup Guide
 
-How to run the Internal Knowledge Agent locally once the codebase is built. Update env var names to match actual implementation.
+How to run the Internal Knowledge Agent locally. Commands use **npm** (this repo's package manager). Update env var names to match actual implementation as phases land.
+
+**Build order:** [PHASES.md](./PHASES.md) · **Full spec:** [PROJECT_SPEC.md](./PROJECT_SPEC.md)
 
 ---
 
 ## Prerequisites
 
 - Node.js 18+
-- pnpm (recommended) or npm
-- Docker (local Qdrant only)
-- Accounts: Voyage AI or OpenAI, Langfuse, LLM provider (Anthropic/OpenAI)
+- npm 10+ (workspaces)
+- Docker (local Qdrant only — Phase 1+)
+- Accounts (Phase 2+): Voyage AI or OpenAI, LLM provider (Anthropic/OpenAI)
+- Accounts (Phase 4+): Langfuse
 
 ---
 
-## Environment variables
+## Current repo (scaffold only)
 
-Create `.env` at the monorepo root (and per-app if needed):
+What works today without the agent stack:
+
+```bash
+npm install
+npm run dev    # starts apps/frontend (:3000) + apps/api (:8080)
+```
+
+Env files needed for the existing auth scaffold:
+
+| App | File | Vars |
+|-----|------|------|
+| `apps/frontend` | `.env` | `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` |
+| `apps/api` | `.env` | Same as frontend (session validation on Express) |
+| `packages/database` | `.env` | `DATABASE_URL` (Prisma CLI) |
+
+```bash
+# From packages/database
+npm run db:migrate -w @repo/db
+npm run db:generate -w @repo/db
+```
+
+The agent stack (Qdrant, ingestion, chat) is **not wired yet** — see phases below.
+
+---
+
+## Environment variables (full agent — Phase 1+)
+
+Create `.env` at monorepo root and per-app as needed:
 
 ```bash
 # LLM
@@ -32,19 +62,19 @@ QDRANT_COLLECTION=help-docs
 # Relational DB
 DATABASE_URL=postgresql://user:pass@localhost:5432/knowledge_agent
 
-# Observability
+# Observability (Phase 4)
 LANGFUSE_PUBLIC_KEY=pk-...
 LANGFUSE_SECRET_KEY=sk-...
 LANGFUSE_HOST=https://cloud.langfuse.com
 
-# MCP server
+# MCP server (Phase 3)
 MCP_SERVER_PORT=3001
 MCP_API_KEY=dev-secret          # auth boundary even with mocks
 ```
 
 ---
 
-## 1. Start infrastructure (local)
+## Phase 1 — Start infrastructure
 
 ### Qdrant
 
@@ -56,8 +86,9 @@ Verify: `curl http://localhost:6333/collections`
 
 ### PostgreSQL
 
+Use Neon (current setup) or local Docker:
+
 ```bash
-# Example with Docker
 docker run -p 5432:5432 \
   -e POSTGRES_USER=user \
   -e POSTGRES_PASSWORD=pass \
@@ -68,26 +99,17 @@ docker run -p 5432:5432 \
 Run migrations:
 
 ```bash
-pnpm --filter @knowledge-agent/shared db:migrate
-# or: npx prisma migrate dev
+npm run db:migrate -w @repo/db
 ```
 
 ---
 
-## 2. Install dependencies
+## Phase 1 — Ingest documents
+
+Once `packages/ingestion` exists:
 
 ```bash
-pnpm install
-```
-
----
-
-## 3. Ingest documents (Phase 1)
-
-Pick a corpus (e.g. Linear help docs). Run the ingestion CLI:
-
-```bash
-pnpm --filter @knowledge-agent/ingestion run ingest \
+npm run ingest -w @knowledge-agent/ingestion -- \
   --source ./data/linear-docs \
   --collection help-docs
 ```
@@ -97,36 +119,37 @@ Expected output: chunk count, embed count, upsert confirmation.
 ### Verify retrieval manually
 
 ```bash
-pnpm --filter @knowledge-agent/agent run retrieval:test \
+npm run retrieval:test -w @knowledge-agent/agent -- \
   --query "How do I reset my API key?"
 ```
 
-Eyeball that the top chunks match the expected article. Repeat for 5–10 queries before proceeding.
+Eyeball that top chunks match the expected article. Repeat for 5–10 queries before Phase 2.
 
 ---
 
-## 4. Start the apps
+## Phase 2–3 — Start the apps
 
-Terminal 1 — MCP server:
+Terminal 1 — MCP server (Phase 3):
 
 ```bash
-pnpm --filter @knowledge-agent/mcp-server dev
+npm run dev -w @knowledge-agent/mcp-server
 ```
 
-Terminal 2 — Web app:
+Terminal 2 — Web / chat UI:
 
 ```bash
-pnpm --filter @knowledge-agent/web dev
+npm run dev -w @knowledge-agent/web
+# or current: npm run dev -w frontend
 ```
 
 Open `http://localhost:3000`.
 
 ---
 
-## 5. Run evals (Phase 4)
+## Phase 4 — Run evals
 
 ```bash
-pnpm eval
+npm run eval
 # runs promptfoo from packages/eval
 ```
 
@@ -134,7 +157,7 @@ Expected output: pass rate percentage and per-case results.
 
 ---
 
-## 6. View traces
+## View traces (Phase 4)
 
 After a chat turn, open Langfuse dashboard → find trace by session ID or timestamp. Confirm spans for retrieval, rerank, tool calls, and generation.
 
@@ -144,11 +167,12 @@ After a chat turn, open Langfuse dashboard → find trace by session ID or times
 
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
-| Empty retrieval results | Collection not seeded or wrong name | Re-run ingest, check `QDRANT_COLLECTION` |
+| Empty retrieval results | Collection not seeded or wrong name | Re-run ingest; check `QDRANT_COLLECTION` |
 | Citations point to wrong docs | Chunk overlap too small or no rerank | Increase overlap; verify rerank step runs |
 | Tool calls not appearing | MCP server not running or wrong port | Check `MCP_SERVER_PORT`, server logs |
 | No Langfuse traces | Missing keys or wrong host | Verify `LANGFUSE_*` env vars |
 | Eval pass rate 0% | Stale index or wrong expected sources | Re-ingest; update test case expected values |
+| Express `/protected` 401 | API `.env` missing or dotenv load order | `import "dotenv/config"` first in `apps/api/src/index.ts` |
 
 ---
 
@@ -161,3 +185,5 @@ After a chat turn, open Langfuse dashboard → find trace by session ID or times
 | Qdrant | Railway or Qdrant Cloud | Use managed instance |
 | PostgreSQL | Railway, Supabase, Neon | Run migrations on deploy |
 | Langfuse | Langfuse Cloud | Recommended over self-host for demo |
+
+No Docker/Kubernetes/Helm in production.

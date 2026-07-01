@@ -148,3 +148,15 @@ Document the Mastra vs LangGraph evaluation in the project README when built.
 | Railway | ~$5–10 |
 
 Total: roughly $20–60/month for active development and demo usage.
+
+---
+
+## Phase 6 — Paid tier (later)
+
+Not part of the initial stack. When picked up after Phases 1–5:
+
+- **Dodo Payments** — merchant-of-record, low setup overhead
+- **Postgres `plan` field** — flipped via webhook after checkout
+- **Middleware gating** — free = plain vector search; Plus = hybrid + rerank + MCP tools
+
+See [PHASES.md#phase-6](./PHASES.md#phase-6--paid-tier-later) and future `BILLING.md`.

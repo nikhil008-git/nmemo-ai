@@ -20,7 +20,7 @@ A reviewer should be able to read this doc and the [README](./README.md) and ful
 
 - **promptfoo** — test runner, assertion library, pass-rate reporting
 - **Location** — `packages/eval/`
-- **Run command** — `pnpm eval` (to be wired in root `package.json`)
+- **Run command** — `npm run eval` (to be wired in root `package.json`)
 
 ---
 
@@ -165,7 +165,7 @@ The eval provider wraps the Mastra agent (or a thin test harness) so promptfoo c
 
 ## What reviewers should look for
 
-1. **Pass rate number** — printed by `pnpm eval`, logged above
+1. **Pass rate number** — printed by `npm run eval`, logged above
 2. **Failure analysis** — at least 2–3 documented failure modes and fixes
 3. **Langfuse correlation** — any failing case has a trace ID you can inspect
 4. **Coverage** — cases span knowledge-only, action-only, and combined queries

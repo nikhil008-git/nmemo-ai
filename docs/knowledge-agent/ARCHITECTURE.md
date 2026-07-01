@@ -193,3 +193,15 @@ Langfuse Cloud  → observability (or self-hosted)
 ```
 
 No Docker/Kubernetes in production. Docker for local Qdrant only.
+
+---
+
+## Current repo vs target
+
+| Target | Current | Notes |
+|--------|---------|-------|
+| `apps/web` | `apps/frontend` | Evolve into chat UI (Phase 2) |
+| `apps/mcp-server` | `apps/api` (Express stub) | Replace in Phase 3 |
+| `packages/shared` | `packages/database` | Prisma here today; add Zod schemas in Phase 2 |
+
+The Better Auth scaffold in `apps/frontend` is optional — the agent, retrieval, and MCP layers are the product core.
