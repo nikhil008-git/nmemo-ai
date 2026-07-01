@@ -2,7 +2,10 @@
   "$schema": "https://turborepo.dev/schema.json",
   "ui": "tui",
   "globalEnv": [
-    "DATABASE_URL"
+    "DATABASE_URL",
+    "QDRANT_URL",
+    "VOYAGE_API_KEY",
+    "OPENAI_API_KEY"
   ],
   "tasks": {
     "build": {
@@ -15,7 +18,8 @@
       ],
       "outputs": [
         ".next/**",
-        "!.next/cache/**"
+        "!.next/cache/**",
+        "dist/**"
       ]
     },
     "lint": {
@@ -31,6 +35,9 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "ingest": {
+      "cache": false
     },
     "db:generate": {
       "cache": false
