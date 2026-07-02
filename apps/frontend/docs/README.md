@@ -6,6 +6,7 @@ Markdown-only documentation for every screen, component, and user flow in `apps/
 
 | Doc | What it covers |
 |-----|----------------|
+| [BUILD_UI.md](../BUILD_UI.md) | **Build checklist** — routes, components, mocks (UI first) |
 | [overview.md](./overview.md) | What the frontend is today vs end-state |
 | [design-system.md](./design-system.md) | Colors, typography, layout rules |
 
