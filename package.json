@@ -22,6 +22,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@qdrant/js-client-rest": "^1.18.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2"
   }

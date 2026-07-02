@@ -1,1 +1,1 @@
-{"root":["./src/chunk.ts","./src/embed.ts","./src/index.ts","./src/parse.ts","./src/qdrant.ts","./src/run.ts","./src/types.ts"],"version":"5.9.2"}
+{"root":["./src/index.ts","./src/ingest.ts"],"errors":true,"version":"5.9.2"}
