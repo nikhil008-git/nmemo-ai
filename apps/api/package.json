@@ -13,14 +13,20 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@qdrant/js-client-rest": "^1.18.0",
     "@repo/db": "*",
     "@types/express": "^5.0.6",
     "better-auth": "^1.5.6",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "typescript": "^6.0.2"
+    "openai": "^6.45.0",
+    "pdf-parse": "^1.1.4",
+    "typescript": "^6.0.2",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.17"
+    "@types/cors": "^2.8.17",
+    "@types/pdf-parse": "^1.1.5"
   }
 }
