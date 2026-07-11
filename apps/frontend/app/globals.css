@@ -1,10 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #000000;
-  --muted-foreground: #737373;
-  --border: #e5e5e5;
+  --background: #101010;
+  --foreground: #ffffff;
+  --muted-foreground: #a3a3a3;
+  --border: #262626;
+  --input: #1a1a1a;
+  --primary: #ffffff;
+  --primary-foreground: #101010;
 }
 
 @theme inline {
@@ -12,11 +15,57 @@
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
-  --font-sans: var(--font-montserrat);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
 }
 
+html,
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-montserrat), sans-serif;
+  font-family: var(--font-hanken), sans-serif;
+}
+
+@keyframes hero-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-copy {
+  animation: hero-fade-up 0.7s ease-out both;
+}
+
+.hero-visual {
+  animation: hero-fade-up 0.8s ease-out 0.15s both;
+}
+
+@keyframes agent-status-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.agent-status {
+  animation: agent-status-in 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy,
+  .hero-visual,
+  .agent-status {
+    animation: none;
+  }
 }

@@ -28,24 +28,24 @@ export default function SignUpPage() {
     }
 
     return (
-        <main className="max-w-md mx-auto p-6 space-y-4 text-black">
-            <p className="text-xs font-light tracking-widest uppercase text-neutral-400">Get started</p>
+        <main className="max-w-md mx-auto p-6 space-y-4 text-foreground">
+            <p className="text-xs tracking-widest uppercase text-muted-foreground">Get started</p>
             <h1 className="text-3xl font-bold">Sign Up</h1>
-            <p className="text-sm font-light text-neutral-500">Create your account in a few seconds.</p>
+            <p className="text-sm text-muted-foreground">Create your account in a few seconds.</p>
             {error && <p className="text-sm font-medium text-red-600">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                     name="name"
                     placeholder="Full Name"
                     required
-                    className="w-full rounded-md bg-white border border-neutral-300 px-3 py-2 text-black font-normal placeholder:font-light placeholder:text-neutral-400"
+                    className="w-full rounded-md bg-input border border-border px-3 py-2 text-foreground font-normal placeholder:text-muted-foreground"
                 />
                 <input
                     name="email"
                     type="email"
                     placeholder="Email"
                     required
-                    className="w-full rounded-md bg-white border border-neutral-300 px-3 py-2 text-black font-normal placeholder:font-light placeholder:text-neutral-400"
+                    className="w-full rounded-md bg-input border border-border px-3 py-2 text-foreground font-normal placeholder:text-muted-foreground"
                 />
                 <input
                     name="password"
@@ -53,11 +53,11 @@ export default function SignUpPage() {
                     placeholder="Password"
                     required
                     minLength={8}
-                    className="w-full rounded-md bg-white border border-neutral-300 px-3 py-2 text-black font-normal placeholder:font-light placeholder:text-neutral-400"
+                    className="w-full rounded-md bg-input border border-border px-3 py-2 text-foreground font-normal placeholder:text-muted-foreground"
                 />
                 <button
                     type="submit"
-                    className="w-full bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-neutral-800"
+                    className="w-full bg-primary text-primary-foreground font-semibold rounded-md px-4 py-2 hover:opacity-90"
                 >
                     Create Account
                 </button>

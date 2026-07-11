@@ -14,19 +14,19 @@ export default function DashboardPage() {
         }
     }, [isPending, session, router]);
 
-    if (isPending) return <p className="text-center mt-8 text-black font-light text-neutral-500">Loading...</p>;
-    if (!session?.user) return <p className="text-center mt-8 text-black font-light text-neutral-500">Redirecting...</p>;
+    if (isPending) return <p className="text-center mt-8 text-muted-foreground">Loading...</p>;
+    if (!session?.user) return <p className="text-center mt-8 text-muted-foreground">Redirecting...</p>;
 
     const { user } = session;
 
     return (
-        <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6 space-y-4 text-black">
-            <p className="text-xs font-light tracking-widest uppercase text-neutral-400">Dashboard</p>
+        <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6 space-y-4 text-foreground">
+            <p className="text-xs tracking-widest uppercase text-muted-foreground">Dashboard</p>
             <p className="text-2xl font-bold">Welcome, {user.name || "User"}!</p>
-            <p className="text-sm font-light text-neutral-500">{user.email}</p>
+            <p className="text-sm text-muted-foreground">{user.email}</p>
             <button
                 onClick={() => signOut()}
-                className="w-full bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-neutral-800">
+                className="w-full bg-primary text-primary-foreground font-semibold rounded-md px-4 py-2 hover:opacity-90">
                 Sign Out
             </button>
 

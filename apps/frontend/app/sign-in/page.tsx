@@ -27,10 +27,10 @@ export default function SignInPage() {
     }
 
     return (
-        <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6 space-y-4 text-black">
-            <p className="text-xs font-light tracking-widest uppercase text-neutral-400">Account</p>
+        <main className="max-w-md h-screen flex items-center justify-center flex-col mx-auto p-6 space-y-4 text-foreground">
+            <p className="text-xs tracking-widest uppercase text-muted-foreground">Account</p>
             <h1 className="text-3xl font-bold">Sign In</h1>
-            <p className="text-sm font-light text-neutral-500">Welcome back — enter your details below.</p>
+            <p className="text-sm text-muted-foreground">Welcome back — enter your details below.</p>
             {error && <p className="text-sm font-medium text-red-600">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
@@ -38,18 +38,18 @@ export default function SignInPage() {
                     type="email"
                     placeholder="Email"
                     required
-                    className="w-full rounded-md bg-white border border-neutral-300 px-3 py-2 text-black font-normal placeholder:font-light placeholder:text-neutral-400"
+                    className="w-full rounded-md bg-input border border-border px-3 py-2 text-foreground font-normal placeholder:text-muted-foreground"
                 />
                 <input
                     name="password"
                     type="password"
                     placeholder="Password"
                     required
-                    className="w-full rounded-md bg-white border border-neutral-300 px-3 py-2 text-black font-normal placeholder:font-light placeholder:text-neutral-400"
+                    className="w-full rounded-md bg-input border border-border px-3 py-2 text-foreground font-normal placeholder:text-muted-foreground"
                 />
                 <button
                     type="submit"
-                    className="w-full bg-black text-white font-semibold rounded-md px-4 py-2 hover:bg-neutral-800"
+                    className="w-full bg-primary text-primary-foreground font-semibold rounded-md px-4 py-2 hover:opacity-90"
                 >
                     Sign In
                 </button>
