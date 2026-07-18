@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Account-level preferences for the logged-in owner.
+Workspace-level configuration for Context Engine integrations.
 
 ## Audience
 
-Authenticated users.
+Authenticated workspace owners and developers.
 
 ## Sections (planned)
 
@@ -15,23 +15,32 @@ Authenticated users.
 - Name, email, avatar
 - Change password
 
-### Workspace / billing (future)
+### Workspace / billing
 
 - Plan tier
-- API usage limits
+- Usage metering (getContext calls, token usage)
 - Payment method
 
 ### API keys
 
-- Create / revoke keys for SDK or server integrations
-- Separate from per-site widget public keys
+- Create / revoke keys for `@contextengine/sdk` integrations
+- Per-workspace scoping
+
+### Connector credentials
+
+- Link to connector setup (mem0, Qdrant, OAuth sources, MCP servers)
+- Per-workspace connector config stored in `packages/db`
 
 ### Notifications
 
-- Weekly analytics email
-- Gap alert when many unanswered questions
+- Weekly context quality report
+- Alert when sources fail or auth expires
 
 ### Danger zone
 
-- Delete account
-- Export all conversation data
+- Delete workspace
+- Export conversation and diagnostics data
+
+## Related spec
+
+- [docs/context-engine/PROJECT_SPEC.md](../../../../docs/context-engine/PROJECT_SPEC.md) — developer integration steps

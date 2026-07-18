@@ -10,7 +10,7 @@ export default function LandingPage() {
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
         aria-hidden="true"
-      />
+      /> 
 
       <section className="relative mx-auto flex w-full max-w-5xl flex-col px-6 pb-12 pt-28 sm:pt-32">
         <div className="hero-copy flex w-full flex-col gap-10 sm:flex-row sm:items-end sm:justify-between sm:gap-16">

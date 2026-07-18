@@ -19,8 +19,8 @@ Reusable chat UI for `/chat` page and optionally embed panel.
 ## Assistant message anatomy
 
 1. Streamed answer text
-2. **Citation row** — see [citation.md](./citation.md)
-3. **Tool indicator** — see [tool-call-indicator.md](./tool-call-indicator.md) if tools ran
+2. **Citation row** — see [citation.md](./citation.md) (from `context.citations`)
+3. **Diagnostics / tool indicator** — see [tool-call-indicator.md](./tool-call-indicator.md)
 
 ## States
 
@@ -28,12 +28,12 @@ Reusable chat UI for `/chat` page and optionally embed panel.
 |-------|-----|
 | Idle | Input enabled |
 | Sending | Input disabled, user message shown |
-| Retrieving | Optional “Searching docs…” |
+| Retrieving | Per-source progress from `getContext()` diagnostics |
 | Streaming | Tokens appearing |
 | Error | Red banner, retry button |
 
 ## Props (conceptual)
 
-- `siteId` — which knowledge collection
+- `workspaceId` — which workspace's connected sources
 - `conversationId` — continue thread
 - `onCitationClick` — open source URL

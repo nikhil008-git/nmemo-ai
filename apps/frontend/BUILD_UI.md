@@ -4,7 +4,7 @@ Build screens with **mock data** in `lib/mocks/`. Wire real API later.
 
 **Design:** white bg, black text, Montserrat, `max-w-5xl`, shadcn/ui. See `docs/design-system.md`.
 
-**Defer:** real `/chat` API, ingestion jobs, MCP, dynamic page rebuild, `widget.js` bundle.
+**Defer:** real `/chat` API, connector syncs, `engine.getContext()` wiring, dynamic page rebuild, `widget.js` bundle.
 
 ---
 

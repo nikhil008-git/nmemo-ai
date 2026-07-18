@@ -12,7 +12,7 @@ Marketing hero — product name and one-line value prop.
 
 - Eyebrow: “Welcome to”
 - Title: nmemo
-- Subtitle: knowledge workspace tagline
+- Subtitle: Context Engine — multi-source context orchestration for AI agents
 
 ## Navigation
 

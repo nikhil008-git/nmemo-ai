@@ -1,0 +1,37 @@
+---
+description: Context Engine retrievers — shared interface and all source implementations
+globs: packages/retrievers/**/*
+alwaysApply: false
+---
+
+# Retrievers
+
+## Shared interface (`retriever-interface`)
+
+```ts
+interface Retriever {
+  retrieve(query: string, opts: { userId: string; workspaceId: string }): Promise<Context[]>
+}
+```
+
+`Context` shape: `text`, `source`, `score`, `metadata` — uniform across all sources so ranking/dedup/conflict-resolution treat them the same.
+
+## Implementations
+
+| Package | Backend | Auth |
+|---------|---------|------|
+| `memory-retriever` | mem0 | workspace config |
+| `rag-retriever` | Qdrant + Voyage | index config (RAG core exists — wrap it) |
+| `slack-retriever` | Slack | OAuth |
+| `notion-retriever` | Notion | OAuth |
+| `github-retriever` | GitHub | OAuth |
+| `sql-retriever` | PostgreSQL, Snowflake | API keys / credentials |
+| `crm-retriever` | HubSpot, Salesforce, Stripe | API keys |
+| `mcp-retriever` | MCP servers | server registration |
+| `voice-stream-retriever` | live ASR | direct feed — bypasses rank/dedup |
+
+## Execution rules
+
+- Retrievers run in parallel with per-source timeouts.
+- A slow or failing source must not block the whole response — note omissions in `diagnostics`.
+- Adding a new source = new package under `packages/retrievers/`, no changes to `packages/core/`.

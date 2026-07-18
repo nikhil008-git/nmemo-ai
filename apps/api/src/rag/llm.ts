@@ -1,3 +1,5 @@
+// ask will be formed
+
 import OpenAI from "openai";
 import { search, type SearchHit } from "./search.js";
 
@@ -5,7 +7,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // whats the type of the source_url? or docs
 export type Citation = {
-    dource_url : string; // doc link
+    source_url : string; // doc link
     title : string; // title
     snippet : string; //first 200 chars of the chunk
 
@@ -28,7 +30,10 @@ function hitsToCitations(hits: SearchHit[]): Citation[] {
     question : string,
     siteId? : string,
   ) : Promise<RagAnswer> {
-    const hits = await search(question, { limit: 5, siteId});
+    const hits = await search(question, {
+      limit: 5,
+      ...(siteId ? { siteId } : {}),
+    });
     
     if (hits.length === 0) {
         return {

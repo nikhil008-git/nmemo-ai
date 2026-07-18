@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Aggregate insight — what visitors ask, where knowledge fails, conversion to actions.
+Aggregate insight — what users ask, where context retrieval fails, token usage, and source performance.
 
 ## Audience
 
-Site owners, growth/support leads.
+Workspace owners, growth/support leads.
 
 ## Sections (planned)
 
@@ -14,30 +14,32 @@ Site owners, growth/support leads.
 
 - Bar chart or table: question clusters, count, trend
 
-### Knowledge gaps
+### Context gaps
 
-- Queries with low retrieval score or no citations
-- “Suggested FAQ” drafts (flywheel input)
+- Queries with low retrieval score, empty sources, or no citations
+- Sources that timed out or returned nothing (from `diagnostics`)
 
-### Actions funnel
+### Source performance
 
-- Messages → leads created → demos booked
-- Tool call breakdown by type
+- Latency by source (from `diagnostics`)
+- Retrieval precision/recall per source over time
+- Token allocation breakdown by section
 
-### Pages
+### Conflicts detected
 
-- Which URLs visitors were on when they asked (heatmap table)
+- Contradictions surfaced by conflict resolution layer
+- Most-recent-source-wins resolutions logged
 
 ### Weekly report
 
-- Export or email summary (Architect-style “what’s stopping sales”)
+- Export or email summary of context quality metrics
 
 ## Data source
 
-- Postgres: `Message`, `Conversation`, tool records
-- Langfuse: retrieval quality metrics
+- Postgres: workspaces, conversations, usage metering
+- `packages/observability`: diagnostics from every `getContext()` call — ranking scores, discarded context, conflicts, latency, token allocation
 
 ## Future
 
 - Compare week over week
-- A/B: widget on vs off (if customer runs experiment)
+- Adaptive retrieval performance trends

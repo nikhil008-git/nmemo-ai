@@ -1,0 +1,54 @@
+---
+description: Context Engine core pipeline — router through memory writer
+globs: packages/core/**/*
+alwaysApply: false
+---
+
+# Core Pipeline Modules
+
+## Source Router (`packages/core/router`)
+
+Decides which sources to query per request — not every query needs every source. For voice: fast path (memory + cached context, sub-300ms) vs full path (full fan-out) based on topic shift detection.
+
+## Ranking (`packages/core/ranking`)
+
+Score on: semantic similarity, recency, importance, confidence, user personalization, source reliability.
+
+## Dedup (`packages/core/dedup`)
+
+Embedding-similarity threshold across contexts from different sources — collapse duplicate facts to one representation.
+
+## Conflict Resolution (`packages/core/conflict-resolution`)
+
+Detect contradictions across sources. Default: most-recent-source-wins. Expose conflicts in `diagnostics` so calling app can override.
+
+## Compression (`packages/core/compression`)
+
+Summarize oversized retrieved chunks to maximize information per token.
+
+## Token Budget (`packages/core/budget`)
+
+Dynamic allocation based on query and source relevance (not fixed split). Tokenizer-based counting per section; truncate/summarize on overflow.
+
+## Prompt Builder (`packages/core/prompt-builder`)
+
+Structured sections — not inline string concatenation:
+system instructions → user memory → relevant documents → workspace context → retrieved API data → conversation → current message.
+
+Voice: live transcription injected into conversation section, bypassing router/rank/dedup.
+
+## Memory Writer (`packages/core/memory-writer`)
+
+Async post-response: extract durable facts, merge duplicates, update importance, archive stale, delete obsolete. Voice: extract on finalized turns only, not mid-utterance ASR.
+
+## Query Planning (`packages/core/query-planning`)
+
+Decompose complex/multi-part questions into retrieval sub-steps.
+
+## Adaptive Retrieval (`packages/core/adaptive-retrieval`)
+
+Track which retrieval strategies perform best over time and adjust.
+
+## API return shape
+
+Every `getContext()` / `getContextFast()` call must return full contract including `diagnostics` (ranking scores, discarded context, conflicts, latency by source).

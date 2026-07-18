@@ -23,8 +23,9 @@ Sources:
 
 ## Rules (product)
 
-- Every factual claim in answer should map to a citation (agent schema enforces)
-- If zero citations, show warning style or “General response” badge
+- Citations come from `getContext()` return: `context.citations` with pointers to source docs/facts
+- Every factual claim in answer should map to a citation
+- If zero citations, show warning style or "General response" badge
 
 ## Empty / error
 
@@ -32,4 +33,5 @@ Sources:
 
 ## Related
 
-- `@repo/shared` `citationSchema`: `source_url`, `title`, `snippet`
+- `getContext()` return shape: `citations` with `source_url`, `title`, `snippet`
+- [docs/context-engine/PROJECT_SPEC.md](../../../../docs/context-engine/PROJECT_SPEC.md)

@@ -1,6 +1,7 @@
+// ingest will be called by the backend when a new pdf is uploaded
+import { randomUUID } from "crypto";
 import fs from "fs/promises";
 import pdf from "pdf-parse";
-import { v4 as uuid } from "uuid";
 import { chunkText } from "./chunk.js";
 import { embed } from "./embed.js";
 import { qdrant, COLLECTION, ensureCollection } from "./qdrant.js";
@@ -20,7 +21,7 @@ export async function ingestPdf(
   const vectors = await embed(chunks, "document");
 
   const points = chunks.map((text, i) => ({
-    id: uuid(),
+    id: randomUUID(),
     vector: vectors[i]!,
     payload: {
       text,

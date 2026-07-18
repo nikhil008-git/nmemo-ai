@@ -2,14 +2,14 @@
 
 ## What this app is
 
-`apps/frontend` is the **nmemo web app** — the surface site owners and (later) demo visitors interact with. It is not the AI brain; it talks to `apps/api` and displays results.
+`apps/frontend` is the **Context Engine dashboard** (`apps/dashboard` in the target layout) — where developers and workspace owners connect sources, manage API keys, view diagnostics, and test context assembly. It is not the engine itself; it talks to `apps/api` and displays results.
 
 ## Two audiences (end-state)
 
-| Audience | Uses frontend for |
+| Audience | Uses dashboard for |
 |----------|-------------------|
-| **Site owner** | Sign up, add sites, view analytics, copy embed code, manage knowledge |
-| **Demo visitor** | Public marketing pages; optionally in-app chat demo before embed ships |
+| **Developer / workspace owner** | Connect sources (mem0, Qdrant, Slack, Notion, GitHub, CRM, MCP), manage API keys, view diagnostics |
+| **Demo visitor** | Public marketing pages; optionally in-app chat demo before SDK integration |
 
 ## Today vs planned
 
@@ -24,10 +24,11 @@
 
 ### Planned (product)
 
-- Streaming chat UI with citations and tool indicators
-- Multi-site dashboard (sites, conversations, analytics, knowledge, embed)
-- Settings and API keys
-- Optional in-app preview of embed widget
+- Connector setup UI (mem0, Qdrant, OAuth sources, MCP servers)
+- Diagnostics viewer (ranking scores, discarded context, conflicts, latency by source)
+- API key management
+- Streaming chat demo powered by `engine.getContext()`
+- Workspace / usage metering
 
 ## App shell
 
@@ -46,19 +47,19 @@ Every page shares:
 /dashboard            Authenticated home (today: welcome only)
 
 ── planned ──
-/chat                 In-app agent demo
-/sites                List customer sites
-/sites/:id            Site overview
-/sites/:id/conversations
-/sites/:id/analytics
-/sites/:id/knowledge
-/sites/:id/embed
-/settings             Account + billing
+/chat                 In-app context demo (getContext → LLM stream)
+/connectors           Source connector setup (mem0, Qdrant, Slack, etc.)
+/diagnostics          Retrieval diagnostics viewer
+/settings             API keys, workspace, billing
 ```
 
 ## Principles
 
-- **Citations visible** — every knowledge answer shows source chips
-- **Tool calls visible** — when agent books demo or creates ticket, user sees it
-- **Owner vs visitor** — dashboard is for logged-in owners; widget is for anonymous visitors on customer sites
-- **No secrets in browser** — LLM and Qdrant keys stay on API only
+- **Citations visible** — every answer shows source chips from `getContext()` return
+- **Diagnostics visible** — ranking scores, conflicts, latency by source exposed in dashboard
+- **No secrets in browser** — LLM, Qdrant, and connector credentials stay on API only
+- **Source agnostic** — UI treats all connectors uniformly via shared connector config model
+
+## Related
+
+- [docs/context-engine/](../../../docs/context-engine/) — full project spec

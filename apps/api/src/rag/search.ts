@@ -11,21 +11,22 @@ export type SearchHit = {
 
 export async function search(
   question: string,
-  opts = { limit: 5, siteId?: string }
+  opts: { limit?: number; siteId?: string } = { limit: 5 }
 ): Promise<SearchHit[]> {
   const [vector] = await embed([question], "query");
-
-  const filter = opts.siteId
-    ? {
-        must: [{ key: "site_id", match: { value: opts.siteId } }],
-      }
-    : undefined;
+  if (!vector) return [];
 
   const results = await qdrant.search(COLLECTION, {
     vector,
-    limit: opts.limit,
-    filter,
+    limit: opts.limit ?? 5,
     with_payload: true,
+    ...(opts.siteId
+      ? {
+          filter: {
+            must: [{ key: "site_id", match: { value: opts.siteId } }],
+          },
+        }
+      : {}),
   });
 
   return results.map((r) => ({

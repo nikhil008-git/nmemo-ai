@@ -2,38 +2,45 @@
 
 ## Purpose
 
-Manage what the agent knows — sources, sync status, manual uploads.
+Manage context sources — connect, configure, and monitor the retrievers that feed `engine.getContext()`.
 
 ## Audience
 
-Site owner or content admin.
+Workspace owner or content admin.
 
 ## Sections (planned)
 
-### Sources
+### Connected sources
 
-- Website crawl (root URL, last sync, page count)
-- Uploaded files (PDF, MD)
-- Manual FAQ entries
+| Source type | Examples | Auth |
+|-------------|----------|------|
+| Memory | mem0 workspace | API key / workspace config |
+| Documents (RAG) | Qdrant index | index config |
+| Workspace | Notion, Google Drive | OAuth |
+| Communication | Slack, Email | OAuth |
+| Development | GitHub, Jira | OAuth |
+| Business | CRM, SQL | API keys / credentials |
+| External | MCP servers | server registration |
 
-### Sync
+### Sync status
 
-- Button: Re-ingest now
-- Schedule: daily / weekly
-- Progress indicator during ingest job
+- Last sync per connector
+- Per-source health (responding / timed out / auth expired)
+- Re-sync button per source
 
 ### Corpus health
 
 - Total chunks in Qdrant
+- Memory fact count in mem0
 - Stale sources warning
 - Link to gap report from analytics
 
-### Self-healing (future)
-
-- Pending suggested doc PRs from gap detection
-- Approve → merge → auto re-ingest
-
 ## Related backend
 
-- `packages/ingestion` CLI / job per `siteId`
-- One Qdrant collection (or filtered payload) per site
+- `packages/retrievers/*` — one package per source type
+- `packages/db` — per-workspace connector configs in Prisma
+- `apps/worker` — embedding jobs, connector syncs
+
+## Related spec
+
+- [docs/context-engine/PROJECT_SPEC.md](../../../../docs/context-engine/PROJECT_SPEC.md) — context sources table

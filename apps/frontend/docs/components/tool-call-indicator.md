@@ -2,7 +2,7 @@
 
 ## Role
 
-Make **actions visible** when the agent calls MCP tools (not silent backend magic).
+Surface **actions and diagnostics** when the agent uses external tools or when `getContext()` diagnostics reveal notable events (conflicts, source timeouts, discarded context).
 
 ## Location
 
@@ -10,28 +10,28 @@ Make **actions visible** when the agent calls MCP tools (not silent backend magi
 
 ## When shown
 
-After assistant message when router chose **tool** or **both** path.
+- External tool invocations triggered by the calling agent (post-context assembly)
+- Notable `diagnostics` events: source timeout, conflict detected, context discarded
 
 ## Examples
 
-| Tool | Card content |
-|------|----------------|
-| `create_lead` | “Lead created — #42” |
-| `create_ticket` | “Ticket #8821 opened” |
-| `lookup_order` | Order status summary |
-| `book_demo` | Confirmed time / calendar link |
+| Event | Card content |
+|-------|----------------|
+| Source timeout | "Slack retriever timed out — omitted from context" |
+| Conflict | "Conflict detected: memory vs CRM — resolved (most-recent wins)" |
+| MCP tool | "Called external tool — result summary" |
 
 ## Layout (planned)
 
-- Compact card with icon, tool name, status (pending / success / error)
-- Expandable JSON for power users (optional)
+- Compact card with icon, event type, status (success / warning / error)
+- Expandable detail for diagnostics (ranking scores, token allocation)
 - Error state: red border + retry suggestion
 
 ## Why it matters
 
-Differentiates nmemo from generic chatbots — user sees **something happened**, not just prose.
+Developers see **what the engine decided** — not just the final answer. Transparency is part of the API contract.
 
 ## Related
 
-- `apps/mcp-server` tool implementations
+- `packages/observability` — diagnostics object
 - [flows/visitor-chat.md](../flows/visitor-chat.md)

@@ -1,0 +1,57 @@
+---
+description: Context Engine — project context, goals, and non-negotiable design decisions
+alwaysApply: true
+---
+
+# Context Engine — Core Context
+
+This monorepo is building a **multi-source context orchestration engine** for AI agents. Developers call one function instead of writing custom glue code:
+
+```ts
+const context = await engine.getContext({ userId, workspaceId, query, conversationId, agent })
+```
+
+Voice/low-latency variant:
+
+```ts
+const context = await engine.getContextFast({ query, userId, workspaceId, conversationId })
+```
+
+## What it is
+
+A decision-making layer that answers "what should the model actually see?" — not another storage layer. It orchestrates retrieval, ranking, dedup, conflict resolution, compression, token budgeting, and prompt assembly across all context sources.
+
+**Long-term vision:** agents ask one system for the best context; Context Engine is the intelligence layer between data sources and language models.
+
+## Context sources (full set)
+
+Memory (mem0), documents/RAG (Qdrant + Voyage), workspace (Notion, Drive), communication (Slack, Email), development (GitHub, Jira), business (CRM, SQL), external tools (APIs, MCP), live voice/transcription (direct to prompt builder).
+
+## Pipeline (non-negotiable shape)
+
+Source Router → Retrievers (parallel, per-source timeouts) → Ranking → Dedup → Conflict Resolution → Compression → Token Budget → Prompt Builder → LLM → Memory Writer (async)
+
+Voice: live transcription bypasses router/rank/dedup; `getContextFast()` uses fast path (memory + cached context, sub-300ms).
+
+## API contract (from day one)
+
+Return shape must include: `prompt`, `memories`, `documents`, `sources`, `citations`, `tokenUsage`, `diagnostics`.
+
+`diagnostics` must expose: ranking scores, discarded context, conflicts, latency by source. Never omit it.
+
+## Design principles
+
+- **Source agnostic** — `Retriever` interface; new source = new package under `packages/retrievers/`
+- **Model agnostic** — OpenAI, Anthropic, Google, DeepSeek, local models
+- **Framework agnostic** — Vercel AI SDK, LangChain, Mastra, LlamaIndex, custom agents
+
+## Target repo layout
+
+```
+apps/dashboard, apps/api, apps/worker
+packages/core/{router,ranking,dedup,conflict-resolution,compression,budget,prompt-builder,memory-writer,query-planning,adaptive-retrieval}
+packages/retrievers/{retriever-interface,memory-retriever,rag-retriever,slack-retriever,notion-retriever,github-retriever,sql-retriever,crm-retriever,mcp-retriever,voice-stream-retriever}
+packages/{db,ai,sdk,observability,config}
+```
+
+Full spec: `docs/context-engine/PROJECT_SPEC.md`. Follow it strictly.

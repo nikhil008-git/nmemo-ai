@@ -1,6 +1,6 @@
 # nmemo Frontend Guide
 
-Markdown-only documentation for every screen, component, and user flow in `apps/frontend`. No implementation detail — product and UX reference for builders and designers.
+Markdown-only documentation for the **Context Engine dashboard** (`apps/dashboard` in target layout). Product and UX reference for builders and designers — connector setup, diagnostics viewer, API keys, chat demo.
 
 ## Start here
 
@@ -50,4 +50,4 @@ Markdown-only documentation for every screen, component, and user flow in `apps/
 ## Related
 
 - [design.md](../design.md) — technical design tokens and shadcn setup
-- [docs/knowledge-agent/](../../../docs/knowledge-agent/) — full product spec
+- [docs/context-engine/](../../../docs/context-engine/) — full product spec
