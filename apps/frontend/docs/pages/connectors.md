@@ -2,16 +2,14 @@
 
 ## Purpose
 
-Connect / disconnect context sources for the workspace.
+Always show Slack / GitHub / Notion / mem0 / Documents rows. Status loads via `/api/proxy` → API (session cookie forwarded).
 
-## Audience
+## For customers
 
-Logged-in workspace owners configuring retrieval sources.
+- **Connect with …** → OAuth (platform env must be set or they see “Unavailable”)
+- **mem0** → paste API key
+- **Documents** → Manage docs → `/sources`
 
-## Layout
+## Auth note
 
-Uniform rows for mem0, Qdrant, Slack, Notion, GitHub, MCP — status badge + Connect (demo) / Disconnect.
-
-## Today
-
-Local mock toggles only. No OAuth or credential storage.
+Browser must not call `:8080` directly for session routes; use Next proxy.

@@ -8,16 +8,35 @@ import { qdrant, COLLECTION, ensureCollection } from "./qdrant.js";
 import type { ChunkPayload } from "./types.js";
 
 export async function ingestPdf(
-  filePath: string,
+  input: string | Buffer,
   meta: { source: string; title: string; siteId?: string }
 ) {
   await ensureCollection();
 
-  const buffer = await fs.readFile(filePath);
-  const parsed = await pdf(buffer);
-  const chunks = chunkText(parsed.text);
+  const buffer = typeof input === "string" ? await fs.readFile(input) : input;
 
-  // Batch embed (example: all at once for small PDFs)
+  let parsed: { text: string };
+  try {
+    parsed = await pdf(buffer);
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : "parse error";
+    throw new Error(
+      `Could not parse PDF (${detail}). Try another PDF or re-export it.`,
+    );
+  }
+
+  const text = parsed.text?.trim() ?? "";
+  if (!text) {
+    throw new Error(
+      "PDF has no extractable text (it may be image-only / scanned).",
+    );
+  }
+
+  const chunks = chunkText(text);
+  if (!chunks.length) {
+    throw new Error("PDF produced no chunks after splitting.");
+  }
+
   const vectors = await embed(chunks, "document");
 
   const points = chunks.map((text, i) => ({

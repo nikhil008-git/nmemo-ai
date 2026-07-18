@@ -1,4 +1,4 @@
-import type { SourceStatus } from "@/lib/mocks";
+import type { SourceStatus } from "@/lib/types";
 
 type Props = {
   sources: SourceStatus[];

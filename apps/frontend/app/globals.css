@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #101010;
-  --foreground: #ffffff;
-  --muted-foreground: #a3a3a3;
-  --border: #262626;
-  --input: #1a1a1a;
-  --primary: #ffffff;
-  --primary-foreground: #101010;
+  --background: #ffffff;
+  --foreground: #000000;
+  --muted-foreground: #737373;
+  --border: #e5e5e5;
+  --input: #f5f5f5;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #ea580c;
+  --secondary-foreground: #ffffff;
+  --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
@@ -18,14 +22,36 @@
   --color-input: var(--input);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
-html,
+html {
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-hanken), sans-serif;
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.btn-cta-primary,
+.btn-cta-secondary,
+.btn-cta-outline {
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
 @keyframes hero-fade-up {
@@ -68,4 +94,101 @@ body {
   .agent-status {
     animation: none;
   }
+}
+
+
+.btn-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ff8c42 0%, #ea580c 100%);
+  padding: 0.4375rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+  transition: opacity 0.15s ease;
+}
+
+.btn-cta-primary:hover {
+  opacity: 0.92;
+}
+
+.btn-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  border-radius: 8px;
+  background: #1a1a1a;
+  padding: 0.4375rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transition: opacity 0.15s ease;
+}
+
+.btn-cta-secondary:hover {
+  opacity: 0.92;
+}
+
+.btn-cta-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  padding: 0.4375rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--foreground);
+  white-space: nowrap;
+  transition:
+    background-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.btn-cta-outline:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-cta-primary:disabled,
+.btn-cta-secondary:disabled,
+.btn-cta-outline:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.btn-cta-compact {
+  min-height: 2rem;
+  min-width: 9rem;
+  padding: 0.375rem 1.25rem;
+  font-size: 0.8125rem;
+}
+
+.cta-button-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+.cta-button-row .btn-cta-primary,
+.cta-button-row .btn-cta-secondary,
+.cta-button-row .btn-cta-outline {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }

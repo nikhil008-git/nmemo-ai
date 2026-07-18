@@ -3,12 +3,9 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-import {
-  createPendingDocument,
-  initialDocuments,
-  markDocumentReady,
-  type IngestedDocument,
-} from "@/lib/mocks";
+import { ingestPdfFile } from "@/lib/api";
+import { CtaButton } from "@/components/ui/cta-button";
+import type { IngestedDocument } from "@/lib/types";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleString(undefined, {
@@ -20,36 +17,82 @@ function formatTime(iso: string) {
 }
 
 export default function SourcesPage() {
-  const [docs, setDocs] = useState<IngestedDocument[]>(initialDocuments);
+  const [docs, setDocs] = useState<IngestedDocument[]>([]);
   const [dragging, setDragging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function ingestFiles(files: FileList | null) {
+  async function ingestFiles(files: FileList | null) {
     if (!files?.length) return;
-    const pending = Array.from(files).map((f) => createPendingDocument(f.name));
-    setDocs((prev) => [...pending, ...prev]);
+    setError(null);
 
-    for (const doc of pending) {
-      window.setTimeout(() => {
+    const pdfs = Array.from(files).filter(
+      (f) =>
+        f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"),
+    );
+    if (!pdfs.length) {
+      setError("Only PDF files are supported for now.");
+      return;
+    }
+
+    for (const file of pdfs) {
+      const id = `doc-${crypto.randomUUID().slice(0, 8)}`;
+      const pending: IngestedDocument = {
+        id,
+        title: file.name.replace(/\.pdf$/i, ""),
+        source: file.name,
+        chunkCount: 0,
+        status: "pending",
+        updatedAt: new Date().toISOString(),
+      };
+      setDocs((prev) => [pending, ...prev]);
+
+      try {
+        const result = await ingestPdfFile(file, { title: pending.title });
         setDocs((prev) =>
-          prev.map((d) => (d.id === doc.id ? markDocumentReady(d) : d)),
+          prev.map((d) =>
+            d.id === id
+              ? {
+                  ...d,
+                  title: result.title,
+                  source: result.source,
+                  chunkCount: result.chunkCount,
+                  status: "ready",
+                  updatedAt: new Date().toISOString(),
+                }
+              : d,
+          ),
         );
-      }, 1200 + Math.random() * 800);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Ingest failed";
+        setError(message);
+        setDocs((prev) =>
+          prev.map((d) =>
+            d.id === id
+              ? { ...d, status: "failed", updatedAt: new Date().toISOString() }
+              : d,
+          ),
+        );
+      }
     }
   }
 
   return (
-    <main className="space-y-10">
-      <header className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          Sources
-        </p>
-        <h1 className="text-2xl font-bold tracking-tight">Documents</h1>
-        <p className="text-sm font-light text-muted-foreground">
-          Upload docs to mock ingest. Wire to{" "}
-          <code className="text-foreground/80">POST /ingest</code> later.
+    <main className="space-y-6">
+      <header className="space-y-1">
+        <h1 className="text-lg font-semibold tracking-tight">Documents</h1>
+        <p className="text-sm font-medium text-muted-foreground">
+          Document RAG for this workspace. Used by the{" "}
+          <Link href="/playground" className="underline underline-offset-4">
+            Playground
+          </Link>{" "}
+          and SDK via{" "}
+          <code className="text-foreground/80">getContext()</code>.
         </p>
       </header>
+
+      {error && <p className="text-sm text-red-500 break-words">{error}</p>}
 
       <section
         onDragOver={(e) => {
@@ -60,29 +103,27 @@ export default function SourcesPage() {
         onDrop={(e) => {
           e.preventDefault();
           setDragging(false);
-          ingestFiles(e.dataTransfer.files);
+          void ingestFiles(e.dataTransfer.files);
         }}
         className={`flex flex-col items-start gap-3 border border-dashed px-4 py-8 transition-colors ${
           dragging ? "border-foreground/50 bg-foreground/5" : "border-border"
         }`}
       >
         <p className="text-sm text-muted-foreground">
-          Drop files here, or choose files to mock-ingest.
+          Drop PDF files here. Ingest requires a session cookie (sign in) and
+          API on :8080.
         </p>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-        >
-          Choose files
-        </button>
+        <CtaButton type="button" size="compact" onClick={() => inputRef.current?.click()}>
+          Choose PDFs
+        </CtaButton>
         <input
           ref={inputRef}
           type="file"
+          accept="application/pdf,.pdf"
           multiple
           className="hidden"
           onChange={(e) => {
-            ingestFiles(e.target.files);
+            void ingestFiles(e.target.files);
             e.target.value = "";
           }}
         />
@@ -93,17 +134,17 @@ export default function SourcesPage() {
           <h2 className="text-sm font-semibold tracking-wide">Ingested</h2>
           {docs.some((d) => d.status === "ready") && (
             <Link
-              href="/chat"
+              href="/playground"
               className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
-              Try chat →
+              Open Playground →
             </Link>
           )}
         </div>
 
         {docs.length === 0 ? (
           <p className="text-sm text-muted-foreground">
-            No documents yet. Upload something to get started, then open Chat.
+            No documents yet this session. Upload a PDF, then open Playground.
           </p>
         ) : (
           <div className="overflow-x-auto border border-border">

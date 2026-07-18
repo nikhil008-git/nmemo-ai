@@ -1,0 +1,27 @@
+{
+  "name": "@contextengine/rag-retriever",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "check-types": "tsc --noEmit"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@contextengine/retriever-interface": "*",
+    "@qdrant/js-client-rest": "^1.18.0",
+    "axios": "^1.18.1",
+    "pdf-parse": "^1.1.4"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/pdf-parse": "^1.1.5",
+    "typescript": "5.9.2"
+  }
+}

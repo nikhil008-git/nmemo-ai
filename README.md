@@ -3,14 +3,22 @@
 A multi-source context orchestration engine for AI agents. Every serious AI application eventually connects to multiple context sources — memory, documents, CRM, Slack, Notion, GitHub, SQL databases, APIs. This engine replaces custom glue code per product with one call:
 
 ```ts
-const context = await engine.getContext({ userId, workspaceId, query, conversationId, agent })
+import { createEngine } from "@contextengine/sdk"
+
+const engine = createEngine({
+  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
+  baseUrl: "http://localhost:8080",
+})
+
+const context = await engine.getContext({
+  query: "What is our refund policy?",
+  userId: "user_123",
+  workspaceId: "ws_123",
+})
+// context.prompt → feed your LLM
 ```
 
-The engine decides which sources to search, how to rank and dedupe results, how to resolve conflicts, how to fit everything into the context window, and returns a ready-to-use prompt with citations and diagnostics.
-
 **Philosophy:** existing tools answer "where is my data?" Context Engine answers "what should the model actually see?"
-
-**Long-term vision:** agents ask one system — "give me the best context for this task" — and the Context Engine becomes the intelligence layer between data sources and language models.
 
 ---
 
@@ -19,88 +27,31 @@ The engine decides which sources to search, how to rank and dedupe results, how 
 | Layer | Choice |
 |-------|--------|
 | Monorepo | Turborepo |
-| Frontend | Next.js |
-| Backend | Node/Express |
+| Frontend | Next.js (`apps/frontend`) |
+| Backend | Node/Express (`apps/api`) |
 | Vector store | Qdrant |
 | Embeddings | Voyage |
-| LLM | OpenAI (via Vercel AI SDK streaming) |
+| LLM | Groq (OpenAI-compatible) |
 | Structured data | Prisma + PostgreSQL |
-| Memory | mem0 |
-| RAG | Chunking, embedding, retrieval via Qdrant + Voyage — implemented |
+| Engine | `@contextengine/core` + `@contextengine/sdk` |
 
 ---
 
-## Context sources
-
-Memory, documents (RAG), workspace (Notion, Drive), communication (Slack, Email), development (GitHub, Jira), business (CRM, SQL), external tools (APIs, MCP), and live voice/transcription.
-
----
-
-## Architecture
-
-```
-User query → Source Router → Retrievers (parallel) → Ranking → Dedup
-  → Conflict Resolution → Compression → Token Budget → Prompt Builder → LLM
-  → Memory Writer (async)
-```
-
-Voice: `getContextFast()` for sub-300ms fast path; live transcription feeds prompt builder directly.
-
----
-
-## API contract
-
-```ts
-const context = await engine.getContext({
-  query, userId, workspaceId, conversationId, agent
-})
-
-// Returns: { prompt, memories, documents, sources, citations, tokenUsage, diagnostics }
-```
-
-```ts
-const context = await engine.getContextFast({ query, userId, workspaceId, conversationId })
-// Same shape — prefetched/cached memory + hot context only
-```
-
----
-
-## Target repo structure
-
-```
-├── apps/
-│   ├── dashboard/          # API keys, connectors, diagnostics viewer
-│   ├── api/                # getContext(), getContextFast(), auth, webhooks
-│   └── worker/             # embedding jobs, memory extraction, connector syncs
-├── packages/
-│   ├── core/               # router, ranking, dedup, conflict-resolution, compression,
-│   │                       # budget, prompt-builder, memory-writer, query-planning, adaptive-retrieval
-│   ├── retrievers/         # memory, rag, slack, notion, github, sql, crm, mcp, voice-stream
-│   ├── db/                 # Prisma — workspaces, API keys, connectors
-│   ├── ai/                 # Vercel AI SDK wrapper
-│   ├── sdk/                # @contextengine/sdk
-│   └── observability/      # diagnostics
-└── docs/context-engine/    # project documentation
-```
-
-**Current repo** (scaffold):
+## MVP status
 
 | Path | Status |
 |------|--------|
-| `apps/frontend` | Next.js — evolves into `apps/dashboard` |
-| `apps/api` | Express — add `getContext()` / `getContextFast()` |
-| `packages/database` | Prisma + Postgres — grows into `packages/db` |
-| RAG core | Implemented — wrap as `rag-retriever` |
-| `packages/core`, `packages/retrievers`, `packages/sdk` | Not started |
+| `apps/frontend` | Dashboard — ingest, chat, connectors, API keys |
+| `apps/api` | `POST /context`, `/context/fast`, `/ask`, `/ingest`, workspace routes |
+| `packages/retriever-interface` | Shared `Retriever` + contract types |
+| `packages/rag-retriever` | Qdrant + Voyage RAG |
+| `packages/core` | `getContext()` / `getContextFast()` (RAG path) |
+| `packages/sdk` | `createEngine().getContext()` HTTP client |
+| `packages/database` | Workspace, ApiKey, Connector models |
 
----
+**Live docs on site:** `/docs`, `/docs/sdk`, `/docs/connectors`, `/docs/api`
 
-## Documentation
-
-| File | Purpose |
-|------|---------|
-| [PROJECT_SPEC.md](./docs/context-engine/PROJECT_SPEC.md) | **Canonical full spec** — follow strictly |
-| [README.md](./docs/context-engine/README.md) | Doc index + repo mapping |
+**Deferred:** full ranking/dedup/conflict packages, worker, npm publish.
 
 ---
 
@@ -108,5 +59,37 @@ const context = await engine.getContextFast({ query, userId, workspaceId, conver
 
 ```bash
 npm install
-npm run dev    # starts apps/frontend (:3000) + apps/api (:8080)
+npm run dev    # frontend :3000 + api :8080
 ```
+
+1. Sign up at http://localhost:3000  
+2. Connectors → ensure Qdrant is connected  
+3. Sources → upload a PDF  
+4. Settings → create an API key  
+5. Chat — or call the SDK with that key  
+
+```bash
+# Example SDK usage (from any Node script in the monorepo)
+node --input-type=module -e "
+import { createEngine } from '@contextengine/sdk'
+const engine = createEngine({ apiKey: 'ce_live_...', baseUrl: 'http://localhost:8080' })
+console.log(await engine.getContext({ query: 'hello', userId: 'u1', workspaceId: 'ws1' }))
+"
+```
+
+API key auth scopes the workspace from the key; `workspaceId` in the body is optional when using a Bearer key.
+
+---
+
+## Documentation
+
+| File | Purpose |
+|------|---------|
+| **[DOCS_MAP.md](./docs/context-engine/DOCS_MAP.md)** | **Where every doc lives (start here)** |
+| [SDK.md](./docs/context-engine/SDK.md) | `@contextengine/sdk` guide |
+| [packages/sdk/README.md](./packages/sdk/README.md) | SDK package README |
+| [API.md](./docs/context-engine/API.md) | HTTP API reference |
+| [PROJECT_SPEC.md](./docs/context-engine/PROJECT_SPEC.md) | Canonical full product spec |
+| [docs/context-engine/README.md](./docs/context-engine/README.md) | Context Engine doc hub |
+| [apps/frontend/docs/README.md](./apps/frontend/docs/README.md) | Dashboard UI docs |
+| [apps/api/README.md](./apps/api/README.md) | API app README |

@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 
-import type { Diagnostics, TokenUsage } from "@/lib/mocks";
+import type { Diagnostics, TokenUsage } from "@/lib/types";
 
 type Props = {
   diagnostics: Diagnostics;
   tokenUsage?: TokenUsage;
 };
 
-export function DiagnosticsPanel({ diagnostics, tokenUsage }: Props) {
-  const [open, setOpen] = useState(false);
+export function DiagnosticsPanel({
+  diagnostics,
+  tokenUsage,
+  defaultOpen = false,
+}: Props & { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
     <div className="mt-3 border border-border">

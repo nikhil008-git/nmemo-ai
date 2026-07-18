@@ -1,30 +1,39 @@
 # Context Engine API
 
-Node/Express backend exposing the Context Engine to dashboard and SDK clients.
+Express backend for dashboard + `@contextengine/sdk`.
 
-## Endpoints (target)
+## Docs
+
+| Doc | Path |
+|-----|------|
+| HTTP reference | [docs/context-engine/API.md](../../docs/context-engine/API.md) |
+| SDK guide | [docs/context-engine/SDK.md](../../docs/context-engine/SDK.md) |
+| Docs map | [docs/context-engine/DOCS_MAP.md](../../docs/context-engine/DOCS_MAP.md) |
+| Spec | [docs/context-engine/PROJECT_SPEC.md](../../docs/context-engine/PROJECT_SPEC.md) |
+
+## Endpoints (live)
 
 | Endpoint | Purpose |
 |----------|---------|
-| `POST /context` | `engine.getContext()` — full multi-source fan-out |
-| `POST /context/fast` | `engine.getContextFast()` — voice/low-latency fast path |
-| `POST /chat` | Streaming LLM response (feeds `context.prompt` into Vercel AI SDK) |
-| Auth / webhooks | Workspace auth, connector OAuth callbacks |
+| `POST /context` | `engine.getContext()` |
+| `POST /context/fast` | `engine.getContextFast()` |
+| `POST /ask` | getContext + LLM (dashboard chat) |
+| `POST /ingest` | PDF → Qdrant |
+| `/workspaces/*` | workspace, connectors, API keys |
+| `GET /health` | health check |
 
-## Responsibilities
+## Run
 
-- `getContext()` and `getContextFast()` orchestration
-- Per-workspace connector config (from `packages/db`)
-- Session middleware
-- Async memory writer trigger post-response
+```bash
+# from repo root
+npm run dev
+# API → http://localhost:8080
+```
+
+Requires env: `DATABASE_URL`, `VOYAGE_API_KEY`, `GROQ_API_KEY`, `QDRANT_URL` (see root `.env.example`).
 
 ## Stack
 
-- Node/Express
-- Prisma (`packages/db`)
-- Vercel AI SDK (streaming)
-- Context Engine core + retrievers
-
-## Related
-
-- [docs/context-engine/PROJECT_SPEC.md](../../docs/context-engine/PROJECT_SPEC.md)
+- `@contextengine/core` — orchestration
+- `@contextengine/rag-retriever` — Qdrant + Voyage
+- `@repo/db` — Prisma workspaces / keys / connectors

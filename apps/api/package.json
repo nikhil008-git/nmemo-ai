@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run build -w @repo/db && tsc -b && node dist/index.js",
+    "dev": "npm run build -w @repo/db -w @contextengine/retriever-interface -w @contextengine/rag-retriever -w @contextengine/core && tsx watch --clear-screen=false src/index.ts",
     "build": "tsc -b"
   },
   "keywords": [],
@@ -13,21 +13,21 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@qdrant/js-client-rest": "^1.18.0",
+    "@contextengine/core": "*",
+    "@contextengine/rag-retriever": "*",
     "@repo/db": "*",
     "@types/express": "^5.0.6",
-    "axios": "^1.18.1",
     "better-auth": "^1.5.6",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "multer": "^2.2.0",
     "openai": "^6.45.0",
-    "pdf-parse": "^1.1.4",
-    "typescript": "^6.0.2",
-    "uuid": "^10.0.0"
+    "typescript": "^6.0.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
-    "@types/pdf-parse": "^1.1.5"
+    "@types/multer": "^2.2.0",
+    "tsx": "^4.23.1"
   }
 }

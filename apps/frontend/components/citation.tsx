@@ -1,4 +1,4 @@
-import type { Citation as CitationType } from "@/lib/mocks";
+import type { Citation as CitationType } from "@/lib/types";
 
 type Props = {
   citations: CitationType[];

@@ -2,50 +2,47 @@
 
 A multi-source context orchestration engine for AI agents. One call replaces custom glue code across memory, documents, CRM, Slack, Notion, GitHub, SQL, APIs, and more.
 
-**Start here:** [PROJECT_SPEC.md](./PROJECT_SPEC.md) — the canonical full project spec. Follow it strictly.
+---
 
-**Repo root:** [../../README.md](../../README.md) — pitch, quickstart, current vs target structure.
+## Where to go
+
+| Need | Open |
+|------|------|
+| **Doc index (everything)** | **[DOCS_MAP.md](./DOCS_MAP.md)** |
+| **SDK usage** | **[SDK.md](./SDK.md)** · package: [`packages/sdk/README.md`](../../packages/sdk/README.md) |
+| **HTTP API** | **[API.md](./API.md)** |
+| **Full product spec** | [PROJECT_SPEC.md](./PROJECT_SPEC.md) |
+| **Repo quickstart** | [../../README.md](../../README.md) |
+| **Dashboard UI docs** | [../../apps/frontend/docs/README.md](../../apps/frontend/docs/README.md) |
 
 ---
 
 ## What it does
 
-Developers call:
-
 ```ts
-const context = await engine.getContext({ userId, workspaceId, query, conversationId, agent })
+import { createEngine } from "@contextengine/sdk"
+
+const engine = createEngine({ apiKey: process.env.CONTEXT_ENGINE_API_KEY! })
+const context = await engine.getContext({
+  userId,
+  workspaceId,
+  query,
+  conversationId,
+  agent,
+})
 ```
 
-For voice/low-latency agents:
+Fast path:
 
 ```ts
 const context = await engine.getContextFast({ query, userId, workspaceId, conversationId })
 ```
 
-The engine decides which sources to search, how to rank and dedupe results, how to resolve conflicts, how to fit everything into the token budget, and returns a ready-to-use prompt with citations and diagnostics.
-
-**Philosophy:** vector DBs and memory systems answer "where is my data?" Context Engine answers "what should the model actually see?"
-
-**Long-term vision:** agents ask one system — "give me the best context for this task" — and the Context Engine becomes the intelligence layer between data sources and language models.
+**Philosophy:** vector DBs answer "where is my data?" Context Engine answers "what should the model actually see?"
 
 ---
 
-## Context sources
-
-| Category | Examples |
-|----------|----------|
-| Long-term memory | mem0, custom memory systems |
-| Documents (RAG) | Qdrant, Pinecone, pgvector, Weaviate |
-| Workspace | Notion, Confluence, Google Drive, SharePoint |
-| Communication | Slack, Teams, Email |
-| Development | GitHub, GitLab, Jira, Linear |
-| Business | HubSpot, Salesforce, Stripe, PostgreSQL, Snowflake |
-| External tools | REST APIs, GraphQL, MCP servers |
-| Live voice/transcription | streaming ASR — feeds prompt builder directly |
-
----
-
-## Pipeline
+## Pipeline (target)
 
 ```
 User query → Source Router → Retrievers (parallel) → Ranking → Dedup
@@ -53,34 +50,33 @@ User query → Source Router → Retrievers (parallel) → Ranking → Dedup
   → Memory Writer (async)
 ```
 
-Voice transcription bypasses router/rank/dedup and feeds the prompt builder directly. `getContextFast()` uses a fast path (memory + cached context only, sub-300ms).
-
-Full architecture: [PROJECT_SPEC.md](./PROJECT_SPEC.md#full-pipeline).
+MVP today: router → RAG retriever → prompt + diagnostics. Full modules: [PROJECT_SPEC.md](./PROJECT_SPEC.md).
 
 ---
 
-## Documentation
+## Documentation files in this folder
 
 | File | Purpose |
 |------|---------|
-| [PROJECT_SPEC.md](./PROJECT_SPEC.md) | **Canonical spec** — API contract, pipeline, modules, folder structure |
+| [DOCS_MAP.md](./DOCS_MAP.md) | **Map of all docs in the repo** |
+| [SDK.md](./SDK.md) | SDK guide |
+| [API.md](./API.md) | HTTP API reference |
+| [PROJECT_SPEC.md](./PROJECT_SPEC.md) | Canonical full spec |
+| [README.md](./README.md) | This hub |
 
 ---
 
 ## Current repo vs target
 
-This monorepo (`nmemo`) maps to the target `context-engine/` layout:
-
 | Target | Current | Notes |
 |--------|---------|-------|
-| `apps/dashboard` | `apps/frontend` | API keys, connectors, diagnostics viewer |
-| `apps/api` | `apps/api` | Express — `getContext()`, `getContextFast()`, auth |
-| `apps/worker` | — | Embedding jobs, memory extraction, connector syncs |
-| `packages/retrievers/rag-retriever` | existing RAG code | Wrap behind `Retriever` interface |
-| `packages/retrievers/memory-retriever` | mem0 integration | To build |
-| `packages/core/*` | — | Router, ranking, dedup, conflict-resolution, compression, budget, prompt-builder, memory-writer, query-planning, adaptive-retrieval |
-| `packages/sdk` | — | Published `@contextengine/sdk` |
-| `packages/db` | `packages/database` | Extend Prisma for workspaces, API keys, connectors |
+| `apps/dashboard` | `apps/frontend` | API keys, connectors, chat, sources — live |
+| `apps/api` | `apps/api` | `POST /context`, `/ask`, `/ingest`, workspace routes |
+| `apps/worker` | — | Not started |
+| `packages/sdk` | `packages/sdk` | `@contextengine/sdk` — live (workspace) |
+| `packages/core` | `packages/core` | MVP `getContext` |
+| `packages/rag-retriever` | `packages/rag-retriever` | Live |
+| `packages/db` | `packages/database` | Workspace, ApiKey, Connector |
 
 ---
 
