@@ -2,39 +2,20 @@
 
 ## Stack
 
-- **better-auth** on Next.js (`app/api/auth/[...all]/route.ts`)
-- **Prisma** via `@repo/db` for users and sessions
-- Client hooks in `lib/auth-client.ts`
+better-auth — Next.js route at `/api/auth/*`, API session middleware on `apps/api`.
 
-## Routes
+## Actors
 
-| Route | Purpose |
-|-------|---------|
-| `/sign-up` | Create account |
-| `/sign-in` | Login |
-| `/dashboard` | Protected; redirects if no session |
+- **Workspace owner / developer** — signs in to dashboard
+- **SDK clients** — use API keys (not browser session)
 
-## Session lifecycle
+## Flow
 
-1. User submits sign-in or sign-up form
-2. Client calls better-auth (`signIn.email` / `signUp.email`)
-3. Session cookie set
-4. Protected pages use `useSession()` — redirect to `/sign-in` if missing
-5. Sign out clears session
+1. User lands on `/sign-in` or `/sign-up`
+2. better-auth creates session cookie
+3. Protected routes under `(app)/*` require session
+4. API protected routes use `requireSession` (or API key for SDK)
 
-## API auth (separate)
+## Out of scope (old product)
 
-- `apps/api` has its own session middleware for `/protected`
-- Future: dashboard chat calls API with same session or API key
-
-## Future
-
-- Team invites / roles per site
-- OAuth (Google)
-- Widget uses **public site key**, not user session — visitors are anonymous `visitorId`
-
-## Related pages
-
-- [sign-in.md](../pages/sign-in.md)
-- [sign-up.md](../pages/sign-up.md)
-- [dashboard.md](../pages/dashboard.md)
+No anonymous visitor widget or public site key — Context Engine is developer infrastructure.

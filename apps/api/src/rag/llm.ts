@@ -3,7 +3,11 @@
 import OpenAI from "openai";
 import { search, type SearchHit } from "./search.js";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// Groq is OpenAI-compatible (free tier). Get a key: https://console.groq.com
+const openai = new OpenAI({
+  apiKey: process.env.GROQ_API_KEY,
+  baseURL: "https://api.groq.com/openai/v1",
+});
 
 // whats the type of the source_url? or docs
 export type Citation = {
@@ -49,7 +53,7 @@ function hitsToCitations(hits: SearchHit[]): Citation[] {
   .join("\n\n"); // array in single string
 
   const completion = await openai.chat.completions.create({
-    model : "gpt-4o-mini",
+    model: "llama-3.3-70b-versatile",
     messages : [
         {
             role: "system",

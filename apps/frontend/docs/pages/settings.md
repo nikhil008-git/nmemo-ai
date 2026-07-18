@@ -1,4 +1,4 @@
-# Settings (`/settings`) — planned
+# Settings (`/settings`)
 
 ## Purpose
 
@@ -8,39 +8,28 @@ Workspace-level configuration for Context Engine integrations.
 
 Authenticated workspace owners and developers.
 
-## Sections (planned)
+## Sections
 
 ### Profile
 
-- Name, email, avatar
-- Change password
-
-### Workspace / billing
-
-- Plan tier
-- Usage metering (getContext calls, token usage)
-- Payment method
+- Name, email from session (read-only)
 
 ### API keys
 
-- Create / revoke keys for `@contextengine/sdk` integrations
-- Per-workspace scoping
+- Create / revoke keys against mock state (`lib/mocks/usage.ts`)
 
-### Connector credentials
+### Usage
 
-- Link to connector setup (mem0, Qdrant, OAuth sources, MCP servers)
-- Per-workspace connector config stored in `packages/db`
+- Context calls and token breakdown (mock)
 
-### Notifications
+### Connectors
 
-- Weekly context quality report
-- Alert when sources fail or auth expires
+- Link to `/connectors`
 
 ### Danger zone
 
-- Delete workspace
-- Export conversation and diagnostics data
+- Delete workspace disabled (demo)
 
-## Related spec
+## Today
 
-- [docs/context-engine/PROJECT_SPEC.md](../../../../docs/context-engine/PROJECT_SPEC.md) — developer integration steps
+Live UI with mocks. No Prisma API keys, billing, or password change yet.

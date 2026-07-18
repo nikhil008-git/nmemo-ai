@@ -39,13 +39,13 @@ export default function LandingPage() {
                 href="/sign-up"
                 className="rounded-md bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
               >
-                Get startedf  
+                Get started
               </Link>
               <Link
-                href="#demo"
+                href="#product"
                 className="rounded-md border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-foreground/40 hover:bg-foreground/5"
               >
-                Book a demo
+                See product
               </Link>
             </div>
           </div>

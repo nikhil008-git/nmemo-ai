@@ -2,30 +2,33 @@
 
 ## Role
 
-Global navigation shell on every page. Combines branding, breadcrumb trail, and primary nav in **one horizontal line**.
+Global navigation shell on every page. Session-aware: marketing links when logged out, app links when logged in.
 
 ## Structure
 
+**Logged out**
+
 ```
-nmemo / [🏠] / Sign In / Sign Up / Dashboard
+nmemo ai | Product Docs Pricing | Log in · Get started
 ```
 
-- **nmemo** — wordmark; links to `/` except on home (shown as current)
-- **Home icon** — shown on non-home routes; links to `/`
-- **Nav items** — Sign In, Sign Up, Dashboard; active route is bold black, others are muted links
+**Logged in**
+
+```
+nmemo ai | Dashboard Chat Sources Settings
+```
 
 ## Behavior
 
-- Fixed to top of viewport (`z-50`)
-- Max width centered with horizontal padding
-- Uses shadcn `Breadcrumb` components internally
+- Fixed to top of viewport (`z-50`), bottom border, backdrop blur
+- Max width centered (`max-w-5xl`) with horizontal padding
+- Active app route highlighted via `usePathname`
+- Logo links to `/` when logged out, `/dashboard` when logged in
 
 ## When to change
 
-- Add new top-level routes → extend `navItems` in implementation (document new link here)
-- Logged-in state: future version may hide Sign In/Up and show avatar menu
+- Add new top-level app routes → extend `appNav` in `components/site-header.tsx`
 
 ## Related
 
-- [breadcrumb.md](./breadcrumb.md)
 - [flows/navigation.md](../flows/navigation.md)

@@ -1,43 +1,17 @@
-# Navigation flow
+# Navigation & header
 
-## Global header
+## Logged out
 
-Present on all pages via root layout. Single-line breadcrumb nav:
+Logo / Product / Docs / Pricing / Log in / Get started
 
-```
-nmemo / [home icon on inner pages] / Sign In / Sign Up / Dashboard
-```
+## Logged in
 
-## Active state
+Logo / Dashboard / Chat / Sources / Settings
 
-- Current route rendered as `BreadcrumbPage` (bold, not a link)
-- Other items are muted links with hover darken
+Connectors is reached from the dashboard hub or Settings — not in the top nav (per BUILD_UI).
 
-## User journeys
+## Notes
 
-### Anonymous visitor
-
-```
-/ → sign-in or sign-up via header → /dashboard
-```
-
-### Returning user
-
-```
-Any page → Dashboard (header) if session valid
-/dashboard → Sign out → session cleared → /sign-in if tries dashboard again
-```
-
-### Future owner journey
-
-```
-/dashboard or /sites → site detail → conversations | analytics | embed
-```
-
-## No sidebar yet
-
-All navigation is header + in-page links. Add sidebar when `/sites/*` section ships.
-
-## Related
-
-- [site-header.md](../components/site-header.md)
+- Header is session-aware (`useSession`)
+- Middleware redirects unauthenticated users away from protected routes
+- All navigation is header + in-page links. Add a sidebar later if the dashboard grows.

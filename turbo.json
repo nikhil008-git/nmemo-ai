@@ -5,6 +5,7 @@
     "DATABASE_URL",
     "QDRANT_URL",
     "VOYAGE_API_KEY",
+    "GROQ_API_KEY",
     "OPENAI_API_KEY"
   ],
   "tasks": {

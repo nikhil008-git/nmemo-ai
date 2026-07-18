@@ -2,42 +2,19 @@
 
 ## Purpose
 
-**Today:** Authenticated landing after login — confirms session and shows user name/email.
-
-**End-state:** Hub for site owners — sites list, quick stats, links to conversations and embed setup.
+Workspace home for Context Engine — quick stats, recent context calls, entry points to chat demo, sources, and connectors.
 
 ## Audience
 
-Logged-in site owners only.
+Logged-in workspace owners and developers.
 
-## Access control
+## Layout
 
-- Unauthenticated → redirect to `/sign-in`
-- Loading state: “Loading…” then “Redirecting…” if no session
+- Usage summary (`getContext` calls, token usage, connected sources) from `lib/mocks/dashboard.ts`
+- Recent context calls list
+- Links: Chat, Sources, Connectors, Settings
+- Sign out
 
-## Layout (today)
+## Today
 
-- **Header:** breadcrumb with **Dashboard** current
-- **Body:** Centered welcome
-  - Eyebrow: “Dashboard”
-  - Welcome line with user name
-  - Email in muted text
-  - Sign Out button (primary style)
-
-## End-state sections (planned)
-
-| Section | Description |
-|---------|-------------|
-| Sites overview | Cards per connected website |
-| Quick stats | Conversations today, leads, unanswered gaps |
-| Recent activity | Last 5 chats across sites |
-| CTA | Add site / copy embed |
-
-## Navigation out
-
-- Header links to other public routes
-- Future sidebar: Sites, Analytics, Settings
-
-## Future routes
-
-Dashboard may become `/sites` as primary home; `/dashboard` redirects or becomes overview widget.
+Live hub with mock stats. Not yet wired to API metering.
