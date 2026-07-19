@@ -18,4 +18,15 @@ export const auth = betterAuth({
     process.env.BETTER_AUTH_URL || "http://localhost:3000",
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080",
   ],
+  // Default /sign-in* rule is 3/10s — too tight while debugging OAuth.
+  rateLimit: {
+    window: 60,
+    max: 100,
+    customRules: {
+      "/sign-in/social": {
+        window: 60,
+        max: 20,
+      },
+    },
+  },
 });
