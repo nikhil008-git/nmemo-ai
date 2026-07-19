@@ -68,7 +68,7 @@ export function AppShellSkeleton() {
   );
 }
 
-/** Sign-in / sign-up form placeholder. */
+/** Sign-in form placeholder. */
 export function AuthFormSkeleton({ className }: { className?: string }) {
   return (
     <div

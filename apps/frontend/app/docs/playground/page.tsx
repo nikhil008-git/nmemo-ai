@@ -22,7 +22,7 @@ export default function DocsPlaygroundPage() {
       subtitle="A live view of what getContext() returns, prompt, sources, and citations, before you wire the SDK into your product."
     >
       <DocCtas
-        primary={{ href: "/sign-up", label: "Try it" }}
+        primary={{ href: "/sign-in", label: "Try it" }}
         secondary={{ href: "/docs/sdk", label: "Ship with the SDK" }}
       />
 

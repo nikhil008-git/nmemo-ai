@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
@@ -15,9 +16,9 @@ const siteUrl = (
   "https://nmemo.cloud"
 ).replace(/\/$/, "");
 
-const title = "nmemo · Context Engine";
+const title = "nmemo · Context Decision Layer";
 const description =
-  "The context layer agent frameworks don't give you. Ranked context from every source — ready in one call. Works with your stack: AI SDK, LangChain, or plain messages.";
+  "The context decision layer for AI agents. Route, rank, and budget what the model sees — from every source, in one call. Works with AI SDK, LangChain, or plain messages.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -28,6 +29,7 @@ export const metadata: Metadata = {
   description,
   applicationName: "nmemo",
   keywords: [
+    "context decision layer",
     "context engine",
     "context orchestration",
     "AI agents",
@@ -96,6 +98,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        <NavigationProgress />
         <SiteHeader />
         {children}
       </body>

@@ -28,7 +28,7 @@ export default function DocsHomePage() {
         <DocLinkList
           items={[
             {
-              href: "/sign-up",
+              href: "/sign-in",
               title: "Create a workspace",
               body: "Book a demo or sign up, then connect the tools your team already uses.",
               step: "01",

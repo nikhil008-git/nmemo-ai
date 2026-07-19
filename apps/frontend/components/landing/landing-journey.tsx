@@ -21,7 +21,7 @@ const sections = [
   {
     n: "01",
     title: "Start from one workspace",
-    body: "See what’s connected, then orchestrate context for every agent from the same shell.",
+    body: "See what’s connected, then decide context for every agent from the same shell.",
     group: "Inside Home",
     features: [
       "Sources connected",
@@ -35,7 +35,7 @@ const sections = [
   {
     n: "02",
     title: "Connect the multi-source stack",
-    body: "Bring every source into one workspace. Connect once; nmemo orchestrates the rest.",
+    body: "Bring every source into one workspace. Connect once; nmemo decides the rest.",
     group: "Inside Connectors",
     features: [
       "Workspace sources",
@@ -49,7 +49,7 @@ const sections = [
   {
     n: "03",
     title: "Ask for the context agents need",
-    body: "Playground shows multi-source retrieval live. Ranked prompt and citations in the stream.",
+    body: "Playground shows decisions live — ranked prompt, citations, and what got used.",
     group: "Inside Playground",
     features: [
       "Ask across sources",

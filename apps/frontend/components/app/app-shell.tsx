@@ -10,12 +10,16 @@ import {
   Inbox,
   Languages,
   Mic,
-  Search,
   Settings,
   Star,
 } from "lucide-react";
 
 import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
+import {
+  CommandSearch,
+  SearchTrigger,
+  type CommandItem,
+} from "@/components/app/command-search";
 import { RoadmapSidebar } from "@/components/app/roadmap-sidebar";
 import { AppShellSkeleton } from "@/components/ui/loading-states";
 import { getConnectors, type Connector } from "@/lib/api";
@@ -88,6 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = useSession();
   const [connectors, setConnectors] = useState<Connector[]>([]);
   const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
   const [soonPop, setSoonPop] = useState<string | null>(null);
 
   useEffect(() => {
@@ -121,6 +126,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ? sourceCatalog.filter((item) => item.name.toLowerCase().includes(q))
         : sourceCatalog,
     [q],
+  );
+
+  const commandItems = useMemo<CommandItem[]>(
+    () => [
+      ...tabs.map((t) => ({
+        id: `page-${t.href}`,
+        label: t.label,
+        hint: t.href,
+        href: t.href,
+        group: "Pages" as const,
+      })),
+      ...sourceCatalog.map((s) => ({
+        id: `source-${s.type}`,
+        label: s.name,
+        hint: "soon" in s && s.soon ? "Soon" : s.type,
+        href: s.href,
+        group: "Sources" as const,
+      })),
+    ],
+    [],
   );
 
   if (isPending || !session?.user) {
@@ -340,16 +365,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </div>
 
-          <label className="flex items-center gap-1.5 rounded-sm border border-border bg-neutral-50 px-2 py-1">
-            <Search size={12} className="text-neutral-500" />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filter sources"
-              className="w-28 bg-transparent text-[11px] font-semibold outline-none placeholder:text-neutral-400"
-            />
-          </label>
+          <SearchTrigger onClick={() => setSearchOpen(true)} />
         </div>
 
         <div
@@ -364,6 +380,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       </div>
+
+      <CommandSearch
+        open={searchOpen}
+        onOpenChange={setSearchOpen}
+        items={commandItems}
+        onQueryChange={setQuery}
+      />
 
       {soonPop ? (
         <div

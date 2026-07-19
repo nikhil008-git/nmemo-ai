@@ -22,8 +22,8 @@ export function LandingFooter() {
             <span>nmemo</span>
           </Link>
           <p className="text-sm font-medium leading-relaxed text-muted-foreground">
-            The context layer agent frameworks don&apos;t give you. Context your
-            agents actually need.
+            The context decision layer for AI agents. Context your agents
+            actually need.
           </p>
         </div>
 

@@ -24,8 +24,8 @@ export function LandingCta() {
           </span>
         </h2>
         <p className="mt-4 max-w-md text-sm font-semibold leading-relaxed text-neutral-500">
-          Docs, agents, voice, and real-time — one API that ranks and budgets
-          context the same way in every surface.
+          Docs, agents, voice, and real-time — the same context decisions,
+          everywhere you ship.
         </p>
       </div>
 
@@ -51,15 +51,15 @@ export function LandingCta() {
           </p>
 
           <h3 className="mt-5 max-w-xl text-[1.85rem] font-semibold tracking-[-0.03em] leading-[1.15] text-neutral-950 sm:text-3xl md:text-[2.5rem]">
-            Orchestrate context across every source
+            Decide context for every agent
           </h3>
 
           <Link
-            href="/sign-up"
+            href="/sign-in"
             className="mt-8 inline-flex items-center gap-1.5 rounded-sm bg-white px-4 py-2.5 text-sm font-semibold text-neutral-900 shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
           >
-            <ArrowUpRight size={15} strokeWidth={2} />  
-            Book demo
+            <ArrowUpRight size={15} strokeWidth={2} />
+            Get started
           </Link>
         </div>
       </section>

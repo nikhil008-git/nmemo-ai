@@ -186,20 +186,20 @@ function DeliverDemo({ active }: { active: boolean }) {
 const steps = [
   {
     n: "01",
-    title: "Orchestrate every source",
-    body: "Every connected source searched in parallel, with latency and hits as they return.",
+    title: "Fan out the ask",
+    body: "Hit memory, docs, Slack, GitHub, and more in parallel — each source timed as it returns.",
     Demo: RetrieveDemo,
   },
   {
     n: "02",
-    title: "Decide what the agent sees",
-    body: "Ranking, dedup, and token budget keep only the context that should reach the model.",
+    title: "Score, cut, fit",
+    body: "Rank by relevance, drop duplicates, and trim to budget so only winning context survives.",
     Demo: RankDemo,
   },
   {
     n: "03",
-    title: "Deliver one ready prompt",
-    body: "One call returns the prompt, citations, and diagnostics your agent can use immediately.",
+    title: "Hand off a packed prompt",
+    body: "Your agent gets the ready prompt, citations, and diagnostics — drop it into any stack.",
     Demo: DeliverDemo,
   },
 ] as const;
@@ -219,7 +219,7 @@ export function LandingHow() {
       <div className="max-w-2xl space-y-1.5">
         <p className="text-[13px] font-medium text-neutral-500">How it works</p>
         <p className="text-sm font-semibold text-neutral-500">
-          Retrieve, rank, and deliver context in one call.
+          Three moves between your sources and the model.
         </p>
       </div>
 

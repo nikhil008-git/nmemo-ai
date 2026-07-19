@@ -83,7 +83,7 @@ export default function DocsSdkPage() {
       subtitle="nmemo decides what the agent should know for this turn. You pass that context into whatever agent or model you already run."
     >
       <DocCtas
-        primary={{ href: "/sign-up", label: "Get an API key" }}
+        primary={{ href: "/sign-in", label: "Get an API key" }}
         secondary={{ href: "/docs/playground", label: "Try playground" }}
       />
 

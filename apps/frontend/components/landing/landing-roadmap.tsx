@@ -233,14 +233,14 @@ export function LandingRoadmap() {
       <div className="max-w-2xl space-y-3">
         <p className="text-[13px] font-medium text-neutral-500">Coming soon</p>
         <h2 className="text-[1.65rem] font-semibold tracking-[-0.03em] leading-[1.15] text-neutral-950 sm:text-[1.85rem]">
-          Broader orchestration.
+          Deeper decisions.
           <span className="mt-1.5 block font-semibold text-neutral-400">
             Same one call.
           </span>
         </h2>
         <p className="text-sm font-semibold leading-relaxed text-neutral-500">
-          Voice, real-time, and deeper orchestration paths, still one call for
-          the context your agents actually need.
+          Voice, real-time, and sharper ranking — still one call for the
+          context your agents actually need.
         </p>
       </div>
 

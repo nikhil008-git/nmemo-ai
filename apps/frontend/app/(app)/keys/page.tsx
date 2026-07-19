@@ -46,7 +46,7 @@ const context = await engine.getContext({
 // Give context.prompt to your agent
 `;
 
-export default function KeysPage() {
+export function KeysView() {
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
@@ -241,4 +241,8 @@ export default function KeysPage() {
       </section>
     </main>
   );
+}
+
+export default function KeysPage() {
+  return <KeysView />;
 }

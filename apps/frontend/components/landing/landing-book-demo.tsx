@@ -16,8 +16,8 @@ export function LandingBookDemo() {
         </p>
         <div className="mx-auto max-w-sm pt-1">
           <CtaButtonRow>
-            <CtaButton href="/sign-up" variant="primary">
-              Book demo
+            <CtaButton href="/sign-in" variant="primary">
+              Get started
             </CtaButton>
             <CtaButton href="/docs/sdk" variant="secondary">
               SDK

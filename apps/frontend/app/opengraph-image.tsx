@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const alt =
-  "nmemo · Ranked context from every source — one call, no glue.";
+  "nmemo · The context decision layer for AI agents.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -103,7 +103,7 @@ export default function OpenGraphImage() {
               lineHeight: 1.35,
             }}
           >
-            Ranked context from every source — one call, no glue.
+            The context decision layer for AI agents.
           </div>
         </div>
       </div>

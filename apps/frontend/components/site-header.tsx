@@ -102,21 +102,13 @@ export function SiteHeader() {
                 Open app
               </CtaButton>
             ) : (
-              <>
-                <Link
-                  href="/sign-in"
-                  className="text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  Log in
-                </Link>
-                <CtaButton
-                  href="/sign-up"
-                  size="compact"
-                  className="!min-w-0 px-3 sm:!min-w-36 sm:px-5"
-                >
-                  Book demo
-                </CtaButton>
-              </>
+              <CtaButton
+                href="/sign-in"
+                size="compact"
+                className="!min-w-0 px-3 sm:!min-w-36 sm:px-5"
+              >
+                Sign in
+              </CtaButton>
             )}
           </div>
         </div>

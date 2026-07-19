@@ -51,13 +51,6 @@ const sources = [
   { name: "Memory", tone: "bg-lime-400", count: "3" },
 ] as const;
 
-const chips = [
-  { label: "Documents", icon: FileText },
-  { label: "Slack", icon: MessageSquare },
-  { label: "Notion", icon: NotebookPen },
-  { label: "GitHub", icon: GitBranch },
-] as const;
-
 function useFrameScale(baseWidth: number) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
@@ -78,67 +71,103 @@ function useFrameScale(baseWidth: number) {
   return { ref, scale };
 }
 
-function HomeDemo() {
-  const steps = [
-    {
-      label: "Connect your sources",
-      description: "Bring every source your agents need into one place.",
-    },
-    {
-      label: "Add workspace knowledge",
-      description: "Give your agents the docs and knowledge they should reason over.",
-    },
-    {
-      label: "See context in action",
-      description: "Ask a question and see which context gets used.",
-    },
-    {
-      label: "Ship it to your agents",
-      description: "Use the same context in whatever agents you already run.",
-    },
-  ] as const;
+const homeSteps = [
+  {
+    label: "Connect your sources",
+    description:
+      "Bring Slack, Notion, GitHub, memory, and more into one place.",
+    tab: "Connectors" as const,
+    rail: 2,
+  },
+  {
+    label: "Add workspace knowledge",
+    description:
+      "Give your agents the docs and knowledge they should reason over.",
+    tab: "Sources" as const,
+    rail: 3,
+  },
+  {
+    label: "See context in action",
+    description: "Ask a question and see which context gets used.",
+    tab: "Playground" as const,
+    rail: 1,
+  },
+  {
+    label: "Ship it to your agents",
+    description: "Use the same context in whatever agents you already run.",
+    tab: "Playground" as const,
+    rail: 1,
+  },
+] as const;
 
+export function HomeDemo({
+  onTab = () => {},
+  onRail = () => {},
+}: {
+  onTab?: (t: DemoTab) => void;
+  onRail?: (i: number) => void;
+}) {
   return (
-    <div className="mx-auto flex h-full max-w-md flex-col justify-center gap-5 py-4">
-      <div className="space-y-2 text-center">
-        <h2 className="font-heading text-[1.65rem] font-semibold tracking-[-0.03em] leading-[1.15]">
+    <div className="mx-auto flex h-full max-w-md flex-col justify-center gap-6 py-6">
+      <div className="space-y-3 text-center">
+        <h2 className="font-heading text-[1.75rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-3xl">
           Hey, Nikhil Rajpurohit
         </h2>
         <p className="text-sm font-semibold leading-relaxed text-neutral-500">
-          Ranked context from every source — one call, no glue.
+          Orchestrate the right context for your agents, across every source.
         </p>
-        <p className="text-sm font-semibold text-neutral-500">
+        <p className="text-sm font-semibold leading-relaxed text-neutral-500">
           <span className="text-foreground">2</span> sources connected · qdrant,
           groq
         </p>
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <span className="inline-flex flex-1 items-center justify-center rounded-sm bg-secondary px-4 py-2.5 text-sm font-bold text-white">
+        <button
+          type="button"
+          onClick={() => {
+            onRail(1);
+            onTab("Playground");
+          }}
+          className="inline-flex flex-1 items-center justify-center rounded-sm bg-secondary px-4 py-2.5 text-sm font-bold text-white"
+        >
           See it work
-        </span>
-        <span className="inline-flex flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-semibold">
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            onRail(2);
+            onTab("Connectors");
+          }}
+          className="inline-flex flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-semibold"
+        >
           Connect sources
-        </span>
+        </button>
       </div>
 
       <ul className="space-y-1.5 text-left">
-        {steps.map((step, i) => (
-          <li
-            key={step.label}
-            className="flex gap-3 rounded-sm border border-border px-3 py-2.5"
-          >
-            <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
-              {i + 1}
-            </span>
-            <span className="min-w-0">
-              <span className="font-heading block text-sm font-semibold tracking-[-0.02em]">
-                {step.label}
+        {homeSteps.map((step, i) => (
+          <li key={step.label}>
+            <button
+              type="button"
+              onClick={() => {
+                onRail(step.rail);
+                onTab(step.tab);
+              }}
+              className="flex w-full gap-3 rounded-sm border border-border px-3 py-2.5 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+            >
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
+                {i + 1}
               </span>
-              <span className="mt-0.5 block text-xs font-semibold leading-relaxed text-neutral-500">
-                {step.description}
+              <span className="min-w-0">
+                <span className="font-heading block text-sm font-semibold tracking-[-0.02em]">
+                  {step.label}
+                </span>
+                <span className="mt-0.5 block text-xs font-semibold leading-relaxed text-neutral-500">
+                  {step.description}
+                </span>
               </span>
-            </span>
+            </button>
           </li>
         ))}
       </ul>
@@ -153,40 +182,284 @@ function HomeDemo() {
   );
 }
 
-function PlaygroundDemo() {
-  return (
-    <div className="flex h-full min-h-0 flex-col items-center justify-center px-6 py-8">
-      <div className="flex w-full max-w-2xl flex-col items-center">
-        <h2 className="text-center font-heading text-[1.85rem] font-semibold tracking-[-0.035em] leading-[1.15] text-neutral-950 sm:text-[2.2rem]">
-          Ask across your sources
-        </h2>
+const askFlows = [
+  {
+    label: "Documents",
+    icon: FileText,
+    q: "What’s in our documents?",
+    a: "Monthly billing stays. Grace period is 14 days — from billing-faq.pdf and #finance.",
+    citation: "billing-faq.pdf",
+    sources: [
+      { name: "Documents", latencyMs: 42 },
+      { name: "Slack", latencyMs: 110 },
+      { name: "Notion", latencyMs: 95 },
+      { name: "GitHub", latencyMs: 128 },
+    ],
+    scores: [
+      { id: "doc:billing-faq", score: 0.92, reason: "semantic match" },
+      { id: "slack:#finance", score: 0.81, reason: "recent + keyword" },
+    ],
+  },
+  {
+    label: "Slack",
+    icon: MessageSquare,
+    q: "What came up in Slack?",
+    a: "Finance locked monthly billing and a 14-day grace period in #finance yesterday.",
+    citation: "#finance",
+    sources: [
+      { name: "Documents", latencyMs: 38 },
+      { name: "Slack", latencyMs: 96 },
+      { name: "Notion", latencyMs: 102 },
+      { name: "GitHub", latencyMs: 140 },
+    ],
+    scores: [
+      { id: "slack:#finance", score: 0.94, reason: "thread match" },
+      { id: "doc:billing-faq", score: 0.71, reason: "related doc" },
+    ],
+  },
+  {
+    label: "Notion",
+    icon: NotebookPen,
+    q: "Summarize our Notion notes",
+    a: "Refund policy: full refund within 30 days. Linked from the customer handbook.",
+    citation: "Refund policy",
+    sources: [
+      { name: "Documents", latencyMs: 51 },
+      { name: "Slack", latencyMs: 120 },
+      { name: "Notion", latencyMs: 78 },
+      { name: "GitHub", latencyMs: 132 },
+    ],
+    scores: [
+      { id: "notion:refund", score: 0.88, reason: "title overlap" },
+      { id: "doc:handbook", score: 0.76, reason: "linked page" },
+    ],
+  },
+  {
+    label: "GitHub",
+    icon: GitBranch,
+    q: "What’s open on GitHub?",
+    a: "Two open PRs touch billing: grace-period copy and invoice webhook retries.",
+    citation: "PR #842",
+    sources: [
+      { name: "Documents", latencyMs: 44 },
+      { name: "Slack", latencyMs: 115 },
+      { name: "Notion", latencyMs: 98 },
+      { name: "GitHub", latencyMs: 86 },
+    ],
+    scores: [
+      { id: "github:pr-842", score: 0.91, reason: "issue match" },
+      { id: "github:pr-819", score: 0.79, reason: "related PR" },
+    ],
+  },
+] as const;
 
-        <div className="relative mt-7 w-full rounded-[1.75rem] border border-black/[0.06] bg-[#f3f1ee] px-5 pb-4 pt-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
-          <p className="min-h-[7rem] text-[15px] font-medium leading-relaxed text-neutral-400">
-            Ask anything across connected sources…
-          </p>
-          <div className="flex items-end justify-end">
-            <span className="inline-flex size-9 items-center justify-center rounded-full bg-neutral-200/80 text-neutral-500">
-              <ArrowRight size={16} strokeWidth={2} />
-            </span>
+export function PlaygroundDemo({
+  onTab = () => {},
+  preferContext = false,
+}: {
+  onTab?: (t: DemoTab) => void;
+  preferContext?: boolean;
+}) {
+  const [active, setActive] = useState(0);
+  const [phase, setPhase] = useState<"idle" | "gathering" | "done">(
+    preferContext ? "done" : "idle",
+  );
+  const [showDetails, setShowDetails] = useState(preferContext);
+  const flow = askFlows[active];
+
+  useEffect(() => {
+    if (phase !== "gathering") return;
+    const t = window.setTimeout(() => {
+      setPhase("done");
+      setShowDetails(preferContext);
+    }, 700);
+    return () => window.clearTimeout(t);
+  }, [phase, preferContext]);
+
+  function ask(i: number) {
+    setActive(i);
+    setShowDetails(false);
+    setPhase("gathering");
+  }
+
+  if (phase === "idle") {
+    return (
+      <div className="flex h-full min-h-0 flex-col items-center justify-center px-6 py-8">
+        <div className="flex w-full max-w-2xl flex-col items-center">
+          <h2 className="text-center font-heading text-[1.85rem] font-semibold tracking-[-0.035em] leading-[1.15] text-neutral-950 sm:text-[2.2rem]">
+            Ask across your sources
+          </h2>
+
+          <div className="relative mt-7 w-full rounded-[1.75rem] border border-black/[0.06] bg-[#f3f1ee] px-5 pb-4 pt-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+            <p className="min-h-[7rem] text-[15px] font-medium leading-relaxed text-neutral-400">
+              Ask anything across connected sources…
+            </p>
+            <div className="flex items-end justify-end">
+              <span className="inline-flex size-9 items-center justify-center rounded-full bg-neutral-200/80 text-neutral-500">
+                <ArrowRight size={16} strokeWidth={2} />
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-2">
+            {askFlows.map(({ label, icon: Icon }, i) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => ask(i)}
+                className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2 text-[13px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-black/20 hover:bg-neutral-50"
+              >
+                <Icon
+                  size={14}
+                  strokeWidth={1.75}
+                  className="text-neutral-500"
+                />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onTab("Connectors")}
+            className="mt-6 text-center text-[12px] font-semibold text-neutral-400 underline decoration-neutral-300 underline-offset-2 hover:text-foreground"
+          >
+            Manage sources
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="min-h-0 flex-1 overflow-auto px-6 py-5">
+        <div className="mx-auto max-w-2xl space-y-4">
+          <div className="flex justify-end">
+            <p className="max-w-[85%] rounded-2xl bg-[#f3f1ee] px-4 py-2.5 text-left text-sm font-medium leading-relaxed">
+              {flow.q}
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <div className="mt-0.5 flex size-[26px] shrink-0 items-center justify-center rounded-[7px] bg-neutral-900 text-[11px] font-bold text-white">
+              n
+            </div>
+            <div className="min-w-0 space-y-1.5">
+              <p className="font-heading text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                nmemo
+              </p>
+              {phase === "gathering" ? (
+                <p className="text-sm font-semibold text-neutral-500">
+                  Gathering context…
+                </p>
+              ) : (
+                <>
+                  <p className="whitespace-pre-wrap text-[0.9375rem] font-medium leading-[1.65] text-neutral-900">
+                    {flow.a}
+                  </p>
+                  <span className="inline-flex max-w-full truncate rounded-sm border border-border px-2 py-0.5 text-[11px] font-semibold text-neutral-500">
+                    {flow.citation}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-2">
-          {chips.map(({ label, icon: Icon }) => (
-            <span
-              key={label}
-              className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2 text-[13px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
-            >
-              <Icon size={14} strokeWidth={1.75} className="text-neutral-500" />
-              {label}
-            </span>
-          ))}
+      <div className="shrink-0 px-4 pb-5 pt-2 sm:px-6">
+        <div className="mx-auto max-w-2xl space-y-2">
+          <div className="relative rounded-[1.5rem] border border-black/[0.06] bg-[#f3f1ee] px-4 pb-3 pt-3">
+            <p className="min-h-[3.25rem] text-[15px] font-medium leading-relaxed text-neutral-400">
+              Ask anything across connected sources…
+            </p>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                {phase === "done" ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowDetails((v) => !v)}
+                    className="text-[11px] font-semibold text-neutral-400 hover:text-foreground"
+                  >
+                    {showDetails ? "Hide context" : "Show context"}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhase("idle");
+                    setShowDetails(false);
+                  }}
+                  className="text-[11px] font-semibold text-neutral-400 hover:text-foreground"
+                >
+                  New chat
+                </button>
+              </div>
+              <div className="flex flex-wrap justify-end gap-1">
+                {askFlows.map(({ label }, i) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => ask(i)}
+                    className={cn(
+                      "rounded-full px-2.5 py-1 text-[11px] font-semibold",
+                      i === active
+                        ? "bg-neutral-900 text-white"
+                        : "bg-white/80 text-neutral-500",
+                    )}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {showDetails && phase === "done" ? (
+            <div className="space-y-3 rounded-2xl border border-black/8 bg-white px-3.5 py-3">
+              <ul className="space-y-1.5 text-xs font-semibold">
+                {flow.sources.map((s) => (
+                  <li
+                    key={s.name}
+                    className="flex items-center justify-between gap-3"
+                  >
+                    <span>{s.name}</span>
+                    <span className="text-neutral-500">{s.latencyMs}ms</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="text-[11px] font-semibold text-neutral-500">
+                Grounding · 87%
+              </p>
+              <div className="rounded-sm border border-border">
+                <p className="px-3 py-2 font-heading text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+                  Diagnostics
+                </p>
+                <div className="space-y-2 border-t border-border px-3 py-2.5 text-[11px] font-semibold text-neutral-500">
+                  <div>
+                    <p className="font-heading text-foreground">Token usage</p>
+                    <p className="mt-0.5">
+                      Total 1,240 · memory 180 · docs 620 · workspace 340 ·
+                      instructions 100
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-heading text-foreground">
+                      Ranking scores
+                    </p>
+                    <ul className="mt-0.5 space-y-0.5">
+                      {flow.scores.map((r) => (
+                        <li key={r.id}>
+                          {r.id} · {r.score.toFixed(2)} · {r.reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
-
-        <p className="mt-6 text-center text-[12px] font-semibold text-neutral-400 underline decoration-neutral-300 underline-offset-2">
-          Manage sources
-        </p>
       </div>
     </div>
   );
@@ -234,75 +507,137 @@ function SourcesDemo() {
   );
 }
 
-function ConnectorsDemo() {
-  const rows = [
-    {
-      name: "Documents (Qdrant)",
-      tone: "bg-orange-400",
-      status: "Connected",
-      desc: "PDFs retrieved into every ask.",
-    },
-    {
-      name: "Slack",
-      tone: "bg-pink-400",
-      status: "Disconnected",
-      desc: "Paste a user token with search:read.",
-    },
-    {
-      name: "Notion",
-      tone: "bg-sky-400",
-      status: "Disconnected",
-      desc: "Internal integration secret.",
-    },
-    {
-      name: "GitHub",
-      tone: "bg-emerald-400",
-      status: "Disconnected",
-      desc: "Classic PAT with repo scope.",
-    },
-    {
-      name: "mem0",
-      tone: "bg-lime-400",
-      status: "Disconnected",
-      desc: "Long-term memory API key.",
-    },
-  ] as const;
+const connectorCatalog = [
+  {
+    type: "qdrant",
+    name: "Documents",
+    description: "PDFs from Sources as workspace knowledge.",
+    connected: true,
+  },
+  {
+    type: "slack",
+    name: "Slack",
+    description: "Search messages for context.",
+    connected: true,
+  },
+  {
+    type: "notion",
+    name: "Notion",
+    description: "Pull pages into context.",
+    connected: false,
+  },
+  {
+    type: "github",
+    name: "GitHub",
+    description: "Issues and PRs for context.",
+    connected: false,
+  },
+  {
+    type: "mem0",
+    name: "Memory",
+    description: "Long-term preferences and facts.",
+    connected: false,
+  },
+] as const;
+
+export function ConnectorsDemo({
+  onTab = () => {},
+}: {
+  onTab?: (t: DemoTab) => void;
+}) {
+  const [rows, setRows] = useState(
+    connectorCatalog.map((c) => ({ ...c, connected: c.connected })),
+  );
+  const [busy, setBusy] = useState<string | null>(null);
+  const connectedCount = rows.filter((r) => r.connected).length;
+  const connectedTypes = rows
+    .filter((r) => r.connected)
+    .map((r) => r.type)
+    .join(", ");
+
+  function toggle(type: string) {
+    setBusy(type);
+    window.setTimeout(() => {
+      setRows((prev) =>
+        prev.map((r) =>
+          r.type === type ? { ...r, connected: !r.connected } : r,
+        ),
+      );
+      setBusy(null);
+    }, 220);
+  }
 
   return (
-    <div className="mx-auto flex h-full max-w-xl flex-col justify-center gap-4 py-4">
-      <div>
-        <p className="font-heading text-lg font-semibold tracking-tight">
+    <div className="mx-auto flex h-full max-w-md flex-col justify-center gap-6 py-6">
+      <div className="space-y-3 text-center">
+        <h2 className="font-heading text-[1.75rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-3xl">
           Connectors
-        </p>
-        <p className="mt-1 text-sm font-semibold text-neutral-500">
+        </h2>
+        <p className="text-sm font-semibold leading-relaxed text-neutral-500">
           Paste a token once, saved on your workspace.
         </p>
+        <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+          <span className="text-foreground">{connectedCount}</span> source
+          {connectedCount === 1 ? "" : "s"} connected
+          {connectedCount > 0 ? ` · ${connectedTypes}` : ""}
+        </p>
       </div>
-      <ul className="divide-y divide-border border border-border">
-        {rows.map((row) => (
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          onClick={() => onTab("Playground")}
+          className="inline-flex flex-1 items-center justify-center rounded-sm bg-secondary px-4 py-2.5 text-sm font-bold text-white"
+        >
+          See it work
+        </button>
+        <button
+          type="button"
+          onClick={() => onTab("Sources")}
+          className="inline-flex flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-semibold"
+        >
+          Add documents
+        </button>
+      </div>
+
+      <ul className="space-y-1.5 text-left">
+        {rows.map((row, i) => (
           <li
-            key={row.name}
-            className="flex items-center justify-between gap-3 px-4 py-3"
+            key={row.type}
+            className="rounded-sm border border-border px-3 py-2.5"
           >
-            <span className="min-w-0">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <span className={cn("size-2 rounded-full", row.tone)} />
-                {row.name}
+            <div className="flex gap-3">
+              <span
+                className={cn(
+                  "flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold",
+                  row.connected
+                    ? "bg-neutral-900 text-white"
+                    : "bg-neutral-100 text-neutral-500",
+                )}
+              >
+                {row.connected ? "✓" : i + 1}
               </span>
-              <span className="mt-0.5 block text-xs font-semibold text-neutral-500">
-                {row.desc}
-              </span>
-            </span>
-            <span
-              className={cn(
-                "shrink-0 text-[10px] font-bold uppercase tracking-wide",
-                row.status === "Connected"
-                  ? "text-foreground"
-                  : "text-neutral-400",
-              )}
-            >
-              {row.status}
-            </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-heading text-sm font-semibold tracking-[-0.02em]">
+                      {row.name}
+                    </p>
+                    <p className="mt-0.5 text-xs font-semibold leading-relaxed text-neutral-500">
+                      {row.description}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={busy === row.type}
+                    onClick={() => toggle(row.type)}
+                    className="shrink-0 pt-0.5 text-xs font-semibold text-foreground underline-offset-4 hover:underline disabled:opacity-40"
+                  >
+                    {busy === row.type ? "…" : row.connected ? "Off" : "On"}
+                  </button>
+                </div>
+              </div>
+            </div>
           </li>
         ))}
       </ul>
@@ -316,6 +651,7 @@ export function ProductShell({
   rail,
   onRail,
   fill = false,
+  preferContext = false,
 }: {
   tab: DemoTab;
   onTab: (t: DemoTab) => void;
@@ -323,6 +659,8 @@ export function ProductShell({
   onRail: (i: number) => void;
   /** Stretch to parent (auth / journey half-screen crops). */
   fill?: boolean;
+  /** Open playground on a completed ask with Show context visible. */
+  preferContext?: boolean;
 }) {
   return (
     <div
@@ -531,10 +869,14 @@ export function ProductShell({
             tab === "Playground" ? "overflow-hidden p-0" : "overflow-auto p-4",
           )}
         >
-          {tab === "Home" ? <HomeDemo /> : null}
-          {tab === "Playground" ? <PlaygroundDemo /> : null}
+          {tab === "Home" ? (
+            <HomeDemo onTab={onTab} onRail={onRail} />
+          ) : null}
+          {tab === "Playground" ? (
+            <PlaygroundDemo onTab={onTab} preferContext={preferContext} />
+          ) : null}
           {tab === "Sources" ? <SourcesDemo /> : null}
-          {tab === "Connectors" ? <ConnectorsDemo /> : null}
+          {tab === "Connectors" ? <ConnectorsDemo onTab={onTab} /> : null}
         </div>
       </div>
     </div>

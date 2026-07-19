@@ -33,13 +33,17 @@ const steps = [
   },
 ] as const;
 
-export default function HomePage() {
+export function HomeView() {
   const { data: session } = useSession();
   const [connectors, setConnectors] = useState<Connector[]>([]);
   const [loadingConnectors, setLoadingConnectors] = useState(true);
 
   useEffect(() => {
-    if (!session?.user) return;
+    if (!session?.user) {
+      setConnectors([]);
+      setLoadingConnectors(false);
+      return;
+    }
     setLoadingConnectors(true);
     void getConnectors()
       .then((r) => setConnectors(r.connectors))
@@ -117,4 +121,8 @@ export default function HomePage() {
       </p>
     </div>
   );
+}
+
+export default function HomePage() {
+  return <HomeView />;
 }

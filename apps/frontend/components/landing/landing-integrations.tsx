@@ -79,8 +79,7 @@ export function LandingIntegrations() {
   return (
     <section className="mt-12 w-full sm:mt-14">
       <p className="text-center text-sm font-medium text-neutral-500">
-        Multi-source by design. More connectors and real-time paths shipping
-        next.
+        Every source feeds the decision. More connectors shipping next.
       </p>
 
       <ul className="mx-auto mt-8 grid max-w-5xl grid-cols-2 sm:grid-cols-5">
