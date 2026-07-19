@@ -9,8 +9,9 @@ services:
     plan: free
     region: oregon
     # Monorepo: install/build from repo root (npm workspaces)
-    # Free tier: no preDeployCommand — run migrations in build instead
-    buildCommand: npm install && npx turbo run build --filter=api... && npm run db:deploy -w @repo/db
+    # Free tier: no preDeployCommand — run migrations in build instead.
+    # --include=dev: NODE_ENV=production would otherwise skip turbo/typescript.
+    buildCommand: npm install --include=dev && npx turbo run build --filter=api... && npm run db:deploy -w @repo/db
     startCommand: npm run start -w api
     healthCheckPath: /health
     buildFilter:
