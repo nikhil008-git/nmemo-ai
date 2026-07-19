@@ -3,7 +3,11 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import { getContext, writeMemoryAsync } from "@contextengine/core";
-import { ingestPdf, listDocuments } from "@contextengine/rag-retriever";
+import {
+  deleteDocument,
+  ingestPdf,
+  listDocuments,
+} from "@contextengine/rag-retriever";
 import { ensureDefaultWorkspace } from "@repo/db";
 import { requireSession } from "./middleware/requireSession.js";
 import { completeFromPrompt } from "./lib/llm.js";
@@ -94,6 +98,32 @@ app.get("/documents", requireSession, async (req, res) => {
   } catch (err) {
     console.error(err);
     const message = err instanceof Error ? err.message : "list documents failed";
+    res.status(500).json({ error: message });
+  }
+});
+
+app.delete("/documents", requireSession, async (req, res) => {
+  try {
+    const workspace = await ensureDefaultWorkspace(
+      req.user!.id,
+      req.user!.name,
+    );
+    const source =
+      typeof req.query.source === "string"
+        ? req.query.source
+        : typeof req.body?.source === "string"
+          ? req.body.source
+          : "";
+    if (!source.trim()) {
+      res.status(400).json({ error: "source required" });
+      return;
+    }
+    const result = await deleteDocument(workspace.id, source);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    const message =
+      err instanceof Error ? err.message : "delete document failed";
     res.status(500).json({ error: message });
   }
 });

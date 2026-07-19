@@ -12,7 +12,7 @@ import {
 import { CtaButton } from "@/components/ui/cta-button";
 import { DocumentsTableSkeleton } from "@/components/ui/loading-states";
 import { Spinner } from "@/components/ui/spinner";
-import { ingestPdfFile, listDocuments } from "@/lib/api";
+import { deleteDocument, ingestPdfFile, listDocuments } from "@/lib/api";
 import type { IngestedDocument } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,7 @@ export default function SourcesPage() {
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
+  const [deletingSource, setDeletingSource] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
@@ -117,6 +118,25 @@ export default function SourcesPage() {
     }
 
     void refresh();
+  }
+
+  async function removeDocument(doc: IngestedDocument) {
+    if (doc.status === "pending") return;
+    const ok = window.confirm(
+      `Delete “${doc.title}”? This removes all chunks from the workspace.`,
+    );
+    if (!ok) return;
+
+    setDeletingSource(doc.source);
+    setError(null);
+    try {
+      await deleteDocument(doc.source);
+      setDocs((prev) => prev.filter((d) => d.source !== doc.source));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setDeletingSource(null);
+    }
   }
 
   return (
@@ -240,26 +260,42 @@ export default function SourcesPage() {
                   <th className="px-4 py-3">Chunks</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Updated</th>
+                  <th className="px-4 py-3 text-right"> </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filtered.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-neutral-50/80">
-                    <td className="px-4 py-3 font-semibold">{doc.title}</td>
-                    <td className="max-w-[200px] truncate px-4 py-3 font-semibold text-neutral-500">
-                      {doc.source}
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-neutral-500">
-                      {doc.chunkCount || "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={doc.status} />
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-neutral-500">
-                      {formatTime(doc.updatedAt)}
-                    </td>
-                  </tr>
-                ))}
+                {filtered.map((doc) => {
+                  const deleting = deletingSource === doc.source;
+                  return (
+                    <tr key={doc.id} className="hover:bg-neutral-50/80">
+                      <td className="px-4 py-3 font-semibold">{doc.title}</td>
+                      <td className="max-w-[200px] truncate px-4 py-3 font-semibold text-neutral-500">
+                        {doc.source}
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-neutral-500">
+                        {doc.chunkCount || "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <StatusBadge status={doc.status} />
+                      </td>
+                      <td className="px-4 py-3 font-semibold text-neutral-500">
+                        {formatTime(doc.updatedAt)}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {doc.status !== "pending" ? (
+                          <button
+                            type="button"
+                            disabled={deleting || deletingSource != null}
+                            onClick={() => void removeDocument(doc)}
+                            className="text-xs font-semibold text-neutral-500 underline-offset-4 hover:text-red-600 hover:underline disabled:opacity-40"
+                          >
+                            {deleting ? "Deleting…" : "Delete"}
+                          </button>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

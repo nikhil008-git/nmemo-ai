@@ -130,6 +130,14 @@ export function listDocuments(): Promise<{
   return api("/documents");
 }
 
+export function deleteDocument(
+  source: string,
+): Promise<{ deleted: true; source: string }> {
+  return api(`/documents?source=${encodeURIComponent(source)}`, {
+    method: "DELETE",
+  });
+}
+
 export function getWorkspace(): Promise<Workspace> {
   return api("/workspaces/current");
 }
