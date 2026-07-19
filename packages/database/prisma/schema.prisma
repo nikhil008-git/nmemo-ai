@@ -77,8 +77,26 @@ model Workspace {
   members    WorkspaceMember[]
   apiKeys    ApiKey[]
   connectors Connector[]
+  usageEvents UsageEvent[]
 
   @@map("workspace")
+}
+
+model UsageEvent {
+  id          String   @id @default(cuid())
+  workspaceId String
+  apiKeyId    String?
+  userId      String?
+  route       String
+  tokens      Int      @default(0)
+  sources     Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, createdAt])
+  @@index([route, createdAt])
+  @@map("usage_event")
 }
 
 model WorkspaceMember {

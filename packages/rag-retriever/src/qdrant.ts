@@ -10,15 +10,36 @@ export const qdrant = new QdrantClient({
     : {}),
 });
 
+function qdrantUnreachableMessage(err: unknown) {
+  const url = process.env.QDRANT_URL ?? "http://localhost:6333";
+  const cause =
+    err && typeof err === "object" && "cause" in err
+      ? (err as { cause?: { code?: string } }).cause
+      : undefined;
+  const code =
+    cause?.code ??
+    (err && typeof err === "object" && "code" in err
+      ? String((err as { code?: unknown }).code)
+      : "");
+  if (code === "ECONNREFUSED" || /fetch failed/i.test(String(err))) {
+    return `Qdrant is not reachable at ${url}. Start it with: docker run -d -p 6333:6333 --name qdrant qdrant/qdrant`;
+  }
+  return err instanceof Error ? err.message : "Qdrant request failed";
+}
+
 export async function ensureCollection() {
-  const { collections } = await qdrant.getCollections();
-  const exists = collections.some((c) => c.name === COLLECTION);
-  if (!exists) {
-    await qdrant.createCollection(COLLECTION, {
-      vectors: {
-        size: VECTOR_SIZE,
-        distance: "Cosine",
-      },
-    });
+  try {
+    const { collections } = await qdrant.getCollections();
+    const exists = collections.some((c) => c.name === COLLECTION);
+    if (!exists) {
+      await qdrant.createCollection(COLLECTION, {
+        vectors: {
+          size: VECTOR_SIZE,
+          distance: "Cosine",
+        },
+      });
+    }
+  } catch (err) {
+    throw new Error(qdrantUnreachableMessage(err));
   }
 }

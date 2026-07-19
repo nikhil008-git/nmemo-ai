@@ -24,12 +24,12 @@ export function buildPrompt(
 
   return [
     "System instructions",
-    "Answer using the relevant memories and documents below. Cite sources when possible.",
+    "Answer using the relevant memories and retrieved context below (docs, GitHub, Slack, Notion, etc.). Cite sources when possible. If context is missing for the question, say so clearly.",
     "",
     "User memory",
     memSection,
     "",
-    "Relevant documents",
+    "Retrieved context",
     docSection,
     "",
     "Current user message",

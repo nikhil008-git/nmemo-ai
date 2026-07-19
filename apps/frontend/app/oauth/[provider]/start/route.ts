@@ -38,7 +38,7 @@ export async function GET(
     return NextResponse.redirect(
       new URL(
         "/connectors?error=" +
-          encodeURIComponent("API unreachable — is the backend running?"),
+          encodeURIComponent("API unreachable. Is the backend running?"),
         _req.url,
       ),
     );

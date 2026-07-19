@@ -1,55 +1,99 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
+import {
+  PageHeader,
+  SectionLabel,
+  appPanelClass,
+} from "@/components/app/page-header";
+import { WorkspaceIdsCard } from "@/components/app/workspace-ids";
+import { CtaButton } from "@/components/ui/cta-button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getWorkspace } from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 
 export default function SettingsPage() {
   const { data: session } = useSession();
   const user = session?.user;
+  const [workspace, setWorkspace] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void getWorkspace()
+      .then((ws) => setWorkspace({ id: ws.id, name: ws.name }))
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : "Failed to load workspace"),
+      )
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
-    <main className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-lg font-semibold tracking-tight">Account</h1>
-        <p className="text-sm font-medium text-muted-foreground">
-          Profile for this workspace. API keys live under{" "}
-          <Link href="/keys" className="underline underline-offset-4">
-            API
-          </Link>
-          .
-        </p>
-      </header>
+    <main className="space-y-8">
+      <PageHeader
+        title="Account"
+        description={
+          <>
+            Profile and workspace IDs for your agents. Keys live under{" "}
+            <Link
+              href="/keys"
+              className="text-foreground underline underline-offset-4"
+            >
+              API
+            </Link>
+            .
+          </>
+        }
+      />
+
+      {error ? (
+        <p className="text-sm font-semibold text-red-500">{error}</p>
+      ) : null}
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold tracking-wide">Profile</h2>
-        <div className="space-y-1 border border-border px-4 py-4 text-sm">
-          <p>
-            <span className="text-muted-foreground">Name · </span>
+        <SectionLabel>Profile</SectionLabel>
+        <div className={`${appPanelClass} space-y-2 px-4 py-4 text-sm`}>
+          <p className="font-semibold">
+            <span className="text-neutral-500">Name · </span>
             {user?.name || "—"}
           </p>
-          <p>
-            <span className="text-muted-foreground">Email · </span>
+          <p className="font-semibold">
+            <span className="text-neutral-500">Email · </span>
             {user?.email || "—"}
           </p>
         </div>
       </section>
 
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-28 w-full rounded-sm" />
+        </div>
+      ) : workspace ? (
+        <WorkspaceIdsCard
+          workspaceName={workspace.name}
+          workspaceId={workspace.id}
+          accountUserId={user?.id}
+        />
+      ) : null}
+
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold tracking-wide">Shortcuts</h2>
-        <div className="flex flex-wrap gap-4 text-sm font-medium">
-          <Link href="/keys" className="underline-offset-4 hover:underline">
-            API keys →
-          </Link>
-          <Link
-            href="/connectors"
-            className="underline-offset-4 hover:underline"
-          >
-            Connectors →
-          </Link>
-          <Link href="/playground" className="underline-offset-4 hover:underline">
-            Playground →
-          </Link>
+        <SectionLabel>Shortcuts</SectionLabel>
+        <div className="flex flex-wrap gap-2">
+          <CtaButton href="/keys" variant="outline" size="compact">
+            API keys
+          </CtaButton>
+          <CtaButton href="/connectors" variant="outline" size="compact">
+            Connectors
+          </CtaButton>
+          <CtaButton href="/playground" size="compact">
+            Playground
+          </CtaButton>
         </div>
       </section>
     </main>

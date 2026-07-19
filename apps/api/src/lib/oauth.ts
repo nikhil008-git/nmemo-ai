@@ -130,6 +130,8 @@ export async function exchangeCode(
     });
     const data = (await res.json()) as {
       access_token?: string;
+      refresh_token?: string;
+      expires_in?: number;
       error?: string;
       error_description?: string;
     };
@@ -146,9 +148,14 @@ export async function exchangeCode(
     const user = (await me.json()) as { login?: string; id?: number };
     return {
       accessToken: data.access_token,
+      ...(data.refresh_token ? { refreshToken: data.refresh_token } : {}),
+      ...(typeof data.expires_in === "number"
+        ? { expiresAt: Date.now() + data.expires_in * 1000 }
+        : {}),
       accountLogin: user.login,
       accountId: user.id,
       provider: "github",
+      authMode: "oauth",
     };
   }
 
@@ -232,22 +239,20 @@ export function publicConnectorConfig(
       collection: c.collection,
     };
   }
-  if (type === "mem0") {
+  if (type === "mem0" || type === "groq") {
     return {
-      hasApiKey: Boolean(c.apiKey),
-      apiKeyPreview: typeof c.apiKey === "string" ? mask(c.apiKey) : undefined,
+      // True for plaintext or encrypted-at-rest secrets — never send the value.
+      hasApiKey: typeof c.apiKey === "string" && c.apiKey.length > 0,
     };
   }
   return {
     hasToken: Boolean(c.accessToken),
+    authMode: c.authMode ?? (c.mock ? "mock" : c.accessToken ? "oauth" : undefined),
+    mock: Boolean(c.mock),
     accountLogin: c.accountLogin,
     teamName: c.teamName,
     workspaceName: c.workspaceName,
     provider: c.provider ?? type,
+    expiresAt: c.expiresAt,
   };
-}
-
-function mask(value: string) {
-  if (value.length <= 8) return "••••";
-  return `${value.slice(0, 4)}…${value.slice(-4)}`;
 }

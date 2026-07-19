@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { ingestPdfFile } from "@/lib/api";
+import {
+  PageHeader,
+  SectionLabel,
+  appFieldClass,
+  appPanelClass,
+} from "@/components/app/page-header";
 import { CtaButton } from "@/components/ui/cta-button";
+import { DocumentsTableSkeleton } from "@/components/ui/loading-states";
+import { Spinner } from "@/components/ui/spinner";
+import { ingestPdfFile, listDocuments } from "@/lib/api";
 import type { IngestedDocument } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 function formatTime(iso: string) {
   return new Date(iso).toLocaleString(undefined, {
@@ -18,9 +27,38 @@ function formatTime(iso: string) {
 
 export default function SourcesPage() {
   const [docs, setDocs] = useState<IngestedDocument[]>([]);
+  const [loading, setLoading] = useState(true);
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const { documents } = await listDocuments();
+      setDocs(documents);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load documents");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  const filtered = useMemo(() => {
+    const q = filter.trim().toLowerCase();
+    if (!q) return docs;
+    return docs.filter(
+      (d) =>
+        d.title.toLowerCase().includes(q) ||
+        d.source.toLowerCase().includes(q),
+    );
+  }, [docs, filter]);
 
   async function ingestFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -54,6 +92,7 @@ export default function SourcesPage() {
             d.id === id
               ? {
                   ...d,
+                  id: `src:${result.source}`,
                   title: result.title,
                   source: result.source,
                   chunkCount: result.chunkCount,
@@ -76,23 +115,38 @@ export default function SourcesPage() {
         );
       }
     }
+
+    void refresh();
   }
 
   return (
     <main className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-lg font-semibold tracking-tight">Documents</h1>
-        <p className="text-sm font-medium text-muted-foreground">
-          Document RAG for this workspace. Used by the{" "}
-          <Link href="/playground" className="underline underline-offset-4">
-            Playground
-          </Link>{" "}
-          and SDK via{" "}
-          <code className="text-foreground/80">getContext()</code>.
-        </p>
-      </header>
+      <PageHeader
+        title="Documents"
+        description={
+          <>
+            Upload PDFs as workspace knowledge, available in{" "}
+            <Link
+              href="/playground"
+              className="text-foreground underline underline-offset-4"
+            >
+              Playground
+            </Link>{" "}
+            and your agents.
+          </>
+        }
+        actions={
+          docs.some((d) => d.status === "ready") ? (
+            <CtaButton href="/playground" size="compact">
+              Open Playground
+            </CtaButton>
+          ) : null
+        }
+      />
 
-      {error && <p className="text-sm text-red-500 break-words">{error}</p>}
+      {error && (
+        <p className="break-words text-sm font-semibold text-red-500">{error}</p>
+      )}
 
       <section
         onDragOver={(e) => {
@@ -105,15 +159,21 @@ export default function SourcesPage() {
           setDragging(false);
           void ingestFiles(e.dataTransfer.files);
         }}
-        className={`flex flex-col items-start gap-3 border border-dashed px-4 py-8 transition-colors ${
-          dragging ? "border-foreground/50 bg-foreground/5" : "border-border"
-        }`}
+        className={cn(
+          "flex flex-col items-start gap-3 rounded-sm border border-border px-4 py-8 transition-colors",
+          dragging
+            ? "border-neutral-400 bg-neutral-100"
+            : "border-border bg-neutral-50/50",
+        )}
       >
-        <p className="text-sm text-muted-foreground">
-          Drop PDF files here. Ingest requires a session cookie (sign in) and
-          API on :8080.
+        <p className="text-sm font-semibold text-neutral-500">
+          Drop PDF files here for this workspace.
         </p>
-        <CtaButton type="button" size="compact" onClick={() => inputRef.current?.click()}>
+        <CtaButton
+          type="button"
+          size="compact"
+          onClick={() => inputRef.current?.click()}
+        >
           Choose PDFs
         </CtaButton>
         <input
@@ -130,48 +190,72 @@ export default function SourcesPage() {
       </section>
 
       <section className="space-y-4">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-sm font-semibold tracking-wide">Ingested</h2>
-          {docs.some((d) => d.status === "ready") && (
-            <Link
-              href="/playground"
-              className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <SectionLabel>
+            Ingested{" "}
+            {!loading ? (
+              <span className="font-semibold text-neutral-400">
+                ({docs.length})
+              </span>
+            ) : null}
+          </SectionLabel>
+          <div className="flex flex-wrap items-center gap-2">
+            {docs.length > 0 ? (
+              <input
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Filter documents…"
+                className={cn(appFieldClass, "max-w-xs !py-1.5 text-xs")}
+              />
+            ) : null}
+            <button
+              type="button"
+              onClick={() => void refresh()}
+              disabled={loading}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-500 underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
             >
-              Open Playground →
-            </Link>
-          )}
+              {loading && docs.length > 0 ? <Spinner size={12} /> : null}
+              Refresh
+            </button>
+          </div>
         </div>
 
-        {docs.length === 0 ? (
-          <p className="text-sm text-muted-foreground">
-            No documents yet this session. Upload a PDF, then open Playground.
+        {loading && docs.length === 0 ? (
+          <DocumentsTableSkeleton />
+        ) : docs.length === 0 ? (
+          <p className="text-sm font-semibold text-neutral-500">
+            No documents yet. Upload a PDF, then open Playground.
+          </p>
+        ) : filtered.length === 0 ? (
+          <p className="text-sm font-semibold text-neutral-500">
+            No documents match “{filter}”.
           </p>
         ) : (
-          <div className="overflow-x-auto border border-border">
+          <div className={cn(appPanelClass, "overflow-x-auto")}>
             <table className="w-full min-w-[560px] text-left text-sm">
-              <thead className="border-b border-border text-xs uppercase tracking-widest text-muted-foreground">
+              <thead className="border-b border-border text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Title</th>
-                  <th className="px-4 py-3 font-medium">Source</th>
-                  <th className="px-4 py-3 font-medium">Chunks</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Updated</th>
+                  <th className="px-4 py-3">Title</th>
+                  <th className="px-4 py-3">Source</th>
+                  <th className="px-4 py-3">Chunks</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Updated</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {docs.map((doc) => (
-                  <tr key={doc.id}>
-                    <td className="px-4 py-3 font-medium">{doc.title}</td>
-                    <td className="max-w-[200px] truncate px-4 py-3 text-muted-foreground">
+                {filtered.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-neutral-50/80">
+                    <td className="px-4 py-3 font-semibold">{doc.title}</td>
+                    <td className="max-w-[200px] truncate px-4 py-3 font-semibold text-neutral-500">
                       {doc.source}
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className="px-4 py-3 font-semibold text-neutral-500">
                       {doc.chunkCount || "—"}
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={doc.status} />
                     </td>
-                    <td className="px-4 py-3 text-muted-foreground">
+                    <td className="px-4 py-3 font-semibold text-neutral-500">
                       {formatTime(doc.updatedAt)}
                     </td>
                   </tr>
@@ -186,19 +270,23 @@ export default function SourcesPage() {
 }
 
 function StatusBadge({ status }: { status: IngestedDocument["status"] }) {
-  const label =
-    status === "ready" ? "Ready" : status === "pending" ? "Pending" : "Failed";
+  if (status === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-neutral-500">
+        <Spinner size={12} className="text-neutral-500" />
+        Pending
+      </span>
+    );
+  }
+
   return (
     <span
-      className={`text-xs font-medium uppercase tracking-wider ${
-        status === "ready"
-          ? "text-foreground"
-          : status === "pending"
-            ? "animate-pulse text-muted-foreground"
-            : "text-red-500"
-      }`}
+      className={cn(
+        "text-[11px] font-bold uppercase tracking-wider",
+        status === "ready" ? "text-foreground" : "text-red-500",
+      )}
     >
-      {label}
+      {status === "ready" ? "Ready" : "Failed"}
     </span>
   );
 }

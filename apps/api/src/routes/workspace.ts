@@ -7,6 +7,8 @@ import {
   publicConnectorConfig,
   type OAuthProvider,
 } from "../lib/oauth.js";
+import { validateConnectorToken } from "../lib/validate-connector-token.js";
+import { encryptConnectorConfig } from "../lib/secrets.js";
 
 export const workspaceRouter = Router();
 
@@ -22,9 +24,6 @@ function mapConnector(c: {
   updatedAt: Date;
   createdAt: Date;
 }) {
-  const oauth =
-    OAUTH_TYPES.has(c.type as OAuthProvider) &&
-    providerConfigured(c.type as OAuthProvider);
   return {
     id: c.id,
     type: c.type,
@@ -32,9 +31,8 @@ function mapConnector(c: {
     config: publicConnectorConfig(c.type, c.config),
     updatedAt: c.updatedAt,
     createdAt: c.createdAt,
-    // In non-production, Connect always works (dev mock if keys missing).
     oauthConfigured: OAUTH_TYPES.has(c.type as OAuthProvider)
-      ? oauth || process.env.NODE_ENV !== "production"
+      ? providerConfigured(c.type as OAuthProvider)
       : undefined,
   };
 }
@@ -90,13 +88,20 @@ workspaceRouter.patch("/connectors/:type", async (req, res) => {
         ? (existing.config as Record<string, unknown>)
         : {};
 
-    // mem0: save API key
-    if (type === "mem0" && config?.apiKey && typeof config.apiKey === "string") {
+    // mem0 / groq: save API key (encrypted at rest)
+    if (
+      (type === "mem0" || type === "groq") &&
+      config?.apiKey &&
+      typeof config.apiKey === "string"
+    ) {
       const updated = await prisma.connector.update({
         where: { workspaceId_type: { workspaceId: workspace.id, type } },
         data: {
           status: "connected",
-          config: { apiKey: config.apiKey, provider: "mem0" },
+          config: encryptConnectorConfig({
+            apiKey: config.apiKey,
+            provider: type,
+          }) as object,
         },
       });
       res.json({ connector: mapConnector(updated) });
@@ -116,8 +121,8 @@ workspaceRouter.patch("/connectors/:type", async (req, res) => {
       return;
     }
 
-    // OAuth sources: disconnect only via PATCH (connect via /oauth/.../start)
-    if (["github", "slack", "notion"].includes(type)) {
+    // GitHub / Slack / Notion: paste token (live) or disconnect; OAuth via /oauth/.../start
+    if (OAUTH_TYPES.has(type as OAuthProvider)) {
       if (status === "disconnected") {
         const updated = await prisma.connector.update({
           where: { workspaceId_type: { workspaceId: workspace.id, type } },
@@ -126,13 +131,46 @@ workspaceRouter.patch("/connectors/:type", async (req, res) => {
         res.json({ connector: mapConnector(updated) });
         return;
       }
+
+      const rawToken =
+        typeof config?.accessToken === "string"
+          ? config.accessToken
+          : typeof config?.apiKey === "string"
+            ? config.apiKey
+            : null;
+      if (rawToken) {
+        try {
+          const verified = await validateConnectorToken(
+            type as OAuthProvider,
+            rawToken,
+          );
+          const updated = await prisma.connector.update({
+            where: { workspaceId_type: { workspaceId: workspace.id, type } },
+            data: {
+              status: "connected",
+              config: encryptConnectorConfig({
+                ...verified,
+                authMode: "token",
+              }) as object,
+            },
+          });
+          res.json({ connector: mapConnector(updated) });
+          return;
+        } catch (err) {
+          res.status(400).json({
+            error: err instanceof Error ? err.message : "Token rejected",
+          });
+          return;
+        }
+      }
+
       res.status(400).json({
-        error: `Connect ${type} via OAuth: GET /oauth/${type}/start`,
+        error: `Paste an accessToken for ${type}, or connect via OAuth when platform apps are configured.`,
       });
       return;
     }
 
-    if (type === "mem0" && status === "disconnected") {
+    if ((type === "mem0" || type === "groq") && status === "disconnected") {
       const updated = await prisma.connector.update({
         where: { workspaceId_type: { workspaceId: workspace.id, type } },
         data: { status: "disconnected", config: {} },
@@ -162,6 +200,32 @@ workspaceRouter.get("/api-keys", async (req, res) => {
       createdAt: k.createdAt,
     })),
   });
+});
+
+/** Simple usage meter for the current workspace (last 30 days). */
+workspaceRouter.get("/usage", async (req, res) => {
+  try {
+    const workspace = await ensureDefaultWorkspace(req.user!.id, req.user!.name);
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const events = await prisma.usageEvent.findMany({
+      where: { workspaceId: workspace.id, createdAt: { gte: since } },
+      orderBy: { createdAt: "desc" },
+      take: 200,
+    });
+    const totals = events.reduce(
+      (acc, e) => {
+        acc.calls += 1;
+        acc.tokens += e.tokens;
+        acc.byRoute[e.route] = (acc.byRoute[e.route] ?? 0) + 1;
+        return acc;
+      },
+      { calls: 0, tokens: 0, byRoute: {} as Record<string, number> },
+    );
+    res.json({ since, totals, recent: events.slice(0, 50) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to load usage" });
+  }
 });
 
 workspaceRouter.post("/api-keys", async (req, res) => {

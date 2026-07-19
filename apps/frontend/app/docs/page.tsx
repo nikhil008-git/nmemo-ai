@@ -1,76 +1,61 @@
-import Link from "next/link";
-
-import { DocH2, DocP, DocsShell } from "@/components/docs/docs-shell";
+import {
+  DocCtas,
+  DocLinkList,
+  DocP,
+  DocSection,
+  DocsShell,
+} from "@/components/docs/docs-shell";
 
 export default function DocsHomePage() {
   return (
-    <DocsShell title="Context Engine docs">
-      <DocP>
-        One call —{" "}
-        <code className="text-foreground">engine.getContext()</code> — replaces
-        custom glue across memory, documents, Slack, Notion, GitHub, and more.
-        Prove it in the Playground, then ship with the SDK.
-      </DocP>
+    <DocsShell
+      title={
+        <>
+          Documentation
+          <span className="mt-1.5 block font-semibold text-neutral-400">
+            Get from zero to context in minutes.
+          </span>
+        </>
+      }
+      subtitle="nmemo gives your agents the right context from your tools and files, in one call. Start in the playground, then ship with the SDK."
+    >
+      <DocCtas
+        primary={{ href: "/docs/sdk", label: "Get the SDK" }}
+        secondary={{ href: "/docs/playground", label: "Open playground" }}
+      />
 
-      <DocH2>Product map</DocH2>
-      <ul className="space-y-0 border border-border divide-y divide-border">
-        {[
-          {
-            href: "/docs/playground",
-            title: "Playground",
-            body: "Ask + context inspector — the differentiator",
-          },
-          {
-            href: "/docs/connectors",
-            title: "Connectors",
-            body: "Connect Slack, GitHub, Notion, mem0, docs",
-          },
-          {
-            href: "/docs/sdk",
-            title: "SDK",
-            body: "createEngine → getContext in your agent",
-          },
-          {
-            href: "/docs/api",
-            title: "HTTP API",
-            body: "/context, /ingest, /ask, workspace routes",
-          },
-        ].map((item) => (
-          <li key={item.href}>
-            <Link
-              href={item.href}
-              className="block px-4 py-3 transition-colors hover:bg-foreground/5"
-            >
-              <p className="font-semibold">{item.title}</p>
-              <p className="font-light text-muted-foreground">{item.body}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <DocSection title="Suggested path">
+        <DocLinkList
+          items={[
+            {
+              href: "/sign-up",
+              title: "Create a workspace",
+              body: "Book a demo or sign up, then connect the tools your team already uses.",
+              step: "01",
+            },
+            {
+              href: "/docs/playground",
+              title: "Try the playground",
+              body: "Ask a question and inspect the prompt, sources, and citations before you code.",
+              step: "02",
+            },
+            {
+              href: "/docs/sdk",
+              title: "Install the SDK",
+              body: "One getContext() call returns a ready prompt for any model or agent framework.",
+              step: "03",
+            },
+          ]}
+        />
+      </DocSection>
 
-      <DocH2>In the app (after sign-in)</DocH2>
-      <DocP>
-        <Link href="/home" className="underline underline-offset-4">
-          Home
-        </Link>
-        {" → "}
-        <Link href="/connectors" className="underline underline-offset-4">
-          Connectors
-        </Link>
-        {" → "}
-        <Link href="/sources" className="underline underline-offset-4">
-          Sources
-        </Link>
-        {" → "}
-        <Link href="/playground" className="underline underline-offset-4">
-          Playground
-        </Link>
-        {" → "}
-        <Link href="/keys" className="underline underline-offset-4">
-          API keys
-        </Link>
-        .
-      </DocP>
+      <DocSection title="What you get">
+        <DocP>
+          Connect sources once. Every agent turn, nmemo retrieves what matters,
+          ranks it, and returns a prompt you can pass straight to your model,
+          with citations your UI can show.
+        </DocP>
+      </DocSection>
     </DocsShell>
   );
 }

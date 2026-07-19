@@ -1,12 +1,21 @@
 {
   "name": "@contextengine/sdk",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
+  "description": "Context Engine SDK — getContext across memory, docs, and connectors",
+  "license": "MIT",
   "scripts": {
     "build": "tsc -b",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

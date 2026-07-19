@@ -32,10 +32,13 @@ async function forward(req: NextRequest, context: RouteContext) {
     method: req.method,
     headers,
     redirect: "manual",
+    // Required so Next can stream upstream AI SDK / SSE bodies.
+    // @ts-expect-error Node fetch duplex
+    duplex: "half",
   };
 
   if (req.method !== "GET" && req.method !== "HEAD") {
-    init.body = await req.arrayBuffer();
+    init.body = req.body;
   }
 
   let upstream: Response;
@@ -53,16 +56,27 @@ async function forward(req: NextRequest, context: RouteContext) {
   if (upstream.status >= 300 && upstream.status < 400) {
     const location = upstream.headers.get("location");
     if (location) {
-      return NextResponse.redirect(location, upstream.status as 301 | 302 | 303 | 307 | 308);
+      return NextResponse.redirect(
+        location,
+        upstream.status as 301 | 302 | 303 | 307 | 308,
+      );
     }
   }
 
-  const body = await upstream.arrayBuffer();
   const resHeaders = new Headers();
-  const upstreamType = upstream.headers.get("content-type");
-  if (upstreamType) resHeaders.set("content-type", upstreamType);
+  for (const key of [
+    "content-type",
+    "cache-control",
+    "x-vercel-ai-ui-message-stream",
+    "x-request-id",
+  ]) {
+    const value = upstream.headers.get(key);
+    if (value) resHeaders.set(key, value);
+  }
+  // Prevent Next/proxy buffering of AI streams
+  resHeaders.set("x-accel-buffering", "no");
 
-  return new NextResponse(body, {
+  return new NextResponse(upstream.body, {
     status: upstream.status,
     headers: resHeaders,
   });

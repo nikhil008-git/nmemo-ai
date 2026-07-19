@@ -117,6 +117,19 @@ export function ingestPdfFile(
   return api("/ingest", { method: "POST", body: form });
 }
 
+export function listDocuments(): Promise<{
+  documents: {
+    id: string;
+    title: string;
+    source: string;
+    chunkCount: number;
+    status: "ready";
+    updatedAt: string;
+  }[];
+}> {
+  return api("/documents");
+}
+
 export function getWorkspace(): Promise<Workspace> {
   return api("/workspaces/current");
 }

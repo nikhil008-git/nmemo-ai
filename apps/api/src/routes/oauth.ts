@@ -10,6 +10,7 @@ import {
   verifyState,
   type OAuthProvider,
 } from "../lib/oauth.js";
+import { encryptConnectorConfig } from "../lib/secrets.js";
 
 export const oauthRouter = Router();
 
@@ -32,36 +33,12 @@ oauthRouter.get("/:provider/start", async (req, res) => {
     }
     const workspace = await ensureDefaultWorkspace(user.id, user.name);
 
-    // Local/dev: no OAuth app keys yet → mark connected so the dashboard flow works.
+    // No platform OAuth app → user must paste a token on Connectors.
     if (!providerConfigured(provider)) {
-      if (process.env.NODE_ENV === "production") {
-        res.redirect(
-          `${frontendUrl()}/connectors?error=${encodeURIComponent(
-            `${provider} is not available yet (platform OAuth not configured).`,
-          )}`,
-        );
-        return;
-      }
-      await prisma.connector.update({
-        where: {
-          workspaceId_type: { workspaceId: workspace.id, type: provider },
-        },
-        data: {
-          status: "connected",
-          config: {
-            provider,
-            mock: true,
-            accessToken: "dev-mock-token",
-            ...(provider === "slack"
-              ? { teamName: "Dev Slack" }
-              : provider === "github"
-                ? { accountLogin: "dev-user" }
-                : { workspaceName: "Dev Notion" }),
-          },
-        },
-      });
       res.redirect(
-        `${frontendUrl()}/connectors?connected=${provider}&dev=1`,
+        `${frontendUrl()}/connectors?error=${encodeURIComponent(
+          `${provider} OAuth app not configured. Paste an access token on Connectors instead.`,
+        )}`,
       );
       return;
     }
@@ -119,7 +96,7 @@ oauthRouter.get("/:provider/callback", async (req, res) => {
       },
       data: {
         status: "connected",
-        config: config as object,
+        config: encryptConnectorConfig(config) as object,
       },
     });
 

@@ -108,8 +108,8 @@ export function SignUpForm() {
           />
         </label>
 
-        <CtaButton type="submit" fullWidth disabled={busy}>
-          {busy ? "Creating…" : "Continue"}
+        <CtaButton type="submit" fullWidth loading={busy}>
+          {busy ? "Creating account" : "Continue"}
         </CtaButton>
       </form>
 

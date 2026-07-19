@@ -1,11 +1,17 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
+function groqClient(apiKey: string) {
+  return new OpenAI({
+    apiKey,
+    baseURL: "https://api.groq.com/openai/v1",
+  });
+}
 
-export async function completeFromPrompt(prompt: string): Promise<string> {
+export async function completeFromPrompt(
+  prompt: string,
+  apiKey: string,
+): Promise<string> {
+  const openai = groqClient(apiKey);
   const completion = await openai.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [

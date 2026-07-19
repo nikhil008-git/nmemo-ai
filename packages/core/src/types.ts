@@ -11,5 +11,7 @@ export type GetContextInput = {
   workspaceId: string;
   conversationId?: string;
   agent?: string;
+  /** Soft cap for prompt assembly (tokens, ~chars/4). */
+  tokenBudget?: number;
   connectors: ConnectorRef[];
 };

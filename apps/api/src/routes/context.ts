@@ -1,10 +1,20 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
-import { getContext, getContextFast } from "@contextengine/core";
+import {
+  getContext,
+  getContextFast,
+  writeMemory,
+  writeMemoryAsync,
+} from "@contextengine/core";
 import { prisma, ensureDefaultWorkspace } from "@repo/db";
 import { requireApiKey } from "../middleware/requireApiKey.js";
 import { requireSession } from "../middleware/requireSession.js";
+import { contextLimiter } from "../middleware/rateLimit.js";
+import { connectorsForContext } from "../lib/refresh-token.js";
+import { recordUsageAsync } from "../lib/usage.js";
 
 export const contextRouter = Router();
+
+contextRouter.use(contextLimiter);
 
 async function resolveWorkspace(opts: {
   userId?: string;
@@ -44,6 +54,10 @@ async function handleContext(req: Request, res: Response, fast: boolean) {
       workspaceId?: string;
       conversationId?: string;
       agent?: string;
+      /** After context is built, also persist this turn to mem0 (SDK convenience). */
+      persistMemory?: {
+        messages: { role?: string; content?: string }[];
+      };
     };
 
     if (!body.query?.trim()) {
@@ -66,21 +80,47 @@ async function handleContext(req: Request, res: Response, fast: boolean) {
       return;
     }
 
+    const connectorRefs = await connectorsForContext(workspace.connectors);
     const fn = fast ? getContextFast : getContext;
+    const tokenBudget = Number(process.env.CONTEXT_TOKEN_BUDGET ?? 6000);
     const result = await fn({
       query: body.query.trim(),
       userId,
       workspaceId: workspace.id,
       ...(body.conversationId ? { conversationId: body.conversationId } : {}),
       ...(body.agent ? { agent: body.agent } : {}),
-      connectors: workspace.connectors.map((c) => ({
-        type: c.type,
-        status: c.status,
-        config:
-          c.config && typeof c.config === "object"
-            ? (c.config as Record<string, unknown>)
-            : {},
-      })),
+      tokenBudget,
+      connectors: connectorRefs,
+    });
+
+    // Optional: persist a completed turn (user + assistant) in the same request.
+    const persistMessages = (body.persistMemory?.messages ?? [])
+      .filter(
+        (m) =>
+          m.content?.trim() &&
+          (m.role === "user" || m.role === "assistant" || m.role === "system"),
+      )
+      .map((m) => ({
+        role: m.role as "user" | "assistant" | "system",
+        content: m.content!.trim(),
+      }));
+    if (persistMessages.length > 0) {
+      writeMemoryAsync({
+        userId,
+        messages: persistMessages,
+        connectors: connectorRefs,
+      });
+    }
+
+    recordUsageAsync({
+      workspaceId: workspace.id,
+      route: fast ? "/context/fast" : "/context",
+      ...(req.apiKeyAuth?.apiKeyId
+        ? { apiKeyId: req.apiKeyAuth.apiKeyId }
+        : {}),
+      userId,
+      tokens: result.tokenUsage.total,
+      sources: result.sources.filter((s) => s.queried).length,
     });
 
     res.json(result);
@@ -105,4 +145,74 @@ contextRouter.post("/", authContext, (req, res) => {
 
 contextRouter.post("/fast", authContext, (req, res) => {
   void handleContext(req, res, true);
+});
+
+/** Persist a chat turn into mem0 (when connected). */
+contextRouter.post("/memory", authContext, async (req, res) => {
+  try {
+    const body = req.body as {
+      userId?: string;
+      workspaceId?: string;
+      messages?: { role?: string; content?: string }[];
+    };
+
+    const messages = (body.messages ?? [])
+      .filter(
+        (m) =>
+          m.content?.trim() &&
+          (m.role === "user" || m.role === "assistant" || m.role === "system"),
+      )
+      .map((m) => ({
+        role: m.role as "user" | "assistant" | "system",
+        content: m.content!.trim(),
+      }));
+
+    if (messages.length === 0) {
+      res.status(400).json({ error: "messages required" });
+      return;
+    }
+
+    const apiWorkspaceId = req.apiKeyAuth?.workspaceId;
+    const sessionUserId = req.user?.id;
+    const userId = body.userId ?? sessionUserId ?? "api-key-user";
+
+    const workspace = await resolveWorkspace({
+      ...(sessionUserId ? { userId: sessionUserId } : {}),
+      ...(body.workspaceId ? { workspaceId: body.workspaceId } : {}),
+      ...(apiWorkspaceId ? { apiWorkspaceId } : {}),
+    });
+
+    if (!workspace) {
+      res.status(404).json({ error: "Workspace not found" });
+      return;
+    }
+
+    const connectorRefs = await connectorsForContext(workspace.connectors);
+    const written = await writeMemory({
+      userId,
+      messages,
+      connectors: connectorRefs,
+    });
+
+    recordUsageAsync({
+      workspaceId: workspace.id,
+      route: "/context/memory",
+      ...(req.apiKeyAuth?.apiKeyId
+        ? { apiKeyId: req.apiKeyAuth.apiKeyId }
+        : {}),
+      userId,
+      tokens: 0,
+      sources: written ? 1 : 0,
+    });
+
+    res.json({
+      ok: true,
+      written,
+      skipped: !written ? "mem0 not connected" : undefined,
+    });
+  } catch (err) {
+    console.error(err);
+    const message = err instanceof Error ? err.message : "memory write failed";
+    res.status(500).json({ error: message });
+  }
 });

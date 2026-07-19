@@ -5,77 +5,99 @@ import { useEffect, useState } from "react";
 
 import { getConnectors, type Connector } from "@/lib/api";
 import { CtaButton } from "@/components/ui/cta-button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth-client";
 
 const steps = [
   {
     href: "/connectors",
-    label: "Link your tools",
-    description: "Connect the apps your team already uses.",
+    label: "Connect your sources",
+    description:
+      "Bring Slack, Notion, GitHub, memory, and more into one place.",
   },
   {
     href: "/sources",
-    label: "Add your files",
-    description: "Upload documents so answers can pull from them.",
+    label: "Add workspace knowledge",
+    description:
+      "Give your agents the docs and knowledge they should reason over.",
   },
   {
     href: "/playground",
-    label: "Try it out",
-    description: "Ask a question and see where the answer came from.",
+    label: "See context in action",
+    description: "Ask a question and see which context gets used.",
   },
   {
     href: "/keys",
-    label: "Get an access key",
-    description: "Use the same setup in your own product.",
+    label: "Ship it to your agents",
+    description: "Use the same context in whatever agents you already run.",
   },
 ] as const;
 
 export default function HomePage() {
   const { data: session } = useSession();
   const [connectors, setConnectors] = useState<Connector[]>([]);
+  const [loadingConnectors, setLoadingConnectors] = useState(true);
 
   useEffect(() => {
     if (!session?.user) return;
+    setLoadingConnectors(true);
     void getConnectors()
       .then((r) => setConnectors(r.connectors))
-      .catch(() => setConnectors([]));
+      .catch(() => setConnectors([]))
+      .finally(() => setLoadingConnectors(false));
   }, [session?.user]);
 
   const connected = connectors.filter((c) => c.status === "connected");
   const user = session?.user;
 
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col justify-center space-y-6 py-6">
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="mx-auto flex min-h-full max-w-md flex-col justify-center gap-6 py-6">
+      <div className="space-y-3 text-center">
+        <h1 className="font-heading text-[1.75rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-3xl">
           {user?.name ? `Hey, ${user.name}` : "Your workspace"}
         </h1>
-        <p className="text-sm font-medium text-muted-foreground">
-          Link your tools, try a question, then take it into your product.
+        <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+          Orchestrate the right context for your agents, across every source.
         </p>
-        <p className="text-sm font-medium text-muted-foreground">
-          <span className="text-foreground">{connected.length}</span> source
-          {connected.length === 1 ? "" : "s"} connected
-          {connected.length > 0
-            ? ` · ${connected.map((c) => c.type).join(", ")}`
-            : ""}
-        </p>
+        {loadingConnectors ? (
+          <div className="flex justify-center">
+            <Skeleton className="h-4 w-40" />
+          </div>
+        ) : (
+          <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+            <span className="text-foreground">{connected.length}</span> source
+            {connected.length === 1 ? "" : "s"} connected
+            {connected.length > 0
+              ? ` · ${connected.map((c) => c.type).join(", ")}`
+              : ""}
+          </p>
+        )}
       </div>
 
-      <CtaButton href="/playground" fullWidth>
-        Try it out
-      </CtaButton>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <CtaButton href="/playground" fullWidth>
+          See it work
+        </CtaButton>
+        <CtaButton href="/connectors" variant="outline" fullWidth>
+          Connect sources
+        </CtaButton>
+      </div>
 
       <ul className="space-y-1.5 text-left">
-        {steps.map((step) => (
+        {steps.map((step, i) => (
           <li key={step.href}>
             <Link
               href={step.href}
-              className="flex gap-3 rounded-sm border border-border px-3 py-2.5 transition-colors hover:bg-neutral-50"
+              className="flex gap-3 rounded-sm border border-border px-3 py-2.5 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
+                {i + 1}
+              </span>
               <span className="min-w-0">
-                <span className="block text-sm font-semibold">{step.label}</span>
-                <span className="mt-0.5 block text-xs font-medium text-muted-foreground">
+                <span className="font-heading block text-sm font-semibold tracking-[-0.02em]">
+                  {step.label}
+                </span>
+                <span className="mt-0.5 block text-xs font-semibold leading-relaxed text-neutral-500">
                   {step.description}
                 </span>
               </span>
@@ -83,6 +105,16 @@ export default function HomePage() {
           </li>
         ))}
       </ul>
+
+      <p className="text-center text-xs font-semibold text-neutral-500">
+        Building agents already?{" "}
+        <Link
+          href="/docs/sdk"
+          className="text-foreground underline underline-offset-4"
+        >
+          Integrate in code
+        </Link>
+      </p>
     </div>
   );
 }

@@ -10,10 +10,17 @@ export class RagRetriever implements Retriever {
   readonly id = "qdrant";
 
   async retrieve(query: string, opts: RetrieveOpts): Promise<ContextItem[]> {
-    // siteId filter left unset so legacy "default" docs remain searchable.
-    const hits = await search(query, {
+    let hits = await search(query, {
       limit: opts.limit ?? 5,
+      siteId: opts.workspaceId,
     });
+    // Legacy ingest used site_id "default" before workspace scoping.
+    if (hits.length === 0) {
+      hits = await search(query, {
+        limit: opts.limit ?? 5,
+        siteId: "default",
+      });
+    }
 
     return hits.map((h) => ({
       id: randomUUID(),

@@ -3,6 +3,7 @@ import { prisma } from "./client.js";
 const CONNECTOR_TYPES = [
   "qdrant",
   "mem0",
+  "groq",
   "slack",
   "notion",
   "github",

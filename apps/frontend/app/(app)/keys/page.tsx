@@ -4,13 +4,23 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import {
+  PageHeader,
+  SectionLabel,
+  appFieldClass,
+  appPanelClass,
+} from "@/components/app/page-header";
+import { IdRow } from "@/components/app/workspace-ids";
+import { CtaButton } from "@/components/ui/cta-button";
+import { KeysListSkeleton } from "@/components/ui/loading-states";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
   createApiKey,
   getWorkspace,
   listApiKeys,
   revokeApiKey,
   type ApiKeyRow,
 } from "@/lib/api";
-import { CtaButton } from "@/components/ui/cta-button";
+import { cn } from "@/lib/utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -20,20 +30,20 @@ function formatDate(iso: string) {
   });
 }
 
-const sdkSnippet = `import { createEngine } from "@contextengine/sdk";
+const sdkSnippet = `import { createEngine } from "@contextengine/sdk"
 
 const engine = createEngine({
-  apiKey: process.env.NMEMO_API_KEY!,
-  baseUrl: "http://localhost:8080", // your API
-});
+  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
+})
 
-const ctx = await engine.getContext({
-  query: "What did we decide about billing?",
+const context = await engine.getContext({
+  query: "What is our refund policy?",
   userId: "user_123",
   workspaceId: "WORKSPACE_ID",
-});
+  conversationId: "conv_123",
+})
 
-// Feed ctx.prompt to your LLM — citations in ctx.citations
+// Give context.prompt to your agent
 `;
 
 export default function KeysPage() {
@@ -43,6 +53,8 @@ export default function KeysPage() {
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [revokingId, setRevokingId] = useState<string | null>(null);
 
   useEffect(() => {
     void Promise.all([listApiKeys(), getWorkspace()])
@@ -52,7 +64,8 @@ export default function KeysPage() {
       })
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : "Failed to load"),
-      );
+      )
+      .finally(() => setLoading(false));
   }, []);
 
   async function handleCreate(e: React.FormEvent) {
@@ -61,7 +74,7 @@ export default function KeysPage() {
     setError(null);
     setCreatedSecret(null);
     try {
-      const { apiKey } = await createApiKey(newName || "SDK key");
+      const { apiKey } = await createApiKey(newName || "API key");
       setKeys((prev) => [
         {
           id: apiKey.id,
@@ -81,7 +94,7 @@ export default function KeysPage() {
   }
 
   async function handleRevoke(id: string) {
-    setBusy(true);
+    setRevokingId(id);
     setError(null);
     try {
       await revokeApiKey(id);
@@ -89,39 +102,64 @@ export default function KeysPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Revoke failed");
     } finally {
-      setBusy(false);
+      setRevokingId(null);
     }
   }
 
   return (
-    <main className="space-y-6">
-      <header className="space-y-1">
-        <h1 className="text-lg font-semibold tracking-tight">Keys & SDK</h1>
-        <p className="max-w-xl text-sm font-medium text-muted-foreground">
-          Same engine as the{" "}
-          <Link href="/playground" className="underline underline-offset-4">
-            Playground
-          </Link>
-          . Create a key, call{" "}
-          <code className="text-foreground/80">getContext()</code> from your
-          agent.{" "}
-          <Link href="/docs/sdk" className="underline underline-offset-4">
-            SDK docs
-          </Link>
-          .
-        </p>
-        {workspaceId && (
-          <p className="text-xs text-muted-foreground">
-            Workspace ID ·{" "}
-            <code className="text-foreground/80">{workspaceId}</code>
-          </p>
-        )}
-      </header>
+    <main className="space-y-8">
+      <PageHeader
+        title="API keys"
+        description={
+          <>
+            Same context as{" "}
+            <Link
+              href="/playground"
+              className="text-foreground underline underline-offset-4"
+            >
+              Playground
+            </Link>
+            , for your own agents.{" "}
+            <Link
+              href="/docs/sdk"
+              className="text-foreground underline underline-offset-4"
+            >
+              Integration docs
+            </Link>
+            .
+          </>
+        }
+      />
 
-      {error && <p className="break-words text-sm text-red-500">{error}</p>}
+      {error && (
+        <p className="break-words text-sm font-semibold text-red-500">{error}</p>
+      )}
+
+      {loading ? (
+        <Skeleton className="h-16 w-full rounded-sm" />
+      ) : workspaceId ? (
+        <div className={appPanelClass}>
+          <IdRow
+            label="workspaceId"
+            value={workspaceId}
+            hint="Use this workspace in your agents. Full profile IDs live under Account."
+          />
+        </div>
+      ) : null}
+      {!loading && workspaceId ? (
+        <p className="-mt-4 text-xs font-semibold text-neutral-500">
+          Need userId too?{" "}
+          <Link
+            href="/settings"
+            className="text-foreground underline underline-offset-4"
+          >
+            Open Account
+          </Link>
+        </p>
+      ) : null}
 
       <section className="space-y-4">
-        <h2 className="text-sm font-semibold tracking-wide">API keys</h2>
+        <SectionLabel>API keys</SectionLabel>
         <form
           onSubmit={(e) => void handleCreate(e)}
           className="flex flex-col gap-2 sm:flex-row"
@@ -130,53 +168,69 @@ export default function KeysPage() {
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Key name"
-            className="min-w-0 flex-1 rounded-md border border-border bg-input px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus:border-foreground/40"
+            disabled={loading}
+            className={appFieldClass}
           />
-          <CtaButton type="submit" disabled={busy} size="compact">
+          <CtaButton
+            type="submit"
+            loading={busy}
+            disabled={loading}
+            size="compact"
+          >
             Create key
           </CtaButton>
         </form>
         {createdSecret && (
-          <p className="border border-border px-3 py-2 text-xs text-muted-foreground">
+          <p className="rounded-sm border border-border bg-neutral-50 px-3 py-2 text-xs font-semibold text-neutral-600">
             Copy now (shown once):{" "}
             <code className="break-all text-foreground">{createdSecret}</code>
           </p>
         )}
-        <ul className="divide-y divide-border border border-border">
-          {keys.map((key) => (
-            <li
-              key={key.id}
-              className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <div className="text-sm">
-                <p className="font-medium">{key.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {key.prefix}… · created {formatDate(key.createdAt)}
-                </p>
-              </div>
-              <CtaButton
-                type="button"
-                variant="outline"
-                size="compact"
-                disabled={busy}
-                onClick={() => void handleRevoke(key.id)}
-                className="self-start"
+        {loading ? (
+          <KeysListSkeleton />
+        ) : (
+          <ul className={cn(appPanelClass, "divide-y divide-border")}>
+            {keys.map((key) => (
+              <li
+                key={key.id}
+                className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
               >
-                Revoke
-              </CtaButton>
-            </li>
-          ))}
-          {keys.length === 0 && (
-            <li className="px-4 py-3 text-sm text-muted-foreground">
-              No keys yet. Create one to call the SDK.
-            </li>
-          )}
-        </ul>
+                <div className="text-sm">
+                  <p className="font-heading font-semibold">{key.name}</p>
+                  <p className="text-xs font-semibold text-neutral-500">
+                    {key.prefix}… · created {formatDate(key.createdAt)}
+                  </p>
+                </div>
+                <CtaButton
+                  type="button"
+                  variant="outline"
+                  size="compact"
+                  loading={revokingId === key.id}
+                  disabled={busy || revokingId !== null}
+                  onClick={() => void handleRevoke(key.id)}
+                  className="self-start"
+                >
+                  Revoke
+                </CtaButton>
+              </li>
+            ))}
+            {keys.length === 0 && (
+              <li className="px-4 py-3 text-sm font-semibold text-neutral-500">
+                No keys yet. Create one for your agents.
+              </li>
+            )}
+          </ul>
+        )}
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold tracking-wide">Quick start</h2>
-        <pre className="overflow-x-auto border border-border bg-input/50 p-4 text-xs leading-relaxed">
+        <SectionLabel>Example</SectionLabel>
+        <pre
+          className={cn(
+            appPanelClass,
+            "overflow-x-auto bg-neutral-50 p-4 text-xs font-medium leading-relaxed",
+          )}
+        >
           <code>
             {sdkSnippet.replace(
               "WORKSPACE_ID",
@@ -184,13 +238,6 @@ export default function KeysPage() {
             )}
           </code>
         </pre>
-        <p className="text-sm text-muted-foreground">
-          Test the same call in the{" "}
-          <Link href="/playground" className="underline underline-offset-4">
-            Playground
-          </Link>{" "}
-          first.
-        </p>
       </section>
     </main>
   );

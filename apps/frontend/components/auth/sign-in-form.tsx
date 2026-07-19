@@ -85,8 +85,8 @@ export function SignInForm({
             required
             className="w-full rounded-sm border border-border bg-input px-3 py-2.5 text-sm font-medium outline-none placeholder:text-muted-foreground focus:border-foreground/30"
           />
-          <CtaButton type="submit" fullWidth disabled={busy}>
-            {busy ? "Signing in…" : "Sign In"}
+          <CtaButton type="submit" fullWidth loading={busy}>
+            {busy ? "Signing in" : "Sign In"}
           </CtaButton>
         </form>
       </div>
@@ -135,8 +135,8 @@ export function SignInForm({
           />
         </label>
 
-        <CtaButton type="submit" fullWidth disabled={busy}>
-          {busy ? "Signing in…" : "Continue"}
+        <CtaButton type="submit" fullWidth loading={busy}>
+          {busy ? "Signing in" : "Continue"}
         </CtaButton>
       </form>
 

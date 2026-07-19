@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ type CtaButtonBase = {
   fullWidth?: boolean;
   className?: string;
   disabled?: boolean;
+  loading?: boolean;
   children: React.ReactNode;
 };
 
@@ -54,19 +56,37 @@ export function CtaButton({
   fullWidth,
   className,
   disabled,
+  loading,
   children,
   ...props
 }: CtaButtonProps) {
   const classes = ctaClasses({ variant, size, fullWidth, className });
+  const isDisabled = disabled || loading;
+  const content = (
+    <>
+      {loading ? (
+        <Loader2
+          size={size === "compact" ? 14 : 16}
+          className="animate-spin"
+          aria-hidden
+        />
+      ) : null}
+      {children}
+    </>
+  );
 
   if ("href" in props && props.href) {
     return (
       <Link
         href={props.href}
-        className={cn(classes, disabled && "pointer-events-none opacity-40")}
-        aria-disabled={disabled}
+        className={cn(
+          classes,
+          "inline-flex items-center justify-center gap-1.5",
+          isDisabled && "pointer-events-none opacity-40",
+        )}
+        aria-disabled={isDisabled}
       >
-        {children}
+        {content}
       </Link>
     );
   }
@@ -74,11 +94,12 @@ export function CtaButton({
   return (
     <button
       type={props.type ?? "button"}
-      disabled={disabled}
+      disabled={isDisabled}
       onClick={props.onClick}
-      className={classes}
+      className={cn(classes, "inline-flex items-center justify-center gap-1.5")}
+      aria-busy={loading || undefined}
     >
-      {children}
+      {content}
     </button>
   );
 }

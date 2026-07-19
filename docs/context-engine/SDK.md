@@ -47,21 +47,23 @@ import { createEngine } from "@contextengine/sdk"
 
 const engine = createEngine({
   apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
-  baseUrl: "http://localhost:8080",
 })
 
 const context = await engine.getContext({
-  query: "Summarize the refund policy",
+  query: "What is our refund policy?",
   userId: "user_123",
-  workspaceId: "ws_123", // optional if API key already scopes workspace
-  conversationId: "conv_1",
-  agent: "support-bot",
+  workspaceId: "ws_123",
 })
 
-// Use with any LLM
+// Feed into any LLM
 const messages = [
   { role: "system", content: context.prompt },
+  { role: "user", content: "What is our refund policy?" },
 ]
+
+console.log(context.prompt)
+console.log(context.citations)
+console.log(context.diagnostics)
 ```
 
 ### Fast path

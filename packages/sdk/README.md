@@ -13,7 +13,7 @@ npm install
 import { createEngine } from "@contextengine/sdk"
 ```
 
-Not published to npm yet — use from this monorepo (`packages/sdk`).
+Monorepo package (`packages/sdk`). To publish: `npm publish -w @contextengine/sdk` (after bundling/publishing `@contextengine/retriever-interface` or inlining types).
 
 ## Quick start
 
@@ -26,17 +26,21 @@ Not published to npm yet — use from this monorepo (`packages/sdk`).
 import { createEngine } from "@contextengine/sdk"
 
 const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!, // ce_live_...
-  baseUrl: "http://localhost:8080",            // optional
+  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
 })
 
 const context = await engine.getContext({
   query: "What is our refund policy?",
   userId: "user_123",
-  workspaceId: "ws_optional_when_using_api_key",
+  workspaceId: "ws_123",
 })
 
-// Feed into your LLM
+// Feed into any LLM
+const messages = [
+  { role: "system", content: context.prompt },
+  { role: "user", content: "What is our refund policy?" },
+]
+
 console.log(context.prompt)
 console.log(context.citations)
 console.log(context.diagnostics)
@@ -70,21 +74,44 @@ const context = await engine.getContextFast({
 | `workspaceId` | `string` | yes\* |
 | `conversationId` | `string` | no |
 | `agent` | `string` | no |
+| `persistMemory` | `{ messages }` | no — write turn to mem0 in same request |
 
 \*With a valid API key, the server uses the key’s workspace; `workspaceId` can still be sent for client bookkeeping.
 
-### Return shape (`GetContextResult`)
+### Memory write-back (after your LLM answers)
 
 ```ts
-{
+const context = await engine.getContext({ query, userId, workspaceId })
+// ... call your LLM with context.prompt → answer
+await engine.writeMemory({
+  userId,
+  workspaceId,
+  messages: [
+    { role: "user", content: query },
+    { role: "assistant", content: answer },
+  ],
+})
+```
+
+### Return shape (`GetContextResult`)
+
+Always these seven fields (from `@contextengine/retriever-interface`):
+
+```ts
+type GetContextResult = {
   prompt: string
   memories: { id, text, score }[]
   documents: { id, text, source, title?, score, metadata? }[]
   sources: { id, name, queried, responded, latencyMs }[]
   citations: { id, source, title, url?, snippet }[]
-  tokenUsage: { total, memory, documents, workspace, instructions }
+  tokenUsage: {
+    total, memory, documents, workspace, instructions
+  }
   diagnostics: {
-    rankingScores, discarded, conflicts, latencyBySource
+    rankingScores,   // { id, score, reason }[]
+    discarded,       // { id, reason }[]
+    conflicts,       // { id, summary, resolution }[]
+    latencyBySource  // Record<sourceId, ms>
   }
 }
 ```

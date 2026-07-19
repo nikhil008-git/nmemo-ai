@@ -31,7 +31,7 @@ export function AuthShell({
         </p>
       </div>
 
-      {/* One-sided preview — zoomed crop of the product */}
+      {/* Orange half — minimal crop, overflow hidden */}
       <div className="relative hidden min-h-screen w-1/2 overflow-hidden lg:block">
         <LandingPlayground variant="auth" />
       </div>

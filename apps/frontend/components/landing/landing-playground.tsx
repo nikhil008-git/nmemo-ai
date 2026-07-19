@@ -1,277 +1,635 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  ArrowRight,
+  AudioLines,
   Bell,
-  Filter,
+  FileText,
+  GitBranch,
   Home,
   Inbox,
+  Languages,
+  MessageSquare,
+  Mic,
+  NotebookPen,
   Search,
   Settings,
-  SortAsc,
-  Sparkles,
   Star,
 } from "lucide-react";
 
-import { SignInForm } from "@/components/auth/sign-in-form";
+import { RoadmapSidebar } from "@/components/app/roadmap-sidebar";
 import { cn } from "@/lib/utils";
 
-const railIcons = [Home, Star, Inbox, Bell, Settings] as const;
+const FRAME_W = 1180;
+const FRAME_H = 720;
 
-const sourceGroups = [
-  {
-    label: "Sources",
-    items: [
-      { name: "Documents", tone: "bg-orange-400", count: 12 },
-      { name: "Slack", tone: "bg-pink-400", count: 4 },
-      { name: "Notion", tone: "bg-sky-400", count: 7 },
-      { name: "GitHub", tone: "bg-emerald-400", count: 3 },
-      { name: "mem0", tone: "bg-lime-400", count: 1 },
-    ],
-  },
-  {
-    label: "View",
-    items: [
-      { name: "Playground", tone: "bg-neutral-400", count: 0 },
-      { name: "Keys", tone: "bg-neutral-400", count: 0 },
-      { name: "Docs", tone: "bg-neutral-400", count: 0 },
-    ],
-  },
+const railIcons = [Home, Star, Inbox, Bell, Settings] as const;
+const upcomingRailIcons = [
+  { icon: Mic, label: "Voice" },
+  { icon: AudioLines, label: "Real-time" },
+  { icon: Languages, label: "Languages" },
 ] as const;
 
-const tabs = ["Sign in", "Playground", "Sources"] as const;
+const topTabs = [
+  "Home",
+  "Playground",
+  "Sources",
+  "Connectors",
+  "API",
+  "Docs",
+  "Settings",
+] as const;
+
+export type DemoTab = (typeof topTabs)[number];
+
+const sources = [
+  { name: "Documents", tone: "bg-orange-400", count: "1" },
+  { name: "Slack", tone: "bg-pink-400", count: "12" },
+  { name: "Notion", tone: "bg-sky-400", count: "8" },
+  { name: "GitHub", tone: "bg-emerald-400", count: "4" },
+  { name: "Memory", tone: "bg-lime-400", count: "3" },
+] as const;
+
+const chips = [
+  { label: "Documents", icon: FileText },
+  { label: "Slack", icon: MessageSquare },
+  { label: "Notion", icon: NotebookPen },
+  { label: "GitHub", icon: GitBranch },
+] as const;
+
+function useFrameScale(baseWidth: number) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => {
+      const width = el.clientWidth;
+      if (width > 0) setScale(width / baseWidth);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [baseWidth]);
+
+  return { ref, scale };
+}
+
+function HomeDemo() {
+  const steps = [
+    {
+      label: "Connect your sources",
+      description: "Bring every source your agents need into one place.",
+    },
+    {
+      label: "Add workspace knowledge",
+      description: "Give your agents the docs and knowledge they should reason over.",
+    },
+    {
+      label: "See context in action",
+      description: "Ask a question and see which context gets used.",
+    },
+    {
+      label: "Ship it to your agents",
+      description: "Use the same context in whatever agents you already run.",
+    },
+  ] as const;
+
+  return (
+    <div className="mx-auto flex h-full max-w-md flex-col justify-center gap-5 py-4">
+      <div className="space-y-2 text-center">
+        <h2 className="font-heading text-[1.65rem] font-semibold tracking-[-0.03em] leading-[1.15]">
+          Hey, Nikhil Rajpurohit
+        </h2>
+        <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+          Ranked context from every source — one call, no glue.
+        </p>
+        <p className="text-sm font-semibold text-neutral-500">
+          <span className="text-foreground">2</span> sources connected · qdrant,
+          groq
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <span className="inline-flex flex-1 items-center justify-center rounded-sm bg-secondary px-4 py-2.5 text-sm font-bold text-white">
+          See it work
+        </span>
+        <span className="inline-flex flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-semibold">
+          Connect sources
+        </span>
+      </div>
+
+      <ul className="space-y-1.5 text-left">
+        {steps.map((step, i) => (
+          <li
+            key={step.label}
+            className="flex gap-3 rounded-sm border border-border px-3 py-2.5"
+          >
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
+              {i + 1}
+            </span>
+            <span className="min-w-0">
+              <span className="font-heading block text-sm font-semibold tracking-[-0.02em]">
+                {step.label}
+              </span>
+              <span className="mt-0.5 block text-xs font-semibold leading-relaxed text-neutral-500">
+                {step.description}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="text-center text-xs font-semibold text-neutral-500">
+        Building agents already?{" "}
+        <span className="text-foreground underline underline-offset-4">
+          Integrate in code
+        </span>
+      </p>
+    </div>
+  );
+}
+
+function PlaygroundDemo() {
+  return (
+    <div className="flex h-full min-h-0 flex-col items-center justify-center px-6 py-8">
+      <div className="flex w-full max-w-2xl flex-col items-center">
+        <h2 className="text-center font-heading text-[1.85rem] font-semibold tracking-[-0.035em] leading-[1.15] text-neutral-950 sm:text-[2.2rem]">
+          Ask across your sources
+        </h2>
+
+        <div className="relative mt-7 w-full rounded-[1.75rem] border border-black/[0.06] bg-[#f3f1ee] px-5 pb-4 pt-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+          <p className="min-h-[7rem] text-[15px] font-medium leading-relaxed text-neutral-400">
+            Ask anything across connected sources…
+          </p>
+          <div className="flex items-end justify-end">
+            <span className="inline-flex size-9 items-center justify-center rounded-full bg-neutral-200/80 text-neutral-500">
+              <ArrowRight size={16} strokeWidth={2} />
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-2">
+          {chips.map(({ label, icon: Icon }) => (
+            <span
+              key={label}
+              className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2 text-[13px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+            >
+              <Icon size={14} strokeWidth={1.75} className="text-neutral-500" />
+              {label}
+            </span>
+          ))}
+        </div>
+
+        <p className="mt-6 text-center text-[12px] font-semibold text-neutral-400 underline decoration-neutral-300 underline-offset-2">
+          Manage sources
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SourcesDemo() {
+  const docs = [
+    { name: "billing-faq.pdf", status: "Ready", chunks: 42 },
+    { name: "refund-policy.md", status: "Ready", chunks: 18 },
+    { name: "q2-handbook.pdf", status: "Ready", chunks: 31 },
+  ] as const;
+
+  return (
+    <div className="mx-auto flex h-full max-w-lg flex-col justify-center gap-4 py-4">
+      <div className="flex items-end justify-between gap-3">
+        <div>
+          <p className="font-heading text-lg font-semibold tracking-tight">
+            Documents
+          </p>
+          <p className="mt-1 text-sm font-semibold text-neutral-500">
+            Ingested files your agents can cite.
+          </p>
+        </div>
+        <span className="rounded-sm bg-secondary px-3 py-1.5 text-xs font-bold text-white">
+          Upload
+        </span>
+      </div>
+      <ul className="divide-y divide-border border border-border">
+        {docs.map((doc) => (
+          <li
+            key={doc.name}
+            className="flex items-center justify-between gap-3 px-4 py-3"
+          >
+            <span className="flex items-center gap-2 text-sm font-semibold">
+              <span className="size-2 rounded-full bg-orange-400" />
+              {doc.name}
+            </span>
+            <span className="text-xs font-semibold text-neutral-500">
+              {doc.status} · {doc.chunks} chunks
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ConnectorsDemo() {
+  const rows = [
+    {
+      name: "Documents (Qdrant)",
+      tone: "bg-orange-400",
+      status: "Connected",
+      desc: "PDFs retrieved into every ask.",
+    },
+    {
+      name: "Slack",
+      tone: "bg-pink-400",
+      status: "Disconnected",
+      desc: "Paste a user token with search:read.",
+    },
+    {
+      name: "Notion",
+      tone: "bg-sky-400",
+      status: "Disconnected",
+      desc: "Internal integration secret.",
+    },
+    {
+      name: "GitHub",
+      tone: "bg-emerald-400",
+      status: "Disconnected",
+      desc: "Classic PAT with repo scope.",
+    },
+    {
+      name: "mem0",
+      tone: "bg-lime-400",
+      status: "Disconnected",
+      desc: "Long-term memory API key.",
+    },
+  ] as const;
+
+  return (
+    <div className="mx-auto flex h-full max-w-xl flex-col justify-center gap-4 py-4">
+      <div>
+        <p className="font-heading text-lg font-semibold tracking-tight">
+          Connectors
+        </p>
+        <p className="mt-1 text-sm font-semibold text-neutral-500">
+          Paste a token once, saved on your workspace.
+        </p>
+      </div>
+      <ul className="divide-y divide-border border border-border">
+        {rows.map((row) => (
+          <li
+            key={row.name}
+            className="flex items-center justify-between gap-3 px-4 py-3"
+          >
+            <span className="min-w-0">
+              <span className="flex items-center gap-2 text-sm font-semibold">
+                <span className={cn("size-2 rounded-full", row.tone)} />
+                {row.name}
+              </span>
+              <span className="mt-0.5 block text-xs font-semibold text-neutral-500">
+                {row.desc}
+              </span>
+            </span>
+            <span
+              className={cn(
+                "shrink-0 text-[10px] font-bold uppercase tracking-wide",
+                row.status === "Connected"
+                  ? "text-foreground"
+                  : "text-neutral-400",
+              )}
+            >
+              {row.status}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export function ProductShell({
+  tab,
+  onTab,
+  rail,
+  onRail,
+  fill = false,
+}: {
+  tab: DemoTab;
+  onTab: (t: DemoTab) => void;
+  rail: number;
+  onRail: (i: number) => void;
+  /** Stretch to parent (auth / journey half-screen crops). */
+  fill?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex overflow-hidden border border-black/8 bg-white",
+        fill
+          ? "absolute inset-0 h-full w-full rounded-none shadow-none"
+          : "h-[720px] w-[1180px] rounded-sm shadow-[0_18px_50px_rgba(0,0,0,0.14)]",
+      )}
+    >
+      <aside className="flex w-12 shrink-0 flex-col items-center gap-3 bg-neutral-900 py-3">
+        {railIcons.map((Icon, i) => (
+          <button
+            key={Icon.displayName ?? i}
+            type="button"
+            onClick={() => {
+              onRail(i);
+              if (i === 0) onTab("Home");
+              if (i === 1) onTab("Playground");
+              if (i === 2) onTab("Connectors");
+              if (i === 3) onTab("Sources");
+              // Settings rail: hover/active only, no content switch
+            }}
+            className={cn(
+              "flex size-8 cursor-pointer items-center justify-center rounded-sm transition-colors",
+              rail === i
+                ? "bg-white/15 text-white"
+                : "text-neutral-400 hover:bg-white/10 hover:text-white",
+            )}
+            aria-label={Icon.displayName ?? "nav"}
+          >
+            <Icon size={16} strokeWidth={1.75} />
+          </button>
+        ))}
+        <div className="mt-auto flex w-full flex-col items-center gap-2 border-t border-white/10 pt-3">
+          {upcomingRailIcons.map(({ icon: Icon, label }) => (
+            <span
+              key={label}
+              className="flex size-8 items-center justify-center rounded-sm text-neutral-500"
+              aria-label={`${label}, coming soon`}
+              title={`${label}, coming soon`}
+            >
+              <Icon size={16} strokeWidth={1.75} />
+            </span>
+          ))}
+        </div>
+      </aside>
+
+      <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-neutral-50">
+        <div className="px-3 py-3">
+          <div className="min-w-0">
+            <p className="font-heading truncate text-sm font-semibold tracking-[-0.02em]">
+              Nikhil Rajpurohit
+            </p>
+            <p className="truncate text-[10px] font-semibold text-neutral-500">
+              Workspace & IDs →
+            </p>
+          </div>
+        </div>
+
+        <div className="flex-1 space-y-4 overflow-auto px-2 pb-3">
+          <div>
+            <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Inbox
+            </p>
+            <ul className="mt-1 space-y-0.5">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onTab("Connectors")}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                    tab === "Connectors" ? "bg-black/5" : "",
+                  )}
+                >
+                  <span>All sources</span>
+                  <span className="text-[10px] text-neutral-500">2</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => onTab("Home")}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                    tab === "Home" ? "bg-black/5" : "",
+                  )}
+                >
+                  <span>My context</span>
+                  <span className="text-[10px] text-neutral-500">2</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Sources
+            </p>
+            <ul className="mt-1 space-y-0.5">
+              {sources.map((item) => (
+                <li key={item.name}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (item.name === "Documents") onTab("Sources");
+                      else onTab("Connectors");
+                    }}
+                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-black/5"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className={cn("size-2 rounded-full", item.tone)} />
+                      {item.name}
+                    </span>
+                    <span className="text-[10px] text-neutral-500">
+                      {item.count}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              View
+            </p>
+            <ul className="mt-1 space-y-0.5">
+              {(
+                [
+                  { name: "Playground", tab: "Playground" as const, live: true },
+                  { name: "Keys", tab: "API" as const, live: false },
+                  { name: "Docs", tab: "Docs" as const, live: false },
+                ] as const
+              ).map((item) => (
+                <li key={item.name}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (item.live) onTab(item.tab);
+                    }}
+                    className={cn(
+                      "flex w-full cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold transition-colors hover:bg-black/5 hover:text-foreground",
+                      item.live && tab === item.tab
+                        ? "bg-black/5 text-foreground"
+                        : "text-foreground",
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-neutral-400" />
+                      {item.name}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <RoadmapSidebar compact />
+        </div>
+
+        <div className="border-t border-border px-2 py-2">
+          <span className="block w-full rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-neutral-500">
+            Sign out
+          </span>
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-4">
+          <div className="flex items-center gap-4 overflow-x-auto">
+            {topTabs.map((t) => {
+              const inert = t === "API" || t === "Docs" || t === "Settings";
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => {
+                    if (!inert) onTab(t);
+                  }}
+                  className={cn(
+                    "shrink-0 cursor-pointer pb-2 pt-1 font-heading text-xs font-semibold tracking-[-0.01em] transition-colors",
+                    !inert && tab === t
+                      ? "border-b-2 border-foreground text-foreground"
+                      : "text-neutral-500 hover:text-foreground",
+                  )}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+          <label className="flex items-center gap-1.5 rounded-sm border border-border bg-neutral-50 px-2 py-1">
+            <Search size={12} className="text-neutral-500" />
+            <input
+              type="search"
+              placeholder="Filter sources"
+              className="w-28 bg-transparent text-[11px] font-semibold outline-none placeholder:text-neutral-400"
+            />
+          </label>
+        </div>
+
+        <div
+          className={cn(
+            "min-h-0 flex-1 bg-white",
+            tab === "Playground" ? "overflow-hidden p-0" : "overflow-auto p-4",
+          )}
+        >
+          {tab === "Home" ? <HomeDemo /> : null}
+          {tab === "Playground" ? <PlaygroundDemo /> : null}
+          {tab === "Sources" ? <SourcesDemo /> : null}
+          {tab === "Connectors" ? <ConnectorsDemo /> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function LandingPlayground({
   variant = "landing",
 }: {
   variant?: "landing" | "auth";
 }) {
-  const [tab, setTab] = useState<(typeof tabs)[number]>("Sign in");
-  const [rail, setRail] = useState(0);
   const isAuth = variant === "auth";
+  const [tab, setTab] = useState<DemoTab>(isAuth ? "Playground" : "Playground");
+  const [rail, setRail] = useState(isAuth ? 1 : 1);
+  const { ref: frameRef, scale } = useFrameScale(FRAME_W);
 
   return (
     <div
       className={
         isAuth
           ? "relative h-full min-h-screen w-full overflow-hidden rounded-l-2xl"
-          : "hero-visual relative w-full overflow-hidden rounded-sm border border-orange-200/40 shadow-[0_24px_70px_rgba(234,88,12,0.18)]"
+          : "hero-visual relative mx-auto w-full max-w-7xl px-2 sm:px-4"
       }
     >
-      {/* Orangish mix stage — subtle radius */}
       <div
-        className="absolute inset-0"
-        style={{
-          background: `
+        className={
+          isAuth
+            ? "relative h-full w-full overflow-hidden"
+            : "relative w-full overflow-hidden rounded-xl sm:rounded-2xl"
+        }
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background: `
             radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255, 190, 120, 0.95) 0%, transparent 55%),
             radial-gradient(ellipse 70% 55% at 88% 18%, rgba(255, 150, 80, 0.8) 0%, transparent 50%),
             radial-gradient(ellipse 85% 55% at 45% 100%, rgba(249, 115, 22, 0.65) 0%, transparent 55%),
             radial-gradient(ellipse 45% 35% at 65% 55%, rgba(254, 215, 170, 0.85) 0%, transparent 45%),
             linear-gradient(165deg, #fff7ed 0%, #ffedd5 42%, #fdba74 100%)
           `,
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
-        style={{
-          background:
-            "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)",
-        }}
-        aria-hidden="true"
-      />
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
+          style={{
+            background:
+              "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)",
+          }}
+          aria-hidden="true"
+        />
 
-      {/* Landing: full page scaled to fit. Auth: zoomed-in crop like Conduit */}
-      <div
-        className={
-          isAuth
-            ? "absolute inset-0 overflow-hidden"
-            : "relative flex items-center justify-center px-4 py-10 sm:px-10 sm:py-14 lg:px-14 lg:py-16"
-        }
-      >
         <div
           className={
             isAuth
-              ? "absolute left-[6%] top-[8%] h-[720px] w-[1180px]"
-              : "h-[calc(640px*0.42)] w-[calc(1080px*0.42)] sm:h-[calc(640px*0.68)] sm:w-[calc(1080px*0.68)] lg:h-[calc(640px*0.82)] lg:w-[calc(1080px*0.82)]"
+              ? "absolute inset-0 overflow-hidden"
+              : "relative flex min-h-[22rem] items-center justify-center px-4 py-8 sm:min-h-[36rem] sm:px-10 sm:py-14 lg:min-h-[42rem] lg:px-14 lg:py-16"
           }
         >
           <div
+            ref={isAuth ? undefined : frameRef}
             className={
               isAuth
-                ? "flex h-[720px] w-[1180px] overflow-hidden rounded-md border border-black/8 bg-white shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
-                : "flex h-[640px] w-[1080px] origin-top-left scale-[0.42] overflow-hidden rounded-sm border border-black/8 bg-white shadow-[0_18px_50px_rgba(0,0,0,0.14)] sm:scale-[0.68] lg:scale-[0.82]"
+                ? "absolute left-[6%] top-[8%] h-[720px] w-[1180px]"
+                : "relative w-[94%] max-w-[1080px]"
+            }
+            style={
+              isAuth
+                ? undefined
+                : {
+                    height: scale > 0 ? FRAME_H * scale : undefined,
+                    aspectRatio:
+                      scale > 0 ? undefined : `${FRAME_W} / ${FRAME_H}`,
+                  }
             }
           >
-          {/* Thin dark rail */}
-          <aside className="flex w-12 shrink-0 flex-col items-center gap-3 bg-neutral-900 py-3">
-            {railIcons.map((Icon, i) => (
-              <button
-                key={Icon.displayName ?? i}
-                type="button"
-                onClick={() => setRail(i)}
-                className={cn(
-                  "flex size-8 items-center justify-center rounded-sm transition-colors",
-                  rail === i
-                    ? "bg-white/15 text-white"
-                    : "text-neutral-400 hover:bg-white/10 hover:text-white",
-                )}
-                aria-label={Icon.displayName ?? "nav"}
-              >
-                <Icon size={16} strokeWidth={1.75} />
-              </button>
-            ))}
-          </aside>
-
-          {/* Light sidebar — always visible at desktop frame size */}
-          <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-neutral-50">
-            <div className="flex items-center justify-between px-3 py-3">
-              <p className="text-sm font-semibold">Workspace</p>
-              <button
-                type="button"
-                className="inline-flex items-center gap-1 rounded-sm border border-border bg-white px-2 py-1 text-[10px] font-semibold text-foreground"
-              >
-                <Sparkles size={11} className="text-secondary" />
-                Ask
-              </button>
-            </div>
-
-            <div className="flex-1 space-y-4 overflow-auto px-2 pb-3">
-              <div>
-                <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Inbox
-                </p>
-                <ul className="mt-1 space-y-0.5">
-                  {["All sources", "My context"].map((label) => (
-                    <li key={label}>
-                      <button
-                        type="button"
-                        className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-medium text-foreground hover:bg-black/5"
-                      >
-                        <span>{label}</span>
-                        <span className="text-[10px] text-muted-foreground">
-                          0
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {sourceGroups.map((group) => (
-                <div key={group.label}>
-                  <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                    {group.label}
-                  </p>
-                  <ul className="mt-1 space-y-0.5">
-                    {group.items.map((item) => (
-                      <li key={item.name}>
-                        <button
-                          type="button"
-                          className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-medium text-foreground hover:bg-black/5"
-                        >
-                          <span className="flex items-center gap-2">
-                            <span
-                              className={cn(
-                                "size-2 rounded-full",
-                                item.tone,
-                              )}
-                            />
-                            {item.name}
-                          </span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {item.count}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </aside>
-
-          {/* Main pane */}
-          <div className="flex min-w-0 flex-1 flex-col">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-4">
-              <div className="flex items-center gap-4">
-                {tabs.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setTab(t)}
-                    className={cn(
-                      "pb-2 pt-1 text-xs font-semibold transition-colors",
-                      tab === t
-                        ? "border-b-2 border-foreground text-foreground"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1 rounded-sm px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:bg-black/5 hover:text-foreground"
-                >
-                  <SortAsc size={12} />
-                  Sort
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1 rounded-sm px-2 py-1 text-[11px] font-semibold text-muted-foreground hover:bg-black/5 hover:text-foreground"
-                >
-                  <Filter size={12} />
-                  Filter
-                </button>
-                <label className="flex items-center gap-1.5 rounded-sm border border-border bg-neutral-50 px-2 py-1">
-                  <Search size={12} className="text-muted-foreground" />
-                  <input
-                    type="search"
-                    placeholder="Search"
-                    className="w-28 bg-transparent text-[11px] font-medium outline-none placeholder:text-muted-foreground"
-                  />
-                  <kbd className="rounded-sm border border-border bg-white px-1 text-[9px] font-semibold text-muted-foreground">
-                    F
-                  </kbd>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex min-h-0 flex-1 items-center justify-center overflow-auto bg-white p-4 sm:p-8">
-              {tab === "Sign in" ? (
-                <div className="w-full max-w-sm">
-                  <Suspense
-                    fallback={
-                      <p className="text-center text-sm text-muted-foreground">
-                        Loading…
-                      </p>
+            <div
+              className={isAuth ? undefined : "origin-top-left"}
+              style={
+                isAuth
+                  ? undefined
+                  : {
+                      transform: `scale(${scale || 0.01})`,
+                      visibility: scale > 0 ? "visible" : "hidden",
                     }
-                  >
-                    <SignInForm compact className="!p-0" />
-                  </Suspense>
-                </div>
-              ) : tab === "Playground" ? (
-                <div className="max-w-sm space-y-2 text-center">
-                  <p className="text-lg font-semibold">Playground</p>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Ask once. Inspect sources, scores, and the final prompt.
-                  </p>
-                </div>
-              ) : (
-                <div className="max-w-sm space-y-2 text-center">
-                  <p className="text-lg font-semibold">Sources</p>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    Connect Slack, Notion, GitHub, docs — then ship with
-                    getContext().
-                  </p>
-                </div>
-              )}
+              }
+            >
+              <ProductShell
+                tab={tab}
+                onTab={setTab}
+                rail={rail}
+                onRail={setRail}
+              />
             </div>
-          </div>
           </div>
         </div>
       </div>
