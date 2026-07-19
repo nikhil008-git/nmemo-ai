@@ -498,18 +498,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </span>
             </button>
 
-            <Link
-              href="/playground"
-              className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-semibold",
-                onPlayground
-                  ? "bg-neutral-900 text-white"
-                  : "border border-border text-foreground hover:bg-neutral-50",
-              )}
-            >
-              <Star size={13} strokeWidth={1.75} />
-              Chat
-            </Link>
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
 
