@@ -43,6 +43,7 @@ function buildRetrievers(connectors: ConnectorRef[]): Retriever[] {
     const config = (c.config ?? {}) as {
       accessToken?: string;
       apiKey?: string;
+      accountLogin?: string;
       mock?: boolean;
     };
     if (config.mock) continue;

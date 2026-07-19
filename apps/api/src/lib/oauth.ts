@@ -92,10 +92,10 @@ export function authorizeUrl(provider: OAuthProvider, state: string): string {
     const u = new URL("https://slack.com/oauth/v2/authorize");
     u.searchParams.set("client_id", process.env.SLACK_CLIENT_ID!);
     u.searchParams.set("redirect_uri", redirectUri);
-    u.searchParams.set(
-      "scope",
-      "channels:history,channels:read,groups:history,search:read,users:read",
-    );
+    // search.messages needs a *user* token (xoxp-) with search:read.
+    // Bot scope alone returns xoxb- and fails with missing_scope at retrieve time.
+    u.searchParams.set("scope", "");
+    u.searchParams.set("user_scope", "search:read");
     u.searchParams.set("state", state);
     return u.toString();
   }
@@ -176,17 +176,29 @@ export async function exchangeCode(
       error?: string;
       access_token?: string;
       team?: { id?: string; name?: string };
-      authed_user?: { id?: string };
+      authed_user?: {
+        id?: string;
+        access_token?: string;
+        scope?: string;
+      };
     };
-    if (!data.ok || !data.access_token) {
+    if (!data.ok) {
       throw new Error(data.error || "Slack OAuth failed");
     }
+    const userToken = data.authed_user?.access_token;
+    if (!userToken) {
+      throw new Error(
+        "Slack did not return a user token. Enable user scope search:read on the Slack app and reconnect.",
+      );
+    }
     return {
-      accessToken: data.access_token,
+      accessToken: userToken,
+      ...(data.access_token ? { botAccessToken: data.access_token } : {}),
       teamId: data.team?.id,
       teamName: data.team?.name,
       authedUserId: data.authed_user?.id,
       provider: "slack",
+      authMode: "oauth",
     };
   }
 

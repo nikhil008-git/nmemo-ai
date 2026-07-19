@@ -11,6 +11,7 @@ function id() {
 type TokenConfig = {
   accessToken?: string;
   apiKey?: string;
+  accountLogin?: string;
 };
 
 function ghHeaders(token: string) {
@@ -21,33 +22,35 @@ function ghHeaders(token: string) {
   };
 }
 
-/** Pull likely GitHub logins out of a natural-language query. */
-function extractLogins(query: string): string[] {
+/** Only explicit @login or github.com/login — never random words from the query. */
+function extractExplicitLogins(query: string): string[] {
   const found = new Set<string>();
   const patterns = [
     /\bgithub\.com\/([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)/gi,
     /@([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)/g,
-    /\b([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)\b/g,
   ];
   for (const re of patterns) {
     for (const match of query.matchAll(re)) {
       const login = match[1];
-      if (!login) continue;
-      if (login.length < 3) continue;
-      if (
-        /^(who|what|where|when|why|how|the|and|for|with|from|about|this|that|have|does|did|is|are|was|were|you|your|me|my|we|our|they|them|his|her|its|can|could|would|should|will|just|also|into|over|under|github|issue|issues|repo|repos|user|users|profile|resume|document|documents)$/i.test(
-          login,
-        )
-      ) {
-        continue;
-      }
+      if (!login || login.length < 1) continue;
       found.add(login);
     }
   }
   return [...found].slice(0, 3);
 }
 
-/** Live GitHub: users + repos + issues (PAT). */
+function searchKeywords(query: string): string {
+  return query
+    .replace(/[?!.]+/g, " ")
+    .replace(
+      /\b(what'?s|what|is|are|on|my|the|a|an|open|github|issue|issues|repo|repos|pull|request|pr|prs|about|show|me|all|in|for|with|from)\b/gi,
+      " ",
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Live GitHub: connected account repos + involved issues (PAT / OAuth). */
 export class GitHubRetriever implements Retriever {
   readonly id = "github";
   constructor(private config: TokenConfig) {}
@@ -58,136 +61,188 @@ export class GitHubRetriever implements Retriever {
 
     const headers = ghHeaders(token);
     const items: ContextItem[] = [];
-    const logins = extractLogins(query);
+    const connectedLogin = this.config.accountLogin?.trim() || null;
+    const explicit = extractExplicitLogins(query).filter(
+      (l) => !connectedLogin || l.toLowerCase() !== connectedLogin.toLowerCase(),
+    );
 
-    for (const login of logins) {
-      const userRes = await fetch(`https://api.github.com/users/${login}`, {
-        headers,
-      });
-      if (userRes.ok) {
-        const u = (await userRes.json()) as {
-          login?: string;
-          name?: string | null;
-          bio?: string | null;
-          company?: string | null;
-          location?: string | null;
-          blog?: string | null;
-          public_repos?: number;
-          followers?: number;
-          html_url?: string;
-        };
-        items.push({
-          id: id(),
-          text: [
-            `GitHub user: ${u.login ?? login}`,
-            u.name ? `Name: ${u.name}` : null,
-            u.bio ? `Bio: ${u.bio}` : null,
-            u.company ? `Company: ${u.company}` : null,
-            u.location ? `Location: ${u.location}` : null,
-            u.blog ? `Blog: ${u.blog}` : null,
-            `Public repos: ${u.public_repos ?? 0}`,
-            `Followers: ${u.followers ?? 0}`,
-            u.html_url ? `Profile: ${u.html_url}` : null,
-          ]
-            .filter(Boolean)
-            .join("\n"),
-          source: u.html_url ?? `https://github.com/${login}`,
-          title: `GitHub · ${u.login ?? login}`,
-          score: 0.95,
-          metadata: { provider: "github", kind: "user" },
-        });
+    // Resolve connected account if we only have a token (older connectors).
+    let login = connectedLogin;
+    if (!login) {
+      const me = await fetch("https://api.github.com/user", { headers });
+      if (me.ok) {
+        const u = (await me.json()) as { login?: string };
+        login = u.login ?? null;
       }
+    }
 
-      const reposRes = await fetch(
-        `https://api.github.com/users/${encodeURIComponent(login)}/repos?per_page=5&sort=updated`,
-        { headers },
+    if (login) {
+      items.push(
+        ...(await fetchUserSummary(login, headers, 0.92)),
+        ...(await fetchUserRepos(login, headers, 0.88, true)),
       );
-      if (reposRes.ok) {
-        const repos = (await reposRes.json()) as {
-          name?: string;
-          full_name?: string;
-          description?: string | null;
-          html_url?: string;
-          language?: string | null;
-          stargazers_count?: number;
-        }[];
-        for (const repo of repos.slice(0, 5)) {
-          items.push({
-            id: id(),
-            text: [
-              `Repo: ${repo.full_name ?? repo.name}`,
-              repo.description ? `Description: ${repo.description}` : null,
-              repo.language ? `Language: ${repo.language}` : null,
-              `Stars: ${repo.stargazers_count ?? 0}`,
-            ]
-              .filter(Boolean)
-              .join("\n"),
-            source: repo.html_url ?? "github",
-            title: repo.full_name ?? repo.name ?? "GitHub repo",
-            score: 0.85,
-            metadata: { provider: "github", kind: "repo" },
-          });
-        }
-      }
+
+      const keywords = searchKeywords(query);
+      const issueQ = [
+        `involves:${login}`,
+        "is:open",
+        keywords ? `${keywords} in:title,body` : null,
+      ]
+        .filter(Boolean)
+        .join(" ");
+      items.push(...(await searchIssues(issueQ, headers, 8)));
     }
 
-    // Broader fallbacks when we didn't resolve a concrete user
+    for (const other of explicit) {
+      items.push(
+        ...(await fetchUserSummary(other, headers, 0.8)),
+        ...(await fetchUserRepos(other, headers, 0.75)),
+      );
+    }
+
     if (items.length === 0) {
-      const userSearch = new URL("https://api.github.com/search/users");
-      userSearch.searchParams.set("q", query);
-      userSearch.searchParams.set("per_page", "3");
-      const us = await fetch(userSearch, { headers });
-      if (us.ok) {
-        const data = (await us.json()) as {
-          items?: { login?: string; html_url?: string; score?: number }[];
-        };
-        for (const u of data.items ?? []) {
-          if (!u.login) continue;
-          items.push({
-            id: id(),
-            text: `GitHub user search hit: ${u.login}`,
-            source: u.html_url ?? `https://github.com/${u.login}`,
-            title: `GitHub · ${u.login}`,
-            score: Math.min(1, (u.score ?? 50) / 100),
-            metadata: { provider: "github", kind: "user-search" },
-          });
-        }
-      }
-    }
-
-    const issueUrl = new URL("https://api.github.com/search/issues");
-    const cleaned = query.replace(/[?!.]+/g, " ").trim();
-    issueUrl.searchParams.set("q", `${cleaned} in:title,body`);
-    issueUrl.searchParams.set("per_page", "5");
-    const issueRes = await fetch(issueUrl, { headers });
-    if (issueRes.ok) {
-      const data = (await issueRes.json()) as {
-        items?: {
-          title?: string;
-          body?: string;
-          html_url?: string;
-          score?: number;
-        }[];
-      };
-      for (const item of data.items ?? []) {
-        items.push({
-          id: id(),
-          text: `${item.title ?? ""}\n${(item.body ?? "").slice(0, 800)}`,
-          source: item.html_url ?? "github",
-          title: item.title ?? "GitHub issue",
-          score: Math.min(1, (item.score ?? 1) / 100),
-          metadata: { provider: "github", kind: "issue" },
-        });
-      }
-    } else if (items.length === 0) {
-      throw new Error(`GitHub search failed (${issueRes.status})`);
+      throw new Error(
+        "GitHub returned no context for the connected account. Reconnect GitHub or check the PAT scopes (repo).",
+      );
     }
 
     return items.slice(0, 12);
   }
 }
 
-/** Slack search.messages (requires search:read). */
+async function fetchUserSummary(
+  login: string,
+  headers: Record<string, string>,
+  score: number,
+): Promise<ContextItem[]> {
+  const userRes = await fetch(
+    `https://api.github.com/users/${encodeURIComponent(login)}`,
+    { headers },
+  );
+  if (!userRes.ok) return [];
+  const u = (await userRes.json()) as {
+    login?: string;
+    name?: string | null;
+    bio?: string | null;
+    company?: string | null;
+    location?: string | null;
+    blog?: string | null;
+    public_repos?: number;
+    followers?: number;
+    html_url?: string;
+  };
+  return [
+    {
+      id: id(),
+      text: [
+        `GitHub user: ${u.login ?? login}`,
+        u.name ? `Name: ${u.name}` : null,
+        u.bio ? `Bio: ${u.bio}` : null,
+        u.company ? `Company: ${u.company}` : null,
+        u.location ? `Location: ${u.location}` : null,
+        u.blog ? `Blog: ${u.blog}` : null,
+        `Public repos: ${u.public_repos ?? 0}`,
+        `Followers: ${u.followers ?? 0}`,
+        u.html_url ? `Profile: ${u.html_url}` : null,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      source: u.html_url ?? `https://github.com/${login}`,
+      title: `GitHub · ${u.login ?? login}`,
+      score,
+      metadata: { provider: "github", kind: "user" },
+    },
+  ];
+}
+
+async function fetchUserRepos(
+  login: string,
+  headers: Record<string, string>,
+  score: number,
+  /** When true, also pull private repos via /user/repos for the token holder. */
+  includePrivate = false,
+): Promise<ContextItem[]> {
+  const urls = [
+    ...(includePrivate
+      ? [
+          "https://api.github.com/user/repos?per_page=8&sort=updated&affiliation=owner,collaborator",
+        ]
+      : []),
+    `https://api.github.com/users/${encodeURIComponent(login)}/repos?per_page=8&sort=updated&type=all`,
+  ];
+
+  const seen = new Set<string>();
+  const items: ContextItem[] = [];
+  for (const url of urls) {
+    const res = await fetch(url, { headers });
+    if (!res.ok) continue;
+    const repos = (await res.json()) as {
+      name?: string;
+      full_name?: string;
+      description?: string | null;
+      html_url?: string;
+      language?: string | null;
+      stargazers_count?: number;
+      private?: boolean;
+    }[];
+    for (const repo of repos) {
+      const key = repo.full_name ?? repo.name;
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      items.push({
+        id: id(),
+        text: [
+          `Repo: ${repo.full_name ?? repo.name}`,
+          repo.description ? `Description: ${repo.description}` : null,
+          repo.language ? `Language: ${repo.language}` : null,
+          `Stars: ${repo.stargazers_count ?? 0}`,
+          repo.private ? "Visibility: private" : "Visibility: public",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        source: repo.html_url ?? "github",
+        title: repo.full_name ?? repo.name ?? "GitHub repo",
+        score,
+        metadata: { provider: "github", kind: "repo" },
+      });
+      if (items.length >= 8) return items;
+    }
+  }
+  return items;
+}
+
+async function searchIssues(
+  q: string,
+  headers: Record<string, string>,
+  limit: number,
+): Promise<ContextItem[]> {
+  const issueUrl = new URL("https://api.github.com/search/issues");
+  issueUrl.searchParams.set("q", q);
+  issueUrl.searchParams.set("per_page", String(limit));
+  issueUrl.searchParams.set("sort", "updated");
+  const issueRes = await fetch(issueUrl, { headers });
+  if (!issueRes.ok) return [];
+  const data = (await issueRes.json()) as {
+    items?: {
+      title?: string;
+      body?: string;
+      html_url?: string;
+      score?: number;
+      state?: string;
+      repository_url?: string;
+    }[];
+  };
+  return (data.items ?? []).map((item) => ({
+    id: id(),
+    text: `${item.title ?? ""}\n${(item.body ?? "").slice(0, 800)}`,
+    source: item.html_url ?? "github",
+    title: item.title ?? "GitHub issue",
+    score: Math.min(1, (item.score ?? 50) / 100),
+    metadata: { provider: "github", kind: "issue", state: item.state },
+  }));
+}
+
+/** Slack search.messages (requires user token + search:read). */
 export class SlackRetriever implements Retriever {
   readonly id = "slack";
   constructor(private config: TokenConfig) {}
@@ -195,6 +250,11 @@ export class SlackRetriever implements Retriever {
   async retrieve(query: string, _opts: RetrieveOpts): Promise<ContextItem[]> {
     const token = this.config.accessToken;
     if (!token) return [];
+    if (token.startsWith("xoxb-")) {
+      throw new Error(
+        "Slack bot token cannot search. Reconnect Slack (user scope search:read) or paste an xoxp- token.",
+      );
+    }
     const url = new URL("https://slack.com/api/search.messages");
     url.searchParams.set("query", query);
     url.searchParams.set("count", "5");
@@ -213,7 +273,14 @@ export class SlackRetriever implements Retriever {
         }[];
       };
     };
-    if (!data.ok) throw new Error(data.error || "Slack search failed");
+    if (!data.ok) {
+      if (data.error === "missing_scope") {
+        throw new Error(
+          "Slack missing_scope: need a user token (xoxp-) with search:read. Reconnect Slack or paste a new token.",
+        );
+      }
+      throw new Error(data.error || "Slack search failed");
+    }
     return (data.messages?.matches ?? []).map((m) => ({
       id: id(),
       text: m.text ?? "",

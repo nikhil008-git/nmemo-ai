@@ -3,7 +3,12 @@ import fs from "fs/promises";
 import pdf from "pdf-parse";
 import { chunkText } from "./chunk.js";
 import { embed } from "./embed.js";
-import { qdrant, COLLECTION, ensureCollection } from "./qdrant.js";
+import {
+  qdrant,
+  COLLECTION,
+  ensureCollection,
+  formatQdrantError,
+} from "./qdrant.js";
 import type { ChunkPayload } from "./types.js";
 
 export async function ingestPdf(
@@ -50,6 +55,10 @@ export async function ingestPdf(
     } satisfies ChunkPayload,
   }));
 
-  await qdrant.upsert(COLLECTION, { wait: true, points });
+  try {
+    await qdrant.upsert(COLLECTION, { wait: true, points });
+  } catch (err) {
+    throw new Error(formatQdrantError(err));
+  }
   return { chunkCount: chunks.length };
 }

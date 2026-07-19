@@ -40,7 +40,7 @@ const LIVE: CatalogItem[] = [
     name: "Slack",
     description: "Search messages for context.",
     kind: "oauth",
-    tokenHint: "User token with search:read.",
+    tokenHint: "User token (xoxp-) with search:read — not a bot xoxb- token.",
     tokenPlaceholder: "xoxp-…",
     helpHref: "https://api.slack.com/apps",
   },

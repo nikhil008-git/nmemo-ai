@@ -46,6 +46,11 @@ export async function validateConnectorToken(
   }
 
   if (provider === "slack") {
+    if (token.startsWith("xoxb-")) {
+      throw new Error(
+        "Bot tokens (xoxb-) cannot search messages. Paste a user token (xoxp-) with search:read, or use Connect.",
+      );
+    }
     const res = await fetch("https://slack.com/api/auth.test", {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -58,8 +63,22 @@ export async function validateConnectorToken(
     if (!data.ok) {
       throw new Error(
         data.error === "invalid_auth"
-          ? "Slack token rejected. Use a user token (xoxp-) with search:read, or a bot token that can search."
+          ? "Slack token rejected. Use a user token (xoxp-) with search:read."
           : data.error || "Slack token rejected.",
+      );
+    }
+    // Fail fast if search:read is missing (same error Playground would hit).
+    const search = await fetch(
+      "https://slack.com/api/search.messages?query=test&count=1",
+      { headers: { Authorization: `Bearer ${token}` } },
+    );
+    const searchData = (await search.json()) as {
+      ok?: boolean;
+      error?: string;
+    };
+    if (!searchData.ok && searchData.error === "missing_scope") {
+      throw new Error(
+        "Slack token is missing search:read. Add that user scope and paste a new xoxp- token.",
       );
     }
     const out: ValidatedToken = {
