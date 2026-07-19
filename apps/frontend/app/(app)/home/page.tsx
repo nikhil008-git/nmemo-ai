@@ -85,7 +85,7 @@ export function HomeView() {
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <CtaButton href="/playground" fullWidth>
-          See it work
+          Open chat
         </CtaButton>
         <CtaButton href="/connectors" variant="outline" fullWidth>
           Connect sources

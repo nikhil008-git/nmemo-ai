@@ -36,6 +36,7 @@ const rail = [
   { href: "/settings", icon: Settings, label: "Settings" },
 ] as const;
 
+/** Upcoming capabilities, rail icons open a banner pop, not a route. */
 const upcomingRail = [
   {
     id: "voice",
@@ -47,8 +48,7 @@ const upcomingRail = [
     id: "realtime",
     icon: AudioLines,
     label: "Real-time",
-    message:
-      "Real-time turns are next, stream context as the conversation moves.",
+    message: "Real-time turns are next, stream context as the conversation moves.",
   },
   {
     id: "languages",
@@ -72,48 +72,13 @@ const sourceCatalog = [
   { type: "qdrant", name: "Documents", tone: "bg-stone-500", href: "/sources" },
   { type: "slack", name: "Slack", tone: "bg-pink-400", href: "/connectors" },
   { type: "notion", name: "Notion", tone: "bg-sky-400", href: "/connectors" },
-  {
-    type: "github",
-    name: "GitHub",
-    tone: "bg-emerald-400",
-    href: "/connectors",
-  },
+  { type: "github", name: "GitHub", tone: "bg-emerald-400", href: "/connectors" },
   { type: "mem0", name: "mem0", tone: "bg-lime-400", href: "/connectors" },
-  {
-    type: "mcp",
-    name: "MCP",
-    tone: "bg-violet-400",
-    href: "/connectors",
-    soon: true,
-  },
-  {
-    type: "gmail",
-    name: "Gmail / Drive",
-    tone: "bg-red-400",
-    href: "/connectors",
-    soon: true,
-  },
-  {
-    type: "linear",
-    name: "Linear / Jira",
-    tone: "bg-blue-400",
-    href: "/connectors",
-    soon: true,
-  },
-  {
-    type: "sql",
-    name: "SQL",
-    tone: "bg-cyan-400",
-    href: "/connectors",
-    soon: true,
-  },
-  {
-    type: "crm",
-    name: "CRM",
-    tone: "bg-fuchsia-400",
-    href: "/connectors",
-    soon: true,
-  },
+  { type: "mcp", name: "MCP", tone: "bg-violet-400", href: "/connectors", soon: true },
+  { type: "gmail", name: "Gmail / Drive", tone: "bg-red-400", href: "/connectors", soon: true },
+  { type: "linear", name: "Linear / Jira", tone: "bg-blue-400", href: "/connectors", soon: true },
+  { type: "sql", name: "SQL", tone: "bg-cyan-400", href: "/connectors", soon: true },
+  { type: "crm", name: "CRM", tone: "bg-fuchsia-400", href: "/connectors", soon: true },
 ] as const;
 
 function tabActive(pathname: string, href: string) {
@@ -128,6 +93,230 @@ function pageTitle(pathname: string) {
   return hit?.label ?? "nmemo";
 }
 
+type NavBodyProps = {
+  pathname: string;
+  userName: string;
+  connectedCount: number;
+  connectors: Connector[];
+  filteredSources: typeof sourceCatalog | typeof sourceCatalog[number][];
+  onNavigate?: () => void;
+  onSoon?: (message: string) => void;
+  showRailLinks?: boolean;
+};
+
+function SidebarNavBody({
+  pathname,
+  userName,
+  connectedCount,
+  connectors,
+  filteredSources,
+  onNavigate,
+  onSoon,
+  showRailLinks = false,
+}: NavBodyProps) {
+  return (
+    <>
+      <div className="px-3 py-3">
+        <Link
+          href="/settings"
+          onClick={onNavigate}
+          className="min-w-0 block"
+        >
+          <p className="font-heading truncate text-sm font-semibold tracking-[-0.02em]">
+            {userName || "Workspace"}
+          </p>
+          <p className="truncate text-[10px] font-semibold text-neutral-500">
+            Workspace & IDs →
+          </p>
+        </Link>
+      </div>
+
+      <div className="flex-1 space-y-4 overflow-auto px-2 pb-3">
+        {showRailLinks ? (
+          <div>
+            <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+              Navigate
+            </p>
+            <ul className="mt-1 space-y-0.5">
+              {rail.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={onNavigate}
+                      className={cn(
+                        "flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold hover:bg-black/5",
+                        tabActive(pathname, item.href)
+                          ? "bg-black/5 text-foreground"
+                          : "text-foreground",
+                      )}
+                    >
+                      <Icon size={14} strokeWidth={1.75} />
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
+              {upcomingRail.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSoon?.(item.message);
+                        onNavigate?.();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold text-neutral-500 hover:bg-black/5 hover:text-foreground"
+                    >
+                      <Icon size={14} strokeWidth={1.75} />
+                      {item.label}
+                      <span className="ml-auto text-[10px]">Soon</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
+
+        <div>
+          <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+            Inbox
+          </p>
+          <ul className="mt-1 space-y-0.5">
+            <li>
+              <Link
+                href="/connectors"
+                onClick={onNavigate}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                  tabActive(pathname, "/connectors")
+                    ? "bg-black/5 text-foreground"
+                    : "text-foreground",
+                )}
+              >
+                <span>All sources</span>
+                <span className="text-[10px] text-neutral-500">
+                  {connectedCount}
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/home"
+                onClick={onNavigate}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                  tabActive(pathname, "/home")
+                    ? "bg-black/5 text-foreground"
+                    : "text-foreground",
+                )}
+              >
+                <span>My context</span>
+                <span className="text-[10px] text-neutral-500">
+                  {connectedCount}
+                </span>
+              </Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+            Sources
+          </p>
+          <ul className="mt-1 space-y-0.5">
+            {filteredSources.map((item) => {
+              const soon = "soon" in item && item.soon;
+              const on =
+                !soon &&
+                connectors.some(
+                  (c) => c.type === item.type && c.status === "connected",
+                );
+              return (
+                <li key={item.type}>
+                  <Link
+                    href={item.href}
+                    onClick={onNavigate}
+                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-black/5"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "size-2 rounded-full",
+                          on ? item.tone : "bg-neutral-300",
+                          soon && "opacity-50",
+                        )}
+                      />
+                      {item.name}
+                    </span>
+                    <span className="text-[10px] text-neutral-500">
+                      {soon ? "Soon" : on ? 1 : 0}
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+            {filteredSources.length === 0 ? (
+              <li className="px-2 py-1.5 text-[11px] font-semibold text-neutral-400">
+                No matches
+              </li>
+            ) : null}
+          </ul>
+        </div>
+
+        <div>
+          <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+            View
+          </p>
+          <ul className="mt-1 space-y-0.5">
+            {[
+              { href: "/playground", name: "Playground" },
+              { href: "/keys", name: "Keys" },
+              { href: "/docs/sdk", name: "SDK" },
+            ].map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={onNavigate}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                    tabActive(pathname, item.href)
+                      ? "bg-black/5 text-foreground"
+                      : "text-foreground",
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-neutral-400" />
+                    {item.name}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <RoadmapSidebar compact />
+      </div>
+
+      <div className="border-t border-border px-2 py-2">
+        <button
+          type="button"
+          onClick={() => {
+            onNavigate?.();
+            void signOut();
+          }}
+          className="w-full rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-neutral-500 hover:bg-black/5 hover:text-foreground"
+        >
+          Sign out
+        </button>
+      </div>
+    </>
+  );
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -135,8 +324,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [connectors, setConnectors] = useState<Connector[]>([]);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [soonPop, setSoonPop] = useState<string | null>(null);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     if (!soonPop) return;
@@ -145,17 +334,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [soonPop]);
 
   useEffect(() => {
-    setMobileNavOpen(false);
+    setMenuOpen(false);
   }, [pathname]);
 
   useEffect(() => {
-    if (!mobileNavOpen) return;
+    if (!menuOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
     };
-  }, [mobileNavOpen]);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!isPending && !session?.user) {
@@ -219,159 +408,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     0,
     rail.findIndex((item) => tabActive(pathname, item.href)),
   );
-  const title = pageTitle(pathname);
   const onPlayground = tabActive(pathname, "/playground");
+  const title = pageTitle(pathname);
 
-  const sidebarNav = (
-    <>
-      <div className="px-3 py-3">
-        <Link
-          href="/settings"
-          onClick={() => setMobileNavOpen(false)}
-          className="min-w-0 block"
-        >
-          <p className="font-heading truncate text-sm font-semibold tracking-[-0.02em]">
-            {user.name || "Workspace"}
-          </p>
-          <p className="truncate text-[10px] font-semibold text-neutral-500">
-            Workspace & IDs →
-          </p>
-        </Link>
-      </div>
-
-      <div className="flex-1 space-y-4 overflow-auto px-2 pb-3">
-        <div>
-          <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-            Inbox
-          </p>
-          <ul className="mt-1 space-y-0.5">
-            <li>
-              <Link
-                href="/connectors"
-                onClick={() => setMobileNavOpen(false)}
-                className={cn(
-                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
-                  tabActive(pathname, "/connectors")
-                    ? "bg-black/5 text-foreground"
-                    : "text-foreground",
-                )}
-              >
-                <span>All sources</span>
-                <span className="text-[10px] text-neutral-500">
-                  {connected.length}
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/home"
-                onClick={() => setMobileNavOpen(false)}
-                className={cn(
-                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
-                  tabActive(pathname, "/home")
-                    ? "bg-black/5 text-foreground"
-                    : "text-foreground",
-                )}
-              >
-                <span>My context</span>
-                <span className="text-[10px] text-neutral-500">
-                  {connected.length}
-                </span>
-              </Link>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-            Sources
-          </p>
-          <ul className="mt-1 space-y-0.5">
-            {filteredSources.map((item) => {
-              const soon = "soon" in item && item.soon;
-              const on =
-                !soon &&
-                connectors.some(
-                  (c) => c.type === item.type && c.status === "connected",
-                );
-              return (
-                <li key={item.type}>
-                  <Link
-                    href={item.href}
-                    onClick={() => setMobileNavOpen(false)}
-                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-black/5"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "size-2 rounded-full",
-                          on ? item.tone : "bg-neutral-300",
-                          soon && "opacity-50",
-                        )}
-                      />
-                      {item.name}
-                    </span>
-                    <span className="text-[10px] text-neutral-500">
-                      {soon ? "Soon" : on ? 1 : 0}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-            {filteredSources.length === 0 ? (
-              <li className="px-2 py-1.5 text-[11px] font-semibold text-neutral-400">
-                No matches
-              </li>
-            ) : null}
-          </ul>
-        </div>
-
-        <div>
-          <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
-            View
-          </p>
-          <ul className="mt-1 space-y-0.5">
-            {[
-              { href: "/playground", name: "Playground" },
-              { href: "/keys", name: "Keys" },
-              { href: "/docs/sdk", name: "SDK" },
-              { href: "/settings", name: "Settings" },
-            ].map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => setMobileNavOpen(false)}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
-                    tabActive(pathname, item.href)
-                      ? "bg-black/5 text-foreground"
-                      : "text-foreground",
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-neutral-400" />
-                    {item.name}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <RoadmapSidebar compact />
-      </div>
-
-      <div className="border-t border-border px-2 py-2">
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="w-full rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-neutral-500 hover:bg-black/5 hover:text-foreground"
-        >
-          Sign out
-        </button>
-      </div>
-    </>
-  );
+  const navProps: NavBodyProps = {
+    pathname,
+    userName: user.name || "Workspace",
+    connectedCount: connected.length,
+    connectors,
+    filteredSources,
+    onSoon: setSoonPop,
+  };
 
   return (
     <div className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-white">
@@ -421,47 +468,53 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Desktop sidebar */}
         <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-neutral-50 md:flex">
-          {sidebarNav}
+          <SidebarNavBody {...navProps} />
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* Mobile header — tap title for full nav */}
-          <div className="flex items-center gap-2 border-b border-border px-3 py-2.5 md:hidden">
+          {/* Mobile header — tap title/workspace to open full nav */}
+          <div className="flex items-center gap-2 border-b border-border px-3 py-2 md:hidden">
             <button
               type="button"
-              onClick={() => setMobileNavOpen(true)}
-              className="flex min-w-0 flex-1 items-center gap-2 rounded-sm py-1 text-left"
-              aria-expanded={mobileNavOpen}
+              onClick={() => setMenuOpen(true)}
+              className="min-w-0 flex-1 rounded-sm px-1 py-1 text-left hover:bg-neutral-50"
+              aria-expanded={menuOpen}
               aria-controls="mobile-nav-drawer"
             >
-              <span className="font-heading truncate text-sm font-semibold tracking-[-0.02em]">
+              <span className="flex items-center gap-1.5">
+                <span className="font-heading truncate text-sm font-semibold tracking-[-0.02em]">
+                  {user.name || "Workspace"}
+                </span>
+                <ChevronDown
+                  size={14}
+                  className={cn(
+                    "shrink-0 text-neutral-400 transition-transform",
+                    menuOpen && "rotate-180",
+                  )}
+                />
+              </span>
+              <span className="block truncate text-[10px] font-semibold text-neutral-500">
                 {title}
               </span>
-              <ChevronDown
-                size={16}
-                className={cn(
-                  "shrink-0 text-neutral-400 transition-transform",
-                  mobileNavOpen && "rotate-180",
-                )}
-              />
             </button>
+
             <Link
               href="/playground"
               className={cn(
-                "flex size-8 shrink-0 items-center justify-center rounded-sm",
+                "inline-flex shrink-0 items-center gap-1.5 rounded-sm px-2.5 py-1.5 text-xs font-semibold",
                 onPlayground
                   ? "bg-neutral-900 text-white"
-                  : "text-neutral-500 hover:bg-neutral-100",
+                  : "border border-border text-foreground hover:bg-neutral-50",
               )}
-              aria-label="Open chat"
             >
-              <Star size={16} strokeWidth={1.75} />
+              <Star size={13} strokeWidth={1.75} />
+              Chat
             </Link>
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
 
           {/* Desktop tabs */}
-          <div className="hidden flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-4 md:flex">
+          <div className="hidden items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-4 md:flex">
             <div className="flex items-center gap-4 overflow-x-auto">
               {tabs.map((t) => {
                 const active = tabActive(pathname, t.href);
@@ -489,60 +542,43 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               "min-h-0 flex-1 bg-white",
               onPlayground
                 ? "overflow-hidden p-0"
-                : "overflow-auto p-3 sm:p-4 md:p-6",
+                : "overflow-auto p-4 sm:p-6",
             )}
           >
             {children}
           </div>
-
-          {/* Mobile bottom bar */}
-          <nav className="flex shrink-0 items-stretch border-t border-border bg-white md:hidden">
-            {rail.map((item) => {
-              const Icon = item.icon;
-              const active = tabActive(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold",
-                    active ? "text-foreground" : "text-neutral-400",
-                  )}
-                >
-                  <Icon size={18} strokeWidth={1.75} />
-                  <span>{item.label === "Playground" ? "Chat" : item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
         </div>
       </div>
 
-      {/* Mobile drawer — sidebar options */}
-      {mobileNavOpen ? (
+      {/* Mobile nav drawer */}
+      {menuOpen ? (
         <div className="fixed inset-0 z-50 md:hidden" id="mobile-nav-drawer">
           <button
             type="button"
             className="absolute inset-0 bg-black/40"
             aria-label="Close menu"
-            onClick={() => setMobileNavOpen(false)}
+            onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col bg-neutral-50 shadow-xl">
+          <div className="absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col bg-neutral-50 shadow-[8px_0_40px_rgba(0,0,0,0.18)]">
             <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
               <p className="font-heading text-sm font-semibold tracking-[-0.02em]">
                 Menu
               </p>
               <button
                 type="button"
-                onClick={() => setMobileNavOpen(false)}
-                className="flex size-8 items-center justify-center rounded-sm text-neutral-500 hover:bg-black/5"
+                onClick={() => setMenuOpen(false)}
+                className="flex size-8 items-center justify-center rounded-sm text-neutral-500 hover:bg-black/5 hover:text-foreground"
                 aria-label="Close"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-              {sidebarNav}
+            <div className="flex min-h-0 flex-1 flex-col">
+              <SidebarNavBody
+                {...navProps}
+                showRailLinks
+                onNavigate={() => setMenuOpen(false)}
+              />
             </div>
           </div>
         </div>
@@ -558,7 +594,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {soonPop ? (
         <div
           role="status"
-          className="pointer-events-none absolute bottom-20 left-3 z-50 w-[min(18rem,calc(100vw-1.5rem))] rounded-sm border border-black/8 bg-neutral-900 px-3.5 py-2.5 text-[11px] font-medium leading-snug text-neutral-200 shadow-[0_12px_40px_rgba(0,0,0,0.28)] md:bottom-4 md:left-16 md:w-[min(18rem,calc(100vw-5rem))]"
+          className="pointer-events-none absolute bottom-4 left-4 z-50 w-[min(18rem,calc(100vw-2rem))] rounded-sm border border-black/8 bg-neutral-900 px-3.5 py-2.5 text-[11px] font-medium leading-snug text-neutral-200 shadow-[0_12px_40px_rgba(0,0,0,0.28)] md:left-16"
         >
           <p className="font-heading text-[9px] font-semibold uppercase tracking-widest text-neutral-500">
             Next up
