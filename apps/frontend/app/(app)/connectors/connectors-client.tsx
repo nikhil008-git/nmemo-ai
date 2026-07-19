@@ -14,7 +14,7 @@ import {
 } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-type ConnectorKind = "oauth" | "key" | "toggle" | "soon";
+type ConnectorKind = "oauth" | "key" | "soon";
 
 type CatalogItem = {
   type: string;
@@ -27,12 +27,6 @@ type CatalogItem = {
 };
 
 const LIVE: CatalogItem[] = [
-  {
-    type: "qdrant",
-    name: "Documents",
-    description: "PDFs from Sources as workspace knowledge.",
-    kind: "toggle",
-  },
   {
     type: "mem0",
     name: "Memory",
@@ -190,21 +184,6 @@ export function ConnectorsClient() {
     setByType((prev) => ({ ...prev, [connector.type]: connector }));
   }
 
-  async function toggleQdrant(current: Connector) {
-    setBusyType("qdrant");
-    setError(null);
-    try {
-      const next =
-        current.status === "connected" ? "disconnected" : "connected";
-      const { connector } = await updateConnector("qdrant", { status: next });
-      upsert(connector);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Update failed");
-    } finally {
-      setBusyType(null);
-    }
-  }
-
   async function disconnect(type: string) {
     setBusyType(type);
     setError(null);
@@ -343,29 +322,6 @@ export function ConnectorsClient() {
                         </p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2 pt-0.5 text-xs font-semibold">
-                        {meta.kind === "toggle" ? (
-                          <>
-                            <Link
-                              href="/sources"
-                              className="text-neutral-500 underline-offset-4 hover:text-foreground hover:underline"
-                            >
-                              Docs
-                            </Link>
-                            <button
-                              type="button"
-                              disabled={needsSignIn || busyType === "qdrant"}
-                              onClick={() => void toggleQdrant(c)}
-                              className="text-foreground underline-offset-4 hover:underline disabled:opacity-40"
-                            >
-                              {busyType === "qdrant"
-                                ? "…"
-                                : connected
-                                  ? "Off"
-                                  : "On"}
-                            </button>
-                          </>
-                        ) : null}
-
                         {(meta.kind === "oauth" || meta.kind === "key") &&
                         connected ? (
                           <button

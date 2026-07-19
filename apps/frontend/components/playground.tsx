@@ -198,6 +198,12 @@ export function Playground() {
 
   useEffect(() => {
     let cancelled = false;
+    const timeout = window.setTimeout(() => {
+      if (cancelled) return;
+      // Don't block chat forever if the API is slow — open key modal path.
+      setGroqReady((prev) => (prev === null ? false : prev));
+    }, 2500);
+
     void getConnectors()
       .then(({ connectors }) => {
         if (cancelled) return;
@@ -218,9 +224,13 @@ export function Playground() {
             setGroqReady(false);
           }
         }
+      })
+      .finally(() => {
+        window.clearTimeout(timeout);
       });
     return () => {
       cancelled = true;
+      window.clearTimeout(timeout);
     };
   }, []);
 

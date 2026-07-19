@@ -117,8 +117,8 @@ export function HomeDemo({
           Orchestrate the right context for your agents, across every source.
         </p>
         <p className="text-sm font-semibold leading-relaxed text-neutral-500">
-          <span className="text-foreground">2</span> sources connected · qdrant,
-          groq
+          <span className="text-foreground">2</span> sources connected · Slack,
+          Documents
         </p>
       </div>
 
@@ -509,7 +509,7 @@ function SourcesDemo() {
 
 const connectorCatalog = [
   {
-    type: "qdrant",
+    type: "documents",
     name: "Documents",
     description: "PDFs from Sources as workspace knowledge.",
     connected: true,

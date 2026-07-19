@@ -46,10 +46,11 @@ async function forward(req: NextRequest, context: RouteContext) {
     upstream = await fetch(target, init);
   } catch (err) {
     console.error("[api/proxy] upstream failed", target.toString(), err);
-    return NextResponse.json(
-      { error: "API unreachable. Is the backend running on :8080?" },
-      { status: 502 },
-    );
+    const error =
+      process.env.NODE_ENV === "production"
+        ? "Service temporarily unavailable. Try again shortly."
+        : "API unreachable. Is the backend running on :8080?";
+    return NextResponse.json({ error }, { status: 502 });
   }
 
   // OAuth start returns 302 to GitHub/Slack/Notion — pass through to browser.

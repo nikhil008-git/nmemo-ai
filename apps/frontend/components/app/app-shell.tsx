@@ -115,7 +115,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [session?.user]);
 
   const connected = useMemo(
-    () => connectors.filter((c) => c.status === "connected"),
+    () =>
+      connectors.filter(
+        (c) =>
+          c.status === "connected" &&
+          c.type !== "qdrant" &&
+          c.type !== "groq",
+      ),
     [connectors],
   );
 

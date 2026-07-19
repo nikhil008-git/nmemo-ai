@@ -35,12 +35,12 @@ export async function GET(
       redirect: "manual",
     });
   } catch {
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "Service temporarily unavailable. Try again shortly."
+        : "API unreachable. Is the backend running?";
     return NextResponse.redirect(
-      new URL(
-        "/connectors?error=" +
-          encodeURIComponent("API unreachable. Is the backend running?"),
-        _req.url,
-      ),
+      new URL("/connectors?error=" + encodeURIComponent(message), _req.url),
     );
   }
 

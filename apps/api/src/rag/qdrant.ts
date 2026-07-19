@@ -9,6 +9,7 @@ export const COLLECTION =   process.env.QDRANT_COLLECTION ?? "documents";
 
 export const qdrant = new QdrantClient({
     url: process.env.QDRANT_URL ?? "http://localhost:6333",
+    checkCompatibility: false,
     ...(process.env.QDRANT_API_KEY
       ? { apiKey: process.env.QDRANT_API_KEY }
       : {}),

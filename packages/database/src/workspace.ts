@@ -59,24 +59,28 @@ export async function ensureDefaultWorkspace(userId: string, userName?: string) 
 }
 
 async function ensureConnectorRows(workspaceId: string) {
-  for (const type of CONNECTOR_TYPES) {
-    await prisma.connector.upsert({
-      where: { workspaceId_type: { workspaceId, type } },
-      create: {
-        workspaceId,
-        type,
-        status: type === "qdrant" ? "connected" : "disconnected",
-        config:
-          type === "qdrant"
-            ? {
-                url: process.env.QDRANT_URL ?? "http://localhost:6333",
-                collection: process.env.QDRANT_COLLECTION ?? "documents",
-              }
-            : {},
-      },
-      update: {},
-    });
-  }
+  const existing = await prisma.connector.findMany({
+    where: { workspaceId },
+    select: { type: true },
+  });
+  const have = new Set(existing.map((c) => c.type));
+  const missing = CONNECTOR_TYPES.filter((type) => !have.has(type));
+  if (missing.length === 0) return;
+
+  await prisma.connector.createMany({
+    data: missing.map((type) => ({
+      workspaceId,
+      type,
+      status: type === "qdrant" ? "connected" : "disconnected",
+      config:
+        type === "qdrant"
+          ? {
+              url: process.env.QDRANT_URL ?? "http://localhost:6333",
+              collection: process.env.QDRANT_COLLECTION ?? "documents",
+            }
+          : {},
+    })),
+  });
 }
 
 export async function getWorkspaceForUser(userId: string, workspaceId?: string) {

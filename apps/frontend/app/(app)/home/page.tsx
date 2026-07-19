@@ -51,7 +51,12 @@ export function HomeView() {
       .finally(() => setLoadingConnectors(false));
   }, [session?.user]);
 
-  const connected = connectors.filter((c) => c.status === "connected");
+  const connected = connectors.filter(
+    (c) =>
+      c.status === "connected" &&
+      c.type !== "qdrant" &&
+      c.type !== "groq",
+  );
   const user = session?.user;
 
   return (
