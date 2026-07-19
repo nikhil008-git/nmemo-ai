@@ -60,12 +60,12 @@ export function HomeView() {
   const user = session?.user;
 
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col justify-center gap-6 py-6">
+    <div className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center gap-5 px-1 py-4 sm:gap-6 sm:px-0 sm:py-6">
       <div className="space-y-3 text-center">
-        <h1 className="font-heading text-[1.75rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-3xl">
+        <h1 className="font-heading text-[1.5rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-[1.75rem] md:text-3xl">
           {user?.name ? `Hey, ${user.name}` : "Your workspace"}
         </h1>
-        <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+        <p className="px-1 text-sm font-semibold leading-relaxed text-neutral-500">
           Orchestrate the right context for your agents, across every source.
         </p>
         {loadingConnectors ? (
@@ -73,7 +73,7 @@ export function HomeView() {
             <Skeleton className="h-4 w-40" />
           </div>
         ) : (
-          <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+          <p className="break-words px-1 text-sm font-semibold leading-relaxed text-neutral-500">
             <span className="text-foreground">{connected.length}</span> source
             {connected.length === 1 ? "" : "s"} connected
             {connected.length > 0
@@ -97,7 +97,7 @@ export function HomeView() {
           <li key={step.href}>
             <Link
               href={step.href}
-              className="flex gap-3 rounded-sm border border-border px-3 py-2.5 transition-colors hover:border-neutral-300 hover:bg-neutral-50"
+              className="flex gap-3 rounded-sm border border-border px-3 py-2.5 transition-colors hover:border-neutral-300 hover:bg-neutral-50 active:bg-neutral-50"
             >
               <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
                 {i + 1}
@@ -115,7 +115,7 @@ export function HomeView() {
         ))}
       </ul>
 
-      <p className="text-center text-xs font-semibold text-neutral-500">
+      <p className="pb-2 text-center text-xs font-semibold text-neutral-500">
         Building agents already?{" "}
         <Link
           href="/docs/sdk"
