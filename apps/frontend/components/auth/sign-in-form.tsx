@@ -57,7 +57,12 @@ export function SignInForm({ className }: { className?: string }) {
 
     if (res.error) {
       setBusy(false);
-      setError(res.error.message || "Could not start Google sign-in.");
+      const msg = res.error.message || "Could not start Google sign-in.";
+      setError(
+        /client|secret|provider|configured/i.test(msg)
+          ? `${msg} Check GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET and restart the app.`
+          : msg,
+      );
     }
   }
 

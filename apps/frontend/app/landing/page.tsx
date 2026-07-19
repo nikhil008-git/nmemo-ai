@@ -33,7 +33,7 @@ export default function LandingPage() {
           <div className="flex w-full max-w-md flex-col gap-5 sm:gap-6 md:items-end md:text-right">
             <p className="max-w-[36ch] text-[0.9375rem] font-semibold leading-relaxed text-neutral-500 sm:max-w-none sm:text-sm">
               The context decision layer for AI agents. Route, rank, and budget
-              what the model sees — from every source, in one call.
+              what the model sees from every source, in one call.
             </p>
 
             <CtaButtonRow className="md:justify-end">
