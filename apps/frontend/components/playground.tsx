@@ -341,7 +341,7 @@ export function Playground() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="groq-key-title"
-            className="w-full max-w-sm rounded-2xl border border-black/8 bg-white p-5 shadow-[0_16px_40px_rgba(0,0,0,0.12)]"
+            className="w-full max-w-sm rounded-2xl border border-black/8 bg-white p-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] sm:p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
@@ -414,15 +414,15 @@ export function Playground() {
       ) : null}
 
       {empty ? (
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 py-10 sm:px-6">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-6 sm:px-6 sm:py-10">
           <div className="flex w-full max-w-2xl flex-col items-center">
-            <h1 className="text-center font-heading text-[1.85rem] font-semibold tracking-[-0.035em] text-balance leading-[1.15] text-neutral-950 sm:text-[2.35rem] md:text-[2.6rem]">
+            <h1 className="text-center font-heading text-[1.45rem] font-semibold tracking-[-0.035em] text-balance leading-[1.15] text-neutral-950 sm:text-[2.35rem] md:text-[2.6rem]">
               Ask across your sources
             </h1>
 
             <form
               onSubmit={(e) => void onSubmit(e)}
-              className="relative mt-8 w-full rounded-[1.75rem] border border-black/[0.06] bg-[#f3f1ee] px-5 pb-4 pt-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]"
+              className="relative mt-5 w-full rounded-2xl border border-black/[0.06] bg-[#f3f1ee] px-3.5 pb-3 pt-3 shadow-[0_1px_0_rgba(0,0,0,0.02)] sm:mt-8 sm:rounded-[1.75rem] sm:px-5 sm:pb-4 sm:pt-4"
             >
               <textarea
                 ref={inputRef}
@@ -434,15 +434,15 @@ export function Playground() {
                 }}
                 placeholder="Ask anything across connected sources…"
                 disabled={busy}
-                rows={4}
-                className="min-h-[7.5rem] w-full resize-none bg-transparent pr-12 text-[15px] font-medium leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 disabled:opacity-50"
+                rows={3}
+                className="min-h-[5rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[7.5rem] sm:pr-12 sm:text-[15px]"
               />
               <div className="flex items-end justify-end">
                 {busy ? (
                   <button
                     type="button"
                     onClick={() => stop()}
-                    className="inline-flex size-9 items-center justify-center rounded-full bg-neutral-900 text-white transition-opacity hover:opacity-90"
+                    className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-900 text-white transition-opacity hover:opacity-90 sm:size-9"
                     aria-label="Stop"
                   >
                     <Square size={11} fill="currentColor" />
@@ -452,14 +452,19 @@ export function Playground() {
                     type="submit"
                     disabled={!canSend}
                     className={cn(
-                      "inline-flex size-9 items-center justify-center rounded-full transition-colors",
+                      "inline-flex size-8 items-center justify-center rounded-full transition-colors sm:size-9",
                       canSend
                         ? "bg-neutral-900 text-white hover:bg-neutral-800"
                         : "bg-neutral-200/80 text-neutral-500",
                     )}
                     aria-label="Send"
                   >
-                    <ArrowRight size={16} strokeWidth={2} />
+                    <ArrowRight size={14} strokeWidth={2} className="sm:hidden" />
+                    <ArrowRight
+                      size={16}
+                      strokeWidth={2}
+                      className="hidden sm:block"
+                    />
                   </button>
                 )}
               </div>
@@ -471,26 +476,31 @@ export function Playground() {
               </p>
             ) : null}
 
-            <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-2">
+            <div className="mt-3.5 flex w-full flex-wrap items-center justify-center gap-1.5 sm:mt-5 sm:gap-2">
               {CHIPS.map(({ label, icon: Icon, prompt }) => (
                 <button
                   key={label}
                   type="button"
                   disabled={busy}
                   onClick={() => void ask(prompt)}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2 text-[13px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-black/20 hover:bg-neutral-50 disabled:opacity-40"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-black/20 hover:bg-neutral-50 disabled:opacity-40 sm:gap-2 sm:px-3.5 sm:py-2 sm:text-[13px]"
                 >
+                  <Icon
+                    size={12}
+                    strokeWidth={1.75}
+                    className="text-neutral-500 sm:hidden"
+                  />
                   <Icon
                     size={14}
                     strokeWidth={1.75}
-                    className="text-neutral-500"
+                    className="hidden text-neutral-500 sm:block"
                   />
                   {label}
                 </button>
               ))}
             </div>
 
-            <p className="mt-6 text-center text-[12px] font-semibold text-neutral-400">
+            <p className="mt-4 text-center text-[11px] font-semibold text-neutral-400 sm:mt-6 sm:text-[12px]">
               <Link
                 href="/connectors"
                 className="underline decoration-neutral-300 underline-offset-2 hover:text-foreground"
@@ -502,8 +512,8 @@ export function Playground() {
         </div>
       ) : (
         <>
-          <div className="min-h-0 flex-1 overflow-y-auto px-4 sm:px-6">
-            <div className="mx-auto max-w-2xl space-y-7 py-8">
+          <div className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6">
+            <div className="mx-auto max-w-2xl space-y-5 py-5 sm:space-y-7 sm:py-8">
               {messages.map((m) => {
                 const text = messageText(m);
                 const ctx = contextFromMessage(m);
@@ -515,32 +525,41 @@ export function Playground() {
                   <article
                     key={m.id}
                     className={cn(
-                      "flex gap-3",
+                      "flex gap-2 sm:gap-3",
                       isUser ? "justify-end" : "justify-start",
                     )}
                   >
                     {!isUser ? (
-                      <Logo size={26} className="mt-0.5 rounded-[7px]" />
+                      <Logo
+                        size={22}
+                        className="mt-0.5 rounded-[6px] sm:hidden"
+                      />
+                    ) : null}
+                    {!isUser ? (
+                      <Logo
+                        size={26}
+                        className="mt-0.5 hidden rounded-[7px] sm:block"
+                      />
                     ) : null}
                     <div
                       className={cn(
-                        "min-w-0 max-w-[88%] space-y-2",
+                        "min-w-0 max-w-[90%] space-y-1.5 sm:max-w-[88%] sm:space-y-2",
                         isUser && "text-right",
                       )}
                     >
                       {isUser ? (
-                        <p className="inline-block rounded-2xl bg-[#f3f1ee] px-4 py-2.5 text-left text-sm font-medium leading-relaxed">
+                        <p className="inline-block rounded-xl bg-[#f3f1ee] px-3 py-2 text-left text-[13px] font-medium leading-relaxed sm:rounded-2xl sm:px-4 sm:py-2.5 sm:text-sm">
                           {text}
                         </p>
                       ) : (
-                        <div className="space-y-1.5 text-left">
-                          <p className="font-heading text-[10px] font-semibold uppercase tracking-[0.14em] text-neutral-400">
+                        <div className="space-y-1 text-left sm:space-y-1.5">
+                          <p className="font-heading text-[9px] font-semibold uppercase tracking-[0.14em] text-neutral-400 sm:text-[10px]">
                             nmemo
                           </p>
-                          <p className="whitespace-pre-wrap text-[0.9375rem] font-medium leading-[1.65] text-neutral-900">
+                          <p className="whitespace-pre-wrap text-[13px] font-medium leading-[1.6] text-neutral-900 sm:text-[0.9375rem] sm:leading-[1.65]">
                             {text}
                             {streamingHere ? (
-                              <span className="ml-0.5 inline-block h-3.5 w-1.5 animate-pulse bg-orange-500 align-middle" />
+                              <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse bg-orange-500 align-middle sm:h-3.5" />
                             ) : null}
                           </p>
                           {ctx?.citations?.length ? (
@@ -556,9 +575,10 @@ export function Playground() {
               })}
 
               {retrieving ? (
-                <div className="flex items-center gap-3">
-                  <Logo size={26} className="rounded-[7px]" />
-                  <p className="text-sm font-semibold text-neutral-500">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <Logo size={22} className="rounded-[6px] sm:hidden" />
+                  <Logo size={26} className="hidden rounded-[7px] sm:block" />
+                  <p className="text-[13px] font-semibold text-neutral-500 sm:text-sm">
                     Gathering context…
                   </p>
                 </div>
@@ -568,7 +588,7 @@ export function Playground() {
             </div>
           </div>
 
-          <div className="shrink-0 px-4 pb-5 pt-2 sm:px-6">
+          <div className="shrink-0 px-3 pb-3 pt-1.5 sm:px-6 sm:pb-5 sm:pt-2">
             <div className="mx-auto max-w-2xl space-y-2">
               {error && groqReady !== false ? (
                 <p className="break-words text-xs font-semibold text-red-500">
@@ -578,7 +598,7 @@ export function Playground() {
 
               <form
                 onSubmit={(e) => void onSubmit(e)}
-                className="relative rounded-[1.5rem] border border-black/[0.06] bg-[#f3f1ee] px-4 pb-3 pt-3"
+                className="relative rounded-2xl border border-black/[0.06] bg-[#f3f1ee] px-3 pb-2.5 pt-2.5 sm:rounded-[1.5rem] sm:px-4 sm:pb-3 sm:pt-3"
               >
                 <textarea
                   ref={inputRef}
@@ -591,14 +611,14 @@ export function Playground() {
                   placeholder="Ask anything across connected sources…"
                   disabled={busy}
                   rows={2}
-                  className="min-h-[3.25rem] w-full resize-none bg-transparent pr-12 text-[15px] font-medium leading-relaxed outline-none placeholder:text-neutral-400 disabled:opacity-50"
+                  className="min-h-[2.75rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[3.25rem] sm:pr-12 sm:text-[15px]"
                 />
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                <div className="flex items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex items-center gap-2.5 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => setShowDetails((v) => !v)}
-                      className="text-[11px] font-semibold text-neutral-400 hover:text-foreground"
+                      className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
                     >
                       {inspectorContext
                         ? showDetails
@@ -610,7 +630,7 @@ export function Playground() {
                       <button
                         type="button"
                         onClick={clearChat}
-                        className="text-[11px] font-semibold text-neutral-400 hover:text-foreground"
+                        className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
                       >
                         New chat
                       </button>
@@ -620,7 +640,7 @@ export function Playground() {
                     <button
                       type="button"
                       onClick={() => stop()}
-                      className="inline-flex size-9 items-center justify-center rounded-full bg-neutral-900 text-white"
+                      className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-900 text-white sm:size-9"
                       aria-label="Stop"
                     >
                       <Square size={11} fill="currentColor" />
@@ -630,14 +650,19 @@ export function Playground() {
                       type="submit"
                       disabled={!canSend}
                       className={cn(
-                        "inline-flex size-9 items-center justify-center rounded-full transition-colors",
+                        "inline-flex size-8 items-center justify-center rounded-full transition-colors sm:size-9",
                         canSend
                           ? "bg-neutral-900 text-white"
                           : "bg-neutral-200/80 text-neutral-500",
                       )}
                       aria-label="Send"
                     >
-                      <ArrowRight size={16} strokeWidth={2} />
+                      <ArrowRight size={14} strokeWidth={2} className="sm:hidden" />
+                      <ArrowRight
+                        size={16}
+                        strokeWidth={2}
+                        className="hidden sm:block"
+                      />
                     </button>
                   )}
                 </div>
