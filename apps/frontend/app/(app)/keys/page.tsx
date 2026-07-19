@@ -46,17 +46,18 @@ const context = await engine.getContext({
 // Give context.prompt to your agent
 `;
 
-export function KeysView() {
+export function KeysView({ preview = false }: { preview?: boolean }) {
   const [keys, setKeys] = useState<ApiKeyRow[]>([]);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!preview);
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (preview) return;
     void Promise.all([listApiKeys(), getWorkspace()])
       .then(([keysRes, ws]) => {
         setKeys(keysRes.apiKeys);
@@ -66,7 +67,7 @@ export function KeysView() {
         setError(err instanceof Error ? err.message : "Failed to load"),
       )
       .finally(() => setLoading(false));
-  }, []);
+  }, [preview]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -131,13 +132,13 @@ export function KeysView() {
         }
       />
 
-      {error && (
+      {error && !preview ? (
         <p className="break-words text-sm font-semibold text-red-500">{error}</p>
-      )}
+      ) : null}
 
-      {loading ? (
+      {!preview && loading ? (
         <Skeleton className="h-16 w-full rounded-sm" />
-      ) : workspaceId ? (
+      ) : !preview && workspaceId ? (
         <div className={appPanelClass}>
           <IdRow
             label="workspaceId"
@@ -146,7 +147,7 @@ export function KeysView() {
           />
         </div>
       ) : null}
-      {!loading && workspaceId ? (
+      {!preview && !loading && workspaceId ? (
         <p className="-mt-4 text-xs font-semibold text-neutral-500">
           Need userId too?{" "}
           <Link
@@ -161,20 +162,27 @@ export function KeysView() {
       <section className="space-y-4">
         <SectionLabel>API keys</SectionLabel>
         <form
-          onSubmit={(e) => void handleCreate(e)}
+          onSubmit={(e) => {
+            if (preview) {
+              e.preventDefault();
+              return;
+            }
+            void handleCreate(e);
+          }}
           className="flex flex-col gap-2 sm:flex-row"
         >
           <input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="Key name"
-            disabled={loading}
+            disabled={loading || preview}
+            readOnly={preview}
             className={appFieldClass}
           />
           <CtaButton
             type="submit"
             loading={busy}
-            disabled={loading}
+            disabled={loading || preview}
             size="compact"
           >
             Create key
@@ -186,7 +194,7 @@ export function KeysView() {
             <code className="break-all text-foreground">{createdSecret}</code>
           </p>
         )}
-        {loading ? (
+        {loading && !preview ? (
           <KeysListSkeleton />
         ) : (
           <ul className={cn(appPanelClass, "divide-y divide-border")}>
@@ -206,7 +214,7 @@ export function KeysView() {
                   variant="outline"
                   size="compact"
                   loading={revokingId === key.id}
-                  disabled={busy || revokingId !== null}
+                  disabled={busy || revokingId !== null || preview}
                   onClick={() => void handleRevoke(key.id)}
                   className="self-start"
                 >
@@ -223,22 +231,24 @@ export function KeysView() {
         )}
       </section>
 
-      <section className="space-y-3">
-        <SectionLabel>Example</SectionLabel>
-        <pre
-          className={cn(
-            appPanelClass,
-            "overflow-x-auto bg-neutral-50 p-4 text-xs font-medium leading-relaxed",
-          )}
-        >
-          <code>
-            {sdkSnippet.replace(
-              "WORKSPACE_ID",
-              workspaceId ?? "your_workspace_id",
+      {!preview ? (
+        <section className="space-y-3">
+          <SectionLabel>Example</SectionLabel>
+          <pre
+            className={cn(
+              appPanelClass,
+              "overflow-x-auto bg-neutral-50 p-4 text-xs font-medium leading-relaxed",
             )}
-          </code>
-        </pre>
-      </section>
+          >
+            <code>
+              {sdkSnippet.replace(
+                "WORKSPACE_ID",
+                workspaceId ?? "your_workspace_id",
+              )}
+            </code>
+          </pre>
+        </section>
+      ) : null}
     </main>
   );
 }

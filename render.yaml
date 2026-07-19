@@ -1,0 +1,57 @@
+# Context Engine API — Render Blueprint
+# Dashboard → New → Blueprint → connect this repo
+# Fill sync:false env vars, then set Vercel NEXT_PUBLIC_API_URL to this service URL.
+
+services:
+  - type: web
+    name: nmemo-api
+    runtime: node
+    plan: free
+    region: oregon
+    # Monorepo: install/build from repo root (npm workspaces)
+    buildCommand: npm install && npx turbo run build --filter=api...
+    preDeployCommand: npm run db:deploy -w @repo/db
+    startCommand: npm run start -w api
+    healthCheckPath: /health
+    buildFilter:
+      paths:
+        - apps/api/**
+        - packages/core/**
+        - packages/database/**
+        - packages/rag-retriever/**
+        - packages/retriever-interface/**
+        - packages/typescript-config/**
+        - package-lock.json
+        - package.json
+        - turbo.json
+        - render.yaml
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: QDRANT_COLLECTION
+        value: documents
+      # Required — Blueprint will prompt for these:
+      - key: DATABASE_URL
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        sync: false
+      - key: BETTER_AUTH_URL
+        sync: false
+      - key: TOKEN_ENCRYPTION_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: API_PUBLIC_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: VOYAGE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false

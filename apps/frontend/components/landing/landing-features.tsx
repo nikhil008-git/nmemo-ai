@@ -63,7 +63,7 @@ const cards = [
 function CardView({ view }: { view: (typeof cards)[number]["view"] }) {
   if (view === "home") return <HomeView />;
   if (view === "playground") return <Playground />;
-  return <KeysView />;
+  return <KeysView preview />;
 }
 
 export function LandingFeatures() {

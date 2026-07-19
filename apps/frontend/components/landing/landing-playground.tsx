@@ -893,19 +893,28 @@ export function LandingPlayground({
   const [rail, setRail] = useState(isAuth ? 1 : 1);
   const { ref: frameRef, scale } = useFrameScale(FRAME_W);
 
+  const shell = (
+    <ProductShell
+      tab={tab}
+      onTab={setTab}
+      rail={rail}
+      onRail={setRail}
+    />
+  );
+
   return (
     <div
       className={
         isAuth
           ? "relative h-full min-h-screen w-full overflow-hidden rounded-l-2xl"
-          : "hero-visual relative mx-auto w-full max-w-7xl px-2 sm:px-4"
+          : "hero-visual relative mx-auto w-full max-w-7xl overflow-hidden pl-2 sm:overflow-visible sm:px-4"
       }
     >
       <div
         className={
           isAuth
             ? "relative h-full w-full overflow-hidden"
-            : "relative w-full overflow-hidden rounded-xl sm:rounded-2xl"
+            : "relative w-full overflow-hidden rounded-l-xl rounded-r-none sm:rounded-2xl"
         }
       >
         <div
@@ -930,11 +939,30 @@ export function LandingPlayground({
           aria-hidden="true"
         />
 
+        {/* Mobile: zoomed landscape desktop, orange + shell clipped on the right */}
+        {!isAuth ? (
+          <div className="relative h-[300px] overflow-hidden sm:hidden">
+            <div
+              className="absolute left-[4%] top-[6%] origin-top-left"
+              style={{ transform: "scale(0.58)" }}
+            >
+              <div className="overflow-hidden rounded-sm shadow-[0_18px_50px_rgba(0,0,0,0.14)]">
+                <ProductShell
+                  tab={tab}
+                  onTab={setTab}
+                  rail={rail}
+                  onRail={setRail}
+                />
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         <div
           className={
             isAuth
               ? "absolute inset-0 overflow-hidden"
-              : "relative flex min-h-[22rem] items-center justify-center px-4 py-8 sm:min-h-[36rem] sm:px-10 sm:py-14 lg:min-h-[42rem] lg:px-14 lg:py-16"
+              : "relative hidden min-h-[36rem] items-center justify-center px-10 py-14 sm:flex lg:min-h-[42rem] lg:px-14 lg:py-16"
           }
         >
           <div
@@ -965,12 +993,7 @@ export function LandingPlayground({
                     }
               }
             >
-              <ProductShell
-                tab={tab}
-                onTab={setTab}
-                rail={rail}
-                onRail={setRail}
-              />
+              {shell}
             </div>
           </div>
         </div>
