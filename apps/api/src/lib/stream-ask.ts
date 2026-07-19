@@ -21,6 +21,15 @@ export type AskStreamMeta = {
   };
 };
 
+const PLAYGROUND_SYSTEM_PREFIX = [
+  "You are a concise assistant for a context-engine playground.",
+  "Answer the user's question using ONLY the context that follows.",
+  "Write a short, natural reply in plain language.",
+  "Do NOT dump, quote, or restate the full context.",
+  "Do NOT invent Notion/GitHub/Slack sections or numbered source reports.",
+  "If the context does not contain the answer, reply with one short sentence that you don't know.",
+].join(" ");
+
 function groqProvider(apiKey: string) {
   return createOpenAI({
     apiKey,
@@ -93,11 +102,8 @@ export function pipeAskStream(opts: {
 
         const result = streamText({
           model: groq.chat("llama-3.3-70b-versatile"),
-          system:
-            "Answer ONLY using the provided context. If the context doesn't contain the answer, say you don't know. Be concise.",
-          prompt: context.prompt.includes(question)
-            ? context.prompt
-            : `${context.prompt}\n\n${question}`,
+          system: `${PLAYGROUND_SYSTEM_PREFIX}\n\n${context.prompt}`,
+          prompt: question,
           onFinish: ({ text }) => {
             onFinishText?.(text);
           },

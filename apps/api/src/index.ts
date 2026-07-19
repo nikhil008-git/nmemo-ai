@@ -244,7 +244,7 @@ app.post("/ask", requireSession, contextLimiter, async (req, res) => {
       prepared;
 
     const answer = hasContext
-      ? await completeFromPrompt(context.prompt, groqKey)
+      ? await completeFromPrompt(context.prompt, groqKey, question.trim())
       : fallbackText;
 
     if (hasContext) {

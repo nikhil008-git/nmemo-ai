@@ -3,8 +3,12 @@ import type {
   MemoryItem,
 } from "@contextengine/retriever-interface";
 
+/**
+ * Assembled agent instructions / system context.
+ * Callers should pass the user question separately as the user message.
+ */
 export function buildPrompt(
-  query: string,
+  _query: string,
   documents: ContextItem[],
   memories: MemoryItem[] = [],
 ): string {
@@ -17,23 +21,19 @@ export function buildPrompt(
     documents.length === 0
       ? "(no documents retrieved)"
       : documents
-          .map(
-            (d, i) => `[${i + 1}] ${d.title ?? d.source}\n${d.text}`,
-          )
+          .map((d, i) => `[${i + 1}] ${d.title ?? d.source}\n${d.text}`)
           .join("\n\n");
 
   return [
-    "System instructions",
-    "Answer using the relevant memories and retrieved context below (docs, GitHub, Slack, Notion, etc.). Cite sources when possible. If context is missing for the question, say so clearly.",
+    "Use only the memories and retrieved context below.",
+    "Cite sources as [1], [M1], etc. when helpful.",
+    "If the context does not answer the question, say so clearly.",
     "",
     "User memory",
     memSection,
     "",
     "Retrieved context",
     docSection,
-    "",
-    "Current user message",
-    query,
   ].join("\n");
 }
 

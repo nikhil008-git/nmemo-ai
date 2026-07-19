@@ -162,7 +162,13 @@ export function Playground() {
       }
     },
     onError: (err) => {
-      setError(err.message || "Something went wrong");
+      const message = err.message || "Something went wrong";
+      setError(message);
+      if (/invalid.?api.?key/i.test(message)) {
+        setGroqReady(false);
+        writeGroqReadyCache(false);
+        setKeyModalOpen(true);
+      }
     },
   });
 
@@ -350,10 +356,12 @@ export function Playground() {
                   id="groq-key-title"
                   className="font-heading text-sm font-semibold tracking-[-0.02em]"
                 >
-                  API key required
+                  {groqReady ? "Update Groq API key" : "Add Groq API key"}
                 </p>
                 <p className="mt-1 text-[12px] font-medium text-neutral-500">
-                  Add a key to start chatting.
+                  {groqReady
+                    ? "Paste a new key from console.groq.com. Saved on your workspace."
+                    : "Paste a free key from console.groq.com to chat."}
                 </p>
               </div>
               <button
@@ -417,8 +425,14 @@ export function Playground() {
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-6 sm:px-6 sm:py-10">
           <div className="flex w-full max-w-2xl flex-col items-center">
             <h1 className="text-center font-heading text-[1.45rem] font-semibold tracking-[-0.035em] text-balance leading-[1.15] text-neutral-950 sm:text-[2.35rem] md:text-[2.6rem]">
-              Ask across your sources
+              See what context your agents get
             </h1>
+            <p className="mt-2 max-w-md text-center text-[12px] font-medium leading-relaxed text-neutral-500 sm:mt-3 sm:text-[13px]">
+              Ask a question to try{" "}
+              <span className="text-neutral-700">getContext()</span>. The reply
+              is a demo — use Show context to inspect sources, citations, and
+              ranking.
+            </p>
 
             <form
               onSubmit={(e) => void onSubmit(e)}
@@ -432,7 +446,7 @@ export function Playground() {
                 onFocus={() => {
                   if (groqReady === false) openKeyModal();
                 }}
-                placeholder="Ask anything across connected sources…"
+                placeholder="Ask something your sources should know…"
                 disabled={busy}
                 rows={3}
                 className="min-h-[5rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[7.5rem] sm:pr-12 sm:text-[15px]"
@@ -500,7 +514,14 @@ export function Playground() {
               ))}
             </div>
 
-            <p className="mt-4 text-center text-[11px] font-semibold text-neutral-400 sm:mt-6 sm:text-[12px]">
+            <p className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-[11px] font-semibold text-neutral-400 sm:mt-6 sm:text-[12px]">
+              <button
+                type="button"
+                onClick={() => openKeyModal()}
+                className="underline decoration-neutral-300 underline-offset-2 hover:text-foreground"
+              >
+                {groqReady ? "Update Groq key" : "Add Groq key"}
+              </button>
               <Link
                 href="/connectors"
                 className="underline decoration-neutral-300 underline-offset-2 hover:text-foreground"
@@ -635,6 +656,13 @@ export function Playground() {
                         New chat
                       </button>
                     ) : null}
+                    <button
+                      type="button"
+                      onClick={() => openKeyModal()}
+                      className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
+                    >
+                      {groqReady ? "Update Groq key" : "Add Groq key"}
+                    </button>
                   </div>
                   {busy ? (
                     <button
