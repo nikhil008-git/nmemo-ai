@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLenis } from "lenis/react";
+import { useState } from "react";
 
 const SIZE = 16;
 const STROKE = 1.75;
@@ -9,24 +10,11 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export function ScrollProgress() {
   const [progress, setProgress] = useState(0);
+  const lenis = useLenis();
 
-  useEffect(() => {
-    const update = () => {
-      const scrollTop = window.scrollY;
-      const docHeight =
-        document.documentElement.scrollHeight - window.innerHeight;
-      const next = docHeight > 0 ? Math.min(1, scrollTop / docHeight) : 0;
-      setProgress(next);
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
+  useLenis((instance) => {
+    setProgress(instance.progress);
+  });
 
   const offset = CIRCUMFERENCE * (1 - progress);
 
@@ -34,7 +22,7 @@ export function ScrollProgress() {
     <button
       type="button"
       aria-label="Scroll progress"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => lenis?.scrollTo(0, { duration: 1.2 })}
       className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2.5 rounded-full bg-neutral-900 px-3.5 py-2 text-white shadow-[0_8px_24px_rgba(0,0,0,0.18)] transition-transform hover:scale-[1.02]"
     >
       <svg

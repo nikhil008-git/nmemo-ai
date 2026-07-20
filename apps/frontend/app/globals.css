@@ -2,6 +2,9 @@
 
 :root {
   --background: #ffffff;
+  --background-soft: #fafafa;
+  --background-cool: #f8fafc;
+  --background-warm: #f5f3ff;
   --foreground: #000000;
   --muted-foreground: #737373;
   --border: #e5e5e5;

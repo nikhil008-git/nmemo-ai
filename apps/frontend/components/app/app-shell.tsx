@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 
+import { ReactLenis } from "lenis/react";
+
 import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
 import {
   CommandSearch,
@@ -131,7 +133,7 @@ function SidebarNavBody({
         </Link>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-auto px-2 pb-3">
+      <div className="flex-1 space-y-4 overflow-auto px-2 pb-3" data-lenis-prevent>
         {showRailLinks ? (
           <div>
             <p className="px-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
@@ -525,16 +527,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
 
-          <div
-            className={cn(
-              "min-h-0 flex-1 bg-white",
-              onPlayground
-                ? "overflow-hidden p-0"
-                : "overflow-auto p-4 sm:p-6",
-            )}
-          >
-            {children}
-          </div>
+          {onPlayground ? (
+            <div className="min-h-0 flex-1 overflow-hidden bg-white p-0">
+              {children}
+            </div>
+          ) : (
+            <ReactLenis
+              className="min-h-0 flex-1 overflow-auto bg-white p-4 sm:p-6"
+              options={{ autoRaf: true }}
+            >
+              {children}
+            </ReactLenis>
+          )}
         </div>
       </div>
 

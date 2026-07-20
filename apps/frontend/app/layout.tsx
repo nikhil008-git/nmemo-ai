@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
+import { SmoothScroll } from "@/components/smooth-scroll";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -94,13 +95,15 @@ export default function RootLayout({
       className={`${poppins.variable} ${poppins.className} h-full antialiased bg-background text-foreground`}
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <NavigationProgress />
-        <SiteHeader />
-        {children}
+        <SmoothScroll>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          <NavigationProgress />
+          <SiteHeader />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );
