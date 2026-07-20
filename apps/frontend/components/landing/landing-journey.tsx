@@ -6,35 +6,16 @@ import {
   ProductShell,
   type DemoTab,
 } from "@/components/landing/landing-playground";
+import { stageBackgrounds } from "@/lib/stage-backgrounds";
 
 type StageStyle = {
   background: string;
 };
 
 const stages: Record<"home" | "connectors" | "playground", StageStyle> = {
-  home: {
-    background: `
-      radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255, 190, 120, 0.95) 0%, transparent 55%),
-      radial-gradient(ellipse 70% 55% at 88% 18%, rgba(255, 150, 80, 0.8) 0%, transparent 50%),
-      radial-gradient(ellipse 85% 55% at 45% 100%, rgba(249, 115, 22, 0.65) 0%, transparent 55%),
-      linear-gradient(165deg, #fff7ed 0%, #ffedd5 42%, #fdba74 100%)
-    `,
-  },
-  connectors: {
-    background: `
-      radial-gradient(ellipse 80% 60% at 85% 15%, rgba(125, 211, 252, 0.55) 0%, transparent 50%),
-      radial-gradient(ellipse 70% 55% at 10% 80%, rgba(167, 243, 208, 0.5) 0%, transparent 55%),
-      radial-gradient(ellipse 55% 40% at 50% 40%, rgba(253, 186, 116, 0.45) 0%, transparent 50%),
-      linear-gradient(160deg, #f8fafc 0%, #e2e8f0 48%, #cbd5e1 100%)
-    `,
-  },
-  playground: {
-    background: `
-      radial-gradient(ellipse 85% 65% at 20% 10%, rgba(254, 215, 170, 0.9) 0%, transparent 55%),
-      radial-gradient(ellipse 70% 50% at 90% 70%, rgba(251, 146, 60, 0.55) 0%, transparent 50%),
-      linear-gradient(180deg, #fffbeb 0%, #ffedd5 55%, #fed7aa 100%)
-    `,
-  },
+  home: { background: stageBackgrounds.orange },
+  connectors: { background: stageBackgrounds.slate },
+  playground: { background: stageBackgrounds.neutral },
 };
 
 const sections = [
@@ -175,9 +156,11 @@ export function LandingJourney() {
               className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
               style={{
                 background:
-                  section.stage === "connectors"
-                    ? "radial-gradient(circle at 60% 30%, rgba(255,255,255,0.7), transparent 55%)"
-                    : "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)",
+                  section.stage === "home"
+                    ? "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)"
+                    : section.stage === "connectors"
+                      ? "radial-gradient(circle at 70% 25%, rgba(255,255,255,0.65), transparent 55%)"
+                      : "radial-gradient(circle at 55% 30%, rgba(255,255,255,0.75), transparent 55%)",
               }}
               aria-hidden
             />

@@ -7,34 +7,23 @@ import {
   HomeDemo,
   PlaygroundDemo,
 } from "@/components/landing/landing-playground";
-
-const stages = {
-  home: `
-    radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255, 190, 120, 0.9) 0%, transparent 55%),
-    linear-gradient(165deg, #fff7ed 0%, #ffedd5 45%, #fdba74 100%)
-  `,
-  playground: `
-    radial-gradient(ellipse 80% 60% at 80% 20%, rgba(251, 146, 60, 0.55) 0%, transparent 50%),
-    linear-gradient(180deg, #fffbeb 0%, #fed7aa 100%)
-  `,
-  api: `
-    radial-gradient(ellipse 70% 55% at 20% 80%, rgba(125, 211, 252, 0.45) 0%, transparent 55%),
-    linear-gradient(160deg, #f8fafc 0%, #e2e8f0 100%)
-  `,
-} as const;
+import {
+  stageBackgrounds,
+  type StageKey,
+} from "@/lib/stage-backgrounds";
 
 function MiniPreview({
   children,
   stage,
 }: {
   children: React.ReactNode;
-  stage: keyof typeof stages;
+  stage: StageKey;
 }) {
   return (
     <div className="relative mt-auto h-[148px] overflow-hidden sm:h-[160px]">
       <div
         className="absolute inset-0"
-        style={{ background: stages[stage] }}
+        style={{ background: stageBackgrounds[stage] }}
         aria-hidden
       />
       <div className="absolute inset-x-3 bottom-0 top-4 overflow-hidden rounded-t-sm border border-b-0 border-black/10 bg-white shadow-[0_10px_28px_rgba(0,0,0,0.1)] sm:inset-x-4">
@@ -75,7 +64,7 @@ const cards = [
     body: "Sources and agents in the same shell.",
     href: "/home",
     view: "home" as const,
-    stage: "home" as const,
+    stage: "orange" as const,
   },
   {
     label: "Playground",
@@ -83,7 +72,8 @@ const cards = [
     body: "Ask once. Ranked context, live.",
     href: "/playground",
     view: "playground" as const,
-    stage: "playground" as const,
+    // Mid — cool slate (neutral stays last on API)
+    stage: "slate" as const,
   },
   {
     label: "API",
@@ -91,7 +81,7 @@ const cards = [
     body: "Keys for getContext in your agents.",
     href: "/keys",
     view: "api" as const,
-    stage: "api" as const,
+    stage: "neutral" as const,
   },
 ] as const;
 
