@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+import { TraceBracket } from "@/components/brand/nmemo-traces";
 import { CtaButton } from "@/components/ui/cta-button";
 import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -67,7 +68,17 @@ export function SignInForm({ className }: { className?: string }) {
   }
 
   return (
-    <div className={cn("space-y-6 text-foreground", className)}>
+    <div className={cn("relative space-y-6 text-foreground", className)}>
+      <TraceBracket
+        corner="tl"
+        size={52}
+        className="pointer-events-none absolute -left-2 -top-4 opacity-70"
+      />
+      <TraceBracket
+        corner="br"
+        size={52}
+        className="pointer-events-none absolute -bottom-4 -right-2 opacity-70"
+      />
       <div className="space-y-1">
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
           Sign in

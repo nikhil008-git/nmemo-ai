@@ -18,6 +18,7 @@ import {
 
 import { ReactLenis } from "lenis/react";
 
+import { AppTraceBackdrop } from "@/components/brand/nmemo-traces";
 import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
 import {
   CommandSearch,
@@ -469,11 +470,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Desktop sidebar */}
-        <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-neutral-50 md:flex">
+        <aside className="relative hidden w-56 shrink-0 flex-col border-r border-border bg-neutral-50 md:flex">
+          <div
+            className="pointer-events-none absolute bottom-8 right-4 top-16 w-px border-r border-dashed border-neutral-300/35"
+            aria-hidden
+          />
           <SidebarNavBody {...navProps} />
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col bg-white">
           {/* Mobile header — tap title/workspace to open full nav */}
           <div className="flex items-center gap-2 border-b border-border px-3 py-2 md:hidden">
             <button
@@ -527,18 +532,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <SearchTrigger onClick={() => setSearchOpen(true)} />
           </div>
 
-          {onPlayground ? (
-            <div className="min-h-0 flex-1 overflow-hidden bg-white p-0">
-              {children}
-            </div>
-          ) : (
-            <ReactLenis
-              className="min-h-0 flex-1 overflow-auto bg-white p-4 sm:p-6"
-              options={{ autoRaf: true }}
-            >
-              {children}
-            </ReactLenis>
-          )}
+          <div className="relative min-h-0 flex-1">
+            <AppTraceBackdrop />
+
+            {onPlayground ? (
+              <div className="relative z-[1] h-full min-h-0 overflow-hidden bg-transparent p-0">
+                {children}
+              </div>
+            ) : (
+              <ReactLenis
+                className="relative z-[1] h-full min-h-0 overflow-auto bg-transparent p-4 sm:p-6"
+                options={{ autoRaf: true }}
+              >
+                {children}
+              </ReactLenis>
+            )}
+          </div>
         </div>
       </div>
 

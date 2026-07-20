@@ -4,6 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { LandingFooter } from "@/components/landing/landing-footer";
+import {
+  NmemoTraceBackdrop,
+  TraceDivider,
+  TraceRule,
+} from "@/components/brand/nmemo-traces";
 import { CtaButton, CtaButtonRow } from "@/components/ui/cta-button";
 import { cn } from "@/lib/utils";
 
@@ -71,8 +76,9 @@ export function DocsShell({
   return (
     <main className="relative flex flex-1 flex-col overflow-hidden text-foreground">
       <GridBackdrop />
+      <NmemoTraceBackdrop variant="docs" />
 
-      <section className="relative mx-auto flex w-full max-w-6xl flex-col px-6 pb-16 pt-28 sm:pt-32">
+      <section className="relative z-[1] mx-auto flex w-full max-w-6xl flex-col px-6 pb-16 pt-28 sm:pt-32">
         <DocsNav />
 
         <header className="mt-10 min-w-0 max-w-2xl space-y-3 sm:mt-12">
@@ -86,8 +92,12 @@ export function DocsShell({
           ) : null}
         </header>
 
-        <article className="mt-10 w-full space-y-12 sm:mt-12">{children}</article>
+        <article className="mt-10 w-full space-y-12 sm:mt-12">
+          {children}
+        </article>
       </section>
+
+      <TraceDivider className="relative z-[1]" />
 
       <LandingFooter />
     </main>
@@ -114,6 +124,7 @@ export function DocSection({
             </span>
           ) : null}
         </h2>
+        <TraceRule className="mt-3 opacity-60" />
       </div>
       {children ? <div className="mt-5 space-y-4">{children}</div> : null}
     </section>

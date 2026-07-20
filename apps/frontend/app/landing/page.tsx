@@ -71,12 +71,18 @@ export default function LandingPage() {
         <LandingFeatures />
       </section>
 
+      <TraceDivider className="relative z-[2]" />
+
       <LandingJourney />
+
+      <TraceDivider className="relative z-[2]" />
 
       <section className="relative z-[2] mx-auto flex w-full max-w-6xl flex-col px-6 pb-12">
         <LandingRoadmap />
         <LandingCta />
       </section>
+
+      <TraceDivider className="relative z-[2]" />
 
       <LandingFooter />
     </main>

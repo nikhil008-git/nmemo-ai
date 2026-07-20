@@ -1,7 +1,7 @@
 "use client";
 
 import { useLenis } from "lenis/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const SIZE = 16;
 const STROKE = 1.75;
@@ -12,9 +12,25 @@ export function ScrollProgress() {
   const [progress, setProgress] = useState(0);
   const lenis = useLenis();
 
-  useLenis((instance) => {
-    setProgress(instance.progress);
-  });
+  // RAF keeps the ring in sync through Lenis deceleration after input stops.
+  useEffect(() => {
+    if (!lenis) return;
+
+    let frame = 0;
+    let last = -1;
+
+    const tick = () => {
+      const next = lenis.progress;
+      if (next !== last) {
+        last = next;
+        setProgress(next);
+      }
+      frame = requestAnimationFrame(tick);
+    };
+
+    tick();
+    return () => cancelAnimationFrame(frame);
+  }, [lenis]);
 
   const offset = CIRCUMFERENCE * (1 - progress);
 
@@ -51,7 +67,7 @@ export function ScrollProgress() {
           strokeLinecap="round"
           strokeDasharray={CIRCUMFERENCE}
           strokeDashoffset={offset}
-          className="text-white transition-[stroke-dashoffset] duration-150 ease-out"
+          className="text-white"
         />
       </svg>
       <span className="text-[13px] font-medium tracking-tight">Context</span>
