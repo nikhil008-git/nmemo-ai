@@ -7,45 +7,30 @@ import { cn } from "@/lib/utils";
 const STEP_MS = 9000;
 const PULSE_MS = 2800;
 
-function SkeletonBar({ className }: { className?: string }) {
-  return <div className={cn("h-2 rounded-sm bg-neutral-200/90", className)} />;
-}
-
-function SkeletonPanel({
-  active,
-  children,
-}: {
-  active: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-sm bg-neutral-100",
-        !active && "opacity-45",
-      )}
-    >
-      <div className="relative h-[200px] p-4 sm:h-[220px] sm:p-5">{children}</div>
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white from-15% via-white/90 via-45% to-transparent"
-        aria-hidden
-      />
-    </div>
-  );
-}
-
 function FeatureTag({
   children,
   active,
+  tone = "dark",
 }: {
   children: ReactNode;
   active?: boolean;
+  tone?: "dark" | "orange" | "sky";
 }) {
+  const tones = {
+    dark: active
+      ? "bg-neutral-900 text-white"
+      : "bg-neutral-200/80 text-neutral-500",
+    orange: active
+      ? "bg-orange-500 text-white"
+      : "bg-orange-100 text-orange-700/70",
+    sky: active ? "bg-sky-600 text-white" : "bg-sky-100 text-sky-800/70",
+  } as const;
+
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-sm px-2 py-0.5 text-[10px] font-semibold tracking-tight",
-        active ? "bg-neutral-900 text-white" : "bg-neutral-200/80 text-neutral-500",
+        tones[tone],
       )}
     >
       {children}
@@ -53,7 +38,33 @@ function FeatureTag({
   );
 }
 
-/** App shell skeleton, sidebar + one highlighted retrieve hit */
+function Panel({
+  active,
+  className,
+  children,
+}: {
+  active: boolean;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-sm border border-black/5",
+        !active && "opacity-45",
+        className,
+      )}
+    >
+      <div className="relative h-[200px] p-4 sm:h-[220px] sm:p-5">{children}</div>
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white from-20% via-white/85 via-50% to-transparent"
+        aria-hidden
+      />
+    </div>
+  );
+}
+
+/** Parallel source fan-out — colored latency chips */
 function RetrieveDemo({ active }: { active: boolean }) {
   const [pulse, setPulse] = useState(0);
 
@@ -66,42 +77,62 @@ function RetrieveDemo({ active }: { active: boolean }) {
     return () => window.clearInterval(id);
   }, [active]);
 
-  const tags = ["Source A · 42ms", "Source B · 110ms", "Source C · 95ms"] as const;
-  const tag = tags[pulse % tags.length];
+  const sources = [
+    { name: "Docs", ms: 42, tone: "bg-orange-400" },
+    { name: "Slack", ms: 110, tone: "bg-pink-400" },
+    { name: "Notion", ms: 95, tone: "bg-sky-400" },
+    { name: "GitHub", ms: 128, tone: "bg-emerald-400" },
+  ] as const;
 
   return (
-    <SkeletonPanel active={active}>
-      <div className="flex h-full gap-3">
-        <div className="flex w-7 shrink-0 flex-col items-center gap-2 pt-0.5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "size-5 rounded-sm bg-neutral-200/90",
-                active && i === pulse % 5 && "bg-neutral-300",
-              )}
-            />
-          ))}
-        </div>
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="space-y-2">
-            <SkeletonBar className="w-2/5" />
-            <SkeletonBar className="w-3/5" />
-          </div>
-          <div
-            className={cn(
-              "h-[72px] rounded-sm bg-neutral-200/50",
-              active && "bg-neutral-200",
-            )}
-          />
-          <FeatureTag active={active}>{tag}</FeatureTag>
+    <Panel active={active} className="bg-neutral-950 text-white">
+      <div className="flex h-full flex-col gap-3">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-white/45">
+          Parallel retrieve
+        </p>
+        <div className="space-y-2">
+          {sources.map((s, i) => {
+            const on = active && i === pulse % sources.length;
+            return (
+              <div
+                key={s.name}
+                className={cn(
+                  "flex items-center gap-2 rounded-sm px-2.5 py-2 transition-colors",
+                  on ? "bg-white/12" : "bg-white/5",
+                )}
+              >
+                <span className={cn("size-2 shrink-0 rounded-full", s.tone)} />
+                <span className="flex-1 text-xs font-semibold">{s.name}</span>
+                <span
+                  className={cn(
+                    "text-[10px] font-bold tabular-nums",
+                    on ? "text-orange-300" : "text-white/40",
+                  )}
+                >
+                  {s.ms}ms
+                </span>
+                <span
+                  className={cn(
+                    "h-1.5 w-16 overflow-hidden rounded-full bg-white/10",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "block h-full rounded-full transition-all",
+                      on ? "w-full bg-orange-400" : "w-2/5 bg-white/25",
+                    )}
+                  />
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </SkeletonPanel>
+    </Panel>
   );
 }
 
-/** Context card skeleton, thicker bars, ranking tags */
+/** Ranking card with scored hits */
 function RankDemo({ active }: { active: boolean }) {
   const [pulse, setPulse] = useState(0);
 
@@ -114,32 +145,53 @@ function RankDemo({ active }: { active: boolean }) {
     return () => window.clearInterval(id);
   }, [active]);
 
-  const scores = ["0.92 · Source A", "0.81 · Source B", "0.74 · Source C"] as const;
+  const scores = [
+    { id: "billing-faq.pdf", score: 0.92, keep: true },
+    { id: "slack:#finance", score: 0.81, keep: true },
+    { id: "notion:runbook", score: 0.54, keep: false },
+  ] as const;
 
   return (
-    <SkeletonPanel active={active}>
-      <div className="flex h-full flex-col gap-4">
+    <Panel active={active} className="bg-orange-50">
+      <div className="flex h-full flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-neutral-400">#ctx</span>
-          <div className="size-7 rounded-full bg-neutral-200" />
-        </div>
-        <div className="space-y-2.5">
-          <SkeletonBar className="h-3.5 w-[88%]" />
-          <SkeletonBar className="h-3 w-full" />
-          <SkeletonBar className="h-3 w-4/5" />
-        </div>
-        <div className="mt-auto flex flex-wrap gap-1.5 pb-6">
-          <FeatureTag active={active}>
-            {scores[pulse % scores.length]}
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-orange-800/50">
+            Rank · dedupe · budget
+          </p>
+          <FeatureTag active={active} tone="orange">
+            Budget ok
           </FeatureTag>
-          <FeatureTag>Budget ok</FeatureTag>
         </div>
+        <ul className="space-y-2">
+          {scores.map((row, i) => {
+            const on = active && i === pulse % scores.length;
+            return (
+              <li
+                key={row.id}
+                className={cn(
+                  "flex items-center gap-2 rounded-sm border px-2.5 py-2",
+                  row.keep
+                    ? "border-orange-200 bg-white"
+                    : "border-transparent bg-orange-100/60 opacity-50 line-through",
+                  on && row.keep && "ring-1 ring-orange-400",
+                )}
+              >
+                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-800">
+                  {row.id}
+                </span>
+                <span className="text-[11px] font-bold tabular-nums text-orange-700">
+                  {row.score.toFixed(2)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-    </SkeletonPanel>
+    </Panel>
   );
 }
 
-/** Prompt skeleton, code-ish bars + delivery tag */
+/** Packed prompt handoff */
 function DeliverDemo({ active }: { active: boolean }) {
   const [pulse, setPulse] = useState(0);
 
@@ -152,34 +204,40 @@ function DeliverDemo({ active }: { active: boolean }) {
     return () => window.clearInterval(id);
   }, [active]);
 
-  const lines = ["w-[92%]", "w-[78%]", "w-[85%]", "w-[60%]", "w-[70%]"] as const;
   const tags = ["via nmemo", "3 citations", "diagnostics"] as const;
 
   return (
-    <SkeletonPanel active={active}>
+    <Panel active={active} className="bg-sky-50">
       <div className="flex h-full flex-col gap-3">
-        <div className="space-y-2">
-          {lines.map((w, i) => (
-            <SkeletonBar
-              key={w}
-              className={cn(
-                w,
-                active && i === pulse % lines.length && "bg-neutral-300",
-              )}
-            />
-          ))}
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-sky-800/50">
+            Ready prompt
+          </p>
+          <FeatureTag active={active} tone="sky">
+            {tags[pulse % tags.length]}
+          </FeatureTag>
+        </div>
+        <div className="rounded-sm border border-sky-200 bg-white p-3 font-mono text-[10px] leading-relaxed text-sky-950/80">
+          <p className="text-sky-600/70">{"// assembled for your agent"}</p>
+          <p className="mt-1.5">
+            <span className="text-sky-700">context</span>
+            <span className="text-neutral-400">: </span>
+            <span className="text-neutral-700">
+              grace period is 14 days…
+            </span>
+          </p>
+          <p className="mt-1 text-neutral-400">
+            citations: [billing-faq, #finance]
+          </p>
         </div>
         <div
           className={cn(
-            "mt-1 h-10 rounded-sm bg-neutral-200/50",
-            active && "bg-neutral-200",
+            "mt-auto h-8 rounded-sm transition-colors",
+            active ? "bg-sky-600" : "bg-sky-200",
           )}
         />
-        <div className="mt-auto pb-6">
-          <FeatureTag active={active}>{tags[pulse % tags.length]}</FeatureTag>
-        </div>
       </div>
-    </SkeletonPanel>
+    </Panel>
   );
 }
 

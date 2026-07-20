@@ -6,7 +6,7 @@ import { ConnectorsClient } from "./connectors-client";
 
 function ConnectorsFallback() {
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col justify-center gap-6 py-6">
+    <div className="mx-auto flex min-h-full max-w-md flex-col gap-6 py-6">
       <div className="space-y-3 text-center">
         <Skeleton className="mx-auto h-8 w-40" />
         <Skeleton className="mx-auto h-4 w-64" />

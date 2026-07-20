@@ -225,7 +225,7 @@ export function ConnectorsClient() {
   }
 
   return (
-    <div className="mx-auto flex min-h-full max-w-md flex-col justify-center gap-6 py-6">
+    <div className="mx-auto flex min-h-full max-w-md flex-col gap-6 py-6">
       <div className="space-y-3 text-center">
         <h1 className="font-heading text-[1.75rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-3xl">
           Connectors

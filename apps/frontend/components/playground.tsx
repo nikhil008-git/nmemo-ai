@@ -241,7 +241,15 @@ export function Playground() {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = bottomRef.current;
+    if (!el) return;
+    // Scroll only the chat pane — never the window (landing embeds this UI).
+    const scroller = el.closest<HTMLElement>("[data-playground-scroll]");
+    if (scroller) {
+      scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+      return;
+    }
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [messages, status]);
 
   useEffect(() => {
@@ -533,7 +541,10 @@ export function Playground() {
         </div>
       ) : (
         <>
-          <div className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6">
+          <div
+            data-playground-scroll
+            className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6"
+          >
             <div className="mx-auto max-w-2xl space-y-5 py-5 sm:space-y-7 sm:py-8">
               {messages.map((m) => {
                 const text = messageText(m);
