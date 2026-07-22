@@ -2,16 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CtaButton } from "@/components/ui/cta-button";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  getConnectors,
-  oauthStartUrl,
-  updateConnector,
-  type Connector,
-} from "@/lib/api";
+import { oauthStartUrl, type Connector } from "@/lib/api";
+import { useConnectors } from "@/lib/connectors-store";
 import { cn } from "@/lib/utils";
 
 type ConnectorKind = "oauth" | "key" | "soon";
@@ -112,47 +108,36 @@ const fieldClass =
 
 export function ConnectorsClient() {
   const search = useSearchParams();
-  const [byType, setByType] = useState<Record<string, Connector>>({});
-  const [loading, setLoading] = useState(true);
+  const {
+    connectors,
+    loading,
+    error: storeError,
+    refresh,
+    upsert,
+    patchConnector,
+  } = useConnectors();
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyType, setBusyType] = useState<string | null>(null);
   const [tokens, setTokens] = useState<Record<string, string>>({});
-  const [needsSignIn, setNeedsSignIn] = useState(false);
   const [openType, setOpenType] = useState<string | null>(null);
   const [showSoon, setShowSoon] = useState(false);
 
-  const refresh = useCallback(async () => {
-    setError(null);
-    setNeedsSignIn(false);
-    try {
-      const r = await getConnectors();
-      const next: Record<string, Connector> = {};
-      for (const c of r.connectors) next[c.type] = c;
-      setByType(next);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to load";
-      if (/unauthorized/i.test(msg)) {
-        setNeedsSignIn(true);
-        setError("Sign in to connect sources.");
-      } else {
-        setError(msg);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const byType = useMemo(() => {
+    const next: Record<string, Connector> = {};
+    for (const c of connectors) next[c.type] = c;
+    return next;
+  }, [connectors]);
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const needsSignIn = /unauthorized/i.test(storeError ?? error ?? "");
+  const displayError = error ?? storeError;
 
   useEffect(() => {
     const connected = search.get("connected");
     const err = search.get("error");
     if (connected) {
       setNotice(`${connected} connected.`);
-      void refresh();
+      void refresh().catch(() => undefined);
     }
     if (err) setError(decodeURIComponent(err));
   }, [search, refresh]);
@@ -180,21 +165,19 @@ export function ConnectorsClient() {
     [rows],
   );
 
-  function upsert(connector: Connector) {
-    setByType((prev) => ({ ...prev, [connector.type]: connector }));
-  }
-
   async function disconnect(type: string) {
     setBusyType(type);
     setError(null);
+    const prev = byType[type];
+    if (prev) {
+      upsert({ ...prev, status: "disconnected", config: {} });
+    }
     try {
-      const { connector } = await updateConnector(type, {
-        status: "disconnected",
-      });
-      upsert(connector);
+      await patchConnector(type, { status: "disconnected" });
       setOpenType(null);
       setNotice(`${type} disconnected.`);
     } catch (err) {
+      if (prev) upsert(prev);
       setError(err instanceof Error ? err.message : "Disconnect failed");
     } finally {
       setBusyType(null);
@@ -207,17 +190,34 @@ export function ConnectorsClient() {
     if (!value) return;
     setBusyType(type);
     setError(null);
+
+    const prev = byType[type] ?? placeholder(type);
+    // Optimistic: show connected immediately while we verify the token.
+    upsert({
+      ...prev,
+      status: "connected",
+      config:
+        type === "mem0" || type === "groq"
+          ? { hasApiKey: true }
+          : { hasToken: true },
+      updatedAt: new Date().toISOString(),
+    });
+    setOpenType(null);
+    setTokens((t) => ({ ...t, [type]: "" }));
+    setNotice(`Verifying ${type}…`);
+
     try {
       const config =
         type === "mem0" || type === "groq"
           ? { apiKey: value }
           : { accessToken: value };
-      const { connector } = await updateConnector(type, { config });
-      upsert(connector);
-      setTokens((prev) => ({ ...prev, [type]: "" }));
-      setOpenType(null);
+      await patchConnector(type, { config });
       setNotice(`${type} connected.`);
     } catch (err) {
+      upsert(prev);
+      setOpenType(type);
+      setTokens((t) => ({ ...t, [type]: value }));
+      setNotice(null);
       setError(err instanceof Error ? err.message : "Connect failed");
     } finally {
       setBusyType(null);
@@ -233,7 +233,7 @@ export function ConnectorsClient() {
         <p className="text-sm font-semibold leading-relaxed text-neutral-500">
           Paste a token once, saved on your workspace.
         </p>
-        {loading ? (
+        {loading && connectors.length === 0 ? (
           <div className="flex justify-center">
             <Skeleton className="h-4 w-40" />
           </div>
@@ -260,10 +260,10 @@ export function ConnectorsClient() {
           {notice}
         </p>
       ) : null}
-      {error ? (
+      {displayError ? (
         <div className="space-y-1 text-center">
           <p className="break-words text-sm font-semibold text-red-500">
-            {error}
+            {displayError}
           </p>
           {needsSignIn ? (
             <Link
@@ -275,7 +275,10 @@ export function ConnectorsClient() {
           ) : (
             <button
               type="button"
-              onClick={() => void refresh()}
+              onClick={() => {
+                setError(null);
+                void refresh().catch(() => undefined);
+              }}
               className="text-sm font-semibold underline underline-offset-4"
             >
               Retry

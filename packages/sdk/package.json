@@ -1,10 +1,24 @@
 {
   "name": "@contextengine/sdk",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
-  "description": "Context Engine SDK — getContext across memory, docs, and connectors",
+  "description": "nmemo Context Engine SDK — getContext across memory, docs, and connectors",
   "license": "MIT",
+  "author": "nmemo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikhil008-git/nmemo-ai.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://nmemo.cloud",
+  "keywords": [
+    "context-engine",
+    "nmemo",
+    "rag",
+    "ai-agents",
+    "llm",
+    "memory"
+  ],
   "scripts": {
     "build": "tsc -b",
     "check-types": "tsc --noEmit",
@@ -14,16 +28,16 @@
     "access": "public"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
-  },
-  "dependencies": {
-    "@contextengine/retriever-interface": "*"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",

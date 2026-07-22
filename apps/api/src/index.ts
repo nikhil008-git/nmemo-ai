@@ -83,6 +83,7 @@ app.get("/protected", requireSession, (_req, res) => {
   res.json({ message: "Protected route" });
 });
 
+// this one is used in sdk.ts
 app.use("/context", contextRouter);
 app.use("/workspaces", workspaceRouter);
 app.use("/oauth", oauthRouter);

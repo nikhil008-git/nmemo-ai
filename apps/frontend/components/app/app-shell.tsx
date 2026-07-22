@@ -27,7 +27,11 @@ import {
 } from "@/components/app/command-search";
 import { RoadmapSidebar } from "@/components/app/roadmap-sidebar";
 import { AppShellSkeleton } from "@/components/ui/loading-states";
-import { getConnectors, type Connector } from "@/lib/api";
+import {
+  ConnectorsProvider,
+  useConnectors,
+} from "@/lib/connectors-store";
+import type { Connector } from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -324,7 +328,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const [connectors, setConnectors] = useState<Connector[]>([]);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -355,12 +358,56 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [isPending, session, router, pathname]);
 
-  useEffect(() => {
-    if (!session?.user) return;
-    void getConnectors()
-      .then((r) => setConnectors(r.connectors))
-      .catch(() => setConnectors([]));
-  }, [session?.user]);
+  if (isPending || !session?.user) {
+    return <AppShellSkeleton />;
+  }
+
+  return (
+    <ConnectorsProvider userId={session.user.id}>
+      <AppShellChrome
+        userName={session.user.name || "Workspace"}
+        pathname={pathname}
+        query={query}
+        setQuery={setQuery}
+        searchOpen={searchOpen}
+        setSearchOpen={setSearchOpen}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        soonPop={soonPop}
+        setSoonPop={setSoonPop}
+      >
+        {children}
+      </AppShellChrome>
+    </ConnectorsProvider>
+  );
+}
+
+function AppShellChrome({
+  userName,
+  pathname,
+  query,
+  setQuery,
+  searchOpen,
+  setSearchOpen,
+  menuOpen,
+  setMenuOpen,
+  soonPop,
+  setSoonPop,
+  children,
+}: {
+  userName: string;
+  pathname: string;
+  query: string;
+  setQuery: (q: string) => void;
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean) => void;
+  menuOpen: boolean;
+  setMenuOpen: (open: boolean) => void;
+  soonPop: string | null;
+  setSoonPop: (message: string | null) => void;
+  children: React.ReactNode;
+}) {
+  const { connectors } = useConnectors();
 
   const connected = useMemo(
     () =>
@@ -402,11 +449,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     [],
   );
 
-  if (isPending || !session?.user) {
-    return <AppShellSkeleton />;
-  }
-
-  const { user } = session;
   const railIndex = Math.max(
     0,
     rail.findIndex((item) => tabActive(pathname, item.href)),
@@ -416,7 +458,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const navProps: NavBodyProps = {
     pathname,
-    userName: user.name || "Workspace",
+    userName,
     connectedCount: connected.length,
     connectors,
     filteredSources,
@@ -490,7 +532,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <span className="flex items-center gap-1.5">
                 <span className="font-heading truncate text-sm font-semibold tracking-[-0.02em]">
-                  {user.name || "Workspace"}
+                  {userName}
                 </span>
                 <ChevronDown
                   size={14}

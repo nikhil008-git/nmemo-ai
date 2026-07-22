@@ -36,3 +36,8 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+waitlist-*.csv
+
+# Personal study / hand-code guides (local only)
+docs/private/

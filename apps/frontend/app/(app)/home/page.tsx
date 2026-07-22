@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-import { getConnectors, type Connector } from "@/lib/api";
 import { CtaButton } from "@/components/ui/cta-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth-client";
+import { useConnectors } from "@/lib/connectors-store";
 
 const steps = [
   {
@@ -35,21 +34,7 @@ const steps = [
 
 export function HomeView() {
   const { data: session } = useSession();
-  const [connectors, setConnectors] = useState<Connector[]>([]);
-  const [loadingConnectors, setLoadingConnectors] = useState(true);
-
-  useEffect(() => {
-    if (!session?.user) {
-      setConnectors([]);
-      setLoadingConnectors(false);
-      return;
-    }
-    setLoadingConnectors(true);
-    void getConnectors()
-      .then((r) => setConnectors(r.connectors))
-      .catch(() => setConnectors([]))
-      .finally(() => setLoadingConnectors(false));
-  }, [session?.user]);
+  const { connectors, loading } = useConnectors();
 
   const connected = connectors.filter(
     (c) =>
@@ -58,6 +43,7 @@ export function HomeView() {
       c.type !== "groq",
   );
   const user = session?.user;
+  const showSkeleton = loading && connectors.length === 0;
 
   return (
     <div className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center gap-5 px-1 py-4 sm:gap-6 sm:px-0 sm:py-6">
@@ -68,7 +54,7 @@ export function HomeView() {
         <p className="px-1 text-sm font-semibold leading-relaxed text-neutral-500">
           Orchestrate the right context for your agents, across every source.
         </p>
-        {loadingConnectors ? (
+        {showSkeleton ? (
           <div className="flex justify-center">
             <Skeleton className="h-4 w-40" />
           </div>

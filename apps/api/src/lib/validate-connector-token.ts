@@ -29,6 +29,7 @@ export async function validateConnectorToken(
         Accept: "application/vnd.github+json",
         "User-Agent": "context-engine",
       },
+      signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) {
       throw new Error(
@@ -53,6 +54,7 @@ export async function validateConnectorToken(
     }
     const res = await fetch("https://slack.com/api/auth.test", {
       headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(4000),
     });
     const data = (await res.json()) as {
       ok?: boolean;
@@ -65,20 +67,6 @@ export async function validateConnectorToken(
         data.error === "invalid_auth"
           ? "Slack token rejected. Use a user token (xoxp-) with search:read."
           : data.error || "Slack token rejected.",
-      );
-    }
-    // Fail fast if search:read is missing (same error Playground would hit).
-    const search = await fetch(
-      "https://slack.com/api/search.messages?query=test&count=1",
-      { headers: { Authorization: `Bearer ${token}` } },
-    );
-    const searchData = (await search.json()) as {
-      ok?: boolean;
-      error?: string;
-    };
-    if (!searchData.ok && searchData.error === "missing_scope") {
-      throw new Error(
-        "Slack token is missing search:read. Add that user scope and paste a new xoxp- token.",
       );
     }
     const out: ValidatedToken = {
@@ -97,6 +85,7 @@ export async function validateConnectorToken(
       Authorization: `Bearer ${token}`,
       "Notion-Version": "2022-06-28",
     },
+    signal: AbortSignal.timeout(4000),
   });
   if (!res.ok) {
     throw new Error(

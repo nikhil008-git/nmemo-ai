@@ -1,3 +1,7 @@
+// auto selecting the best retriever for the query
+// auto selecting the best retriever for the query
+// auto selecting the best retriever for the query
+
 import type {
   Citation,
   ContextItem,

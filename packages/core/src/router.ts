@@ -1,3 +1,6 @@
+//How auto-select works right now
+
+
 import type { ConnectorRef } from "./types.js";
 
 /**

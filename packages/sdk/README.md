@@ -1,59 +1,65 @@
 # `@contextengine/sdk`
 
-Developer client for Context Engine. Calls `POST /context` on `apps/api` with an API key from the dashboard.
+Official client for **nmemo** (Context Engine). Call `getContext()` from any agent or app — route, rank, and budget multi-source context in one request.
 
-## Install (monorepo)
+## Install
 
 ```bash
-# already a workspace package
-npm install
+npm install @contextengine/sdk
 ```
-
-```ts
-import { createEngine } from "@contextengine/sdk"
-```
-
-Monorepo package (`packages/sdk`). To publish: `npm publish -w @contextengine/sdk` (after bundling/publishing `@contextengine/retriever-interface` or inlining types).
 
 ## Quick start
 
-1. Run API + frontend (`npm run dev`)
-2. Dashboard → **Settings** → create an API key (copy the secret once)
-3. Dashboard → **Sources** → upload PDFs (Qdrant connected)
-4. Call the SDK:
+1. Create an API key in the [nmemo dashboard](https://nmemo.cloud) → **Keys**
+2. Connect sources (docs, Slack, Notion, GitHub, memory)
+3. Call the SDK:
 
 ```ts
-import { createEngine } from "@contextengine/sdk"
+import { createEngine } from "@contextengine/sdk";
 
 const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
-})
+  apiKey: process.env.NMEMO_API_KEY!,
+  // optional — defaults to https://api.nmemo.cloud
+  // baseUrl: "http://localhost:8080",
+});
 
 const context = await engine.getContext({
   query: "What is our refund policy?",
   userId: "user_123",
   workspaceId: "ws_123",
-})
+});
 
 // Feed into any LLM
 const messages = [
   { role: "system", content: context.prompt },
   { role: "user", content: "What is our refund policy?" },
-]
+];
 
-console.log(context.prompt)
-console.log(context.citations)
-console.log(context.diagnostics)
+console.log(context.citations);
+console.log(context.diagnostics);
 ```
 
-Fast path (same shape today; RAG-only MVP):
+### Fast path
 
 ```ts
 const context = await engine.getContextFast({
   query: "Continue…",
   userId: "user_123",
   workspaceId: "ws_123",
-})
+});
+```
+
+### Memory write-back
+
+```ts
+await engine.writeMemory({
+  userId,
+  workspaceId,
+  messages: [
+    { role: "user", content: query },
+    { role: "assistant", content: answer },
+  ],
+});
 ```
 
 ## API
@@ -62,63 +68,28 @@ const context = await engine.getContextFast({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `apiKey` | `string` | required | Bearer key from Settings |
-| `baseUrl` | `string` | `http://localhost:8080` | API origin |
+| `apiKey` | `string` | required | Bearer key from the dashboard |
+| `baseUrl` | `string` | `https://api.nmemo.cloud` | API origin |
 
-### `engine.getContext(params)` / `getContextFast(params)`
-
-| Param | Type | Required |
-|-------|------|----------|
-| `query` | `string` | yes |
-| `userId` | `string` | yes |
-| `workspaceId` | `string` | yes\* |
-| `conversationId` | `string` | no |
-| `agent` | `string` | no |
-| `persistMemory` | `{ messages }` | no — write turn to mem0 in same request |
-
-\*With a valid API key, the server uses the key’s workspace; `workspaceId` can still be sent for client bookkeeping.
-
-### Memory write-back (after your LLM answers)
-
-```ts
-const context = await engine.getContext({ query, userId, workspaceId })
-// ... call your LLM with context.prompt → answer
-await engine.writeMemory({
-  userId,
-  workspaceId,
-  messages: [
-    { role: "user", content: query },
-    { role: "assistant", content: answer },
-  ],
-})
-```
-
-### Return shape (`GetContextResult`)
-
-Always these seven fields (from `@contextengine/retriever-interface`):
+### Return shape
 
 ```ts
 type GetContextResult = {
-  prompt: string
-  memories: { id, text, score }[]
-  documents: { id, text, source, title?, score, metadata? }[]
-  sources: { id, name, queried, responded, latencyMs }[]
-  citations: { id, source, title, url?, snippet }[]
-  tokenUsage: {
-    total, memory, documents, workspace, instructions
-  }
+  prompt: string;
+  memories: { id: string; text: string; score: number }[];
+  documents: { id: string; text: string; source: string; title?: string; score: number }[];
+  sources: { id: string; name: string; queried: boolean; responded: boolean; latencyMs: number }[];
+  citations: { id: string; source: string; title: string; url?: string; snippet: string }[];
+  tokenUsage: { total: number; memory: number; documents: number; workspace: number; instructions: number };
   diagnostics: {
-    rankingScores,   // { id, score, reason }[]
-    discarded,       // { id, reason }[]
-    conflicts,       // { id, summary, resolution }[]
-    latencyBySource  // Record<sourceId, ms>
-  }
-}
+    rankingScores: { id: string; score: number; reason: string }[];
+    discarded: { id: string; reason: string }[];
+    conflicts: { id: string; summary: string; resolution: string }[];
+    latencyBySource: Record<string, number>;
+  };
+};
 ```
 
-## Source
+## License
 
-- Implementation: [`src/index.ts`](./src/index.ts)
-- Types: `@contextengine/retriever-interface`
-- Server: `apps/api` → `POST /context`, `POST /context/fast`
-- Full guide: [docs/context-engine/SDK.md](../../docs/context-engine/SDK.md)
+MIT

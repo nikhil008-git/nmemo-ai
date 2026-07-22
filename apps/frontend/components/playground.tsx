@@ -5,9 +5,12 @@ import { DefaultChatTransport } from "ai";
 import type { UIMessage } from "ai";
 import {
   ArrowRight,
+  AudioLines,
   FileText,
   GitBranch,
+  Languages,
   MessageSquare,
+  Mic,
   NotebookPen,
   Square,
   X,
@@ -18,7 +21,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CitationList } from "@/components/citation";
 import { DiagnosticsPanel } from "@/components/diagnostics-panel";
 import { Logo } from "@/components/logo";
-import { getConnectors, updateConnector } from "@/lib/api";
+import { updateConnector } from "@/lib/api";
+import { useConnectorsOptional } from "@/lib/connectors-store";
 import type {
   Citation,
   Diagnostics,
@@ -38,6 +42,46 @@ const CHIPS = [
   { label: "Notion", icon: NotebookPen, prompt: "Summarize our Notion notes" },
   { label: "GitHub", icon: GitBranch, prompt: "What’s open on GitHub?" },
 ] as const;
+
+const SOON_ACTIONS = [
+  { id: "voice", label: "Voice", icon: Mic },
+  { id: "realtime", label: "Real-time", icon: AudioLines },
+  { id: "languages", label: "Languages", icon: Languages },
+] as const;
+
+function SoonIconButton({
+  label,
+  icon: Icon,
+  size = "md",
+}: {
+  label: string;
+  icon: typeof Mic;
+  size?: "sm" | "md";
+}) {
+  return (
+    <span className="group relative inline-flex">
+      <button
+        type="button"
+        className={cn(
+          "inline-flex items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-black/[0.04] hover:text-neutral-600",
+          size === "sm" ? "size-7 sm:size-8" : "size-8 sm:size-9",
+        )}
+        aria-label={`${label}, coming soon`}
+      >
+        <Icon
+          size={size === "sm" ? 14 : 15}
+          strokeWidth={1.75}
+        />
+      </button>
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-[10px] font-semibold tracking-[-0.01em] text-neutral-100 opacity-0 shadow-[0_6px_16px_rgba(0,0,0,0.18)] transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+      >
+        Soon
+      </span>
+    </span>
+  );
+}
 
 type ContextPayload = {
   citations: {
@@ -116,6 +160,7 @@ function mapCitations(
 }
 
 export function Playground() {
+  const connectorsCtx = useConnectorsOptional();
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -203,14 +248,27 @@ export function Playground() {
   }, [messages, chatHydrated]);
 
   useEffect(() => {
+    const connectors = connectorsCtx?.connectors;
+    if (!connectors) return;
+
+    const groq = connectors.find((c) => c.type === "groq");
+    const ready =
+      groq?.status === "connected" && Boolean(groq.config?.hasApiKey);
+    setGroqReady(ready);
+    writeGroqReadyCache(ready);
+  }, [connectorsCtx?.connectors]);
+
+  useEffect(() => {
+    if (connectorsCtx) return;
+
     let cancelled = false;
     const timeout = window.setTimeout(() => {
       if (cancelled) return;
-      // Don't block chat forever if the API is slow — open key modal path.
       setGroqReady((prev) => (prev === null ? false : prev));
     }, 2500);
 
-    void getConnectors()
+    void import("@/lib/api")
+      .then(({ getConnectors }) => getConnectors())
       .then(({ connectors }) => {
         if (cancelled) return;
         const groq = connectors.find((c) => c.type === "groq");
@@ -221,7 +279,6 @@ export function Playground() {
       })
       .catch(() => {
         if (!cancelled) {
-          // Keep optimistic cache if network blips; only clear when sure.
           try {
             if (localStorage.getItem(GROQ_READY_KEY) !== "1") {
               setGroqReady(false);
@@ -238,7 +295,7 @@ export function Playground() {
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, []);
+  }, [connectorsCtx]);
 
   useEffect(() => {
     const el = bottomRef.current;
@@ -287,6 +344,7 @@ export function Playground() {
       const { connector } = await updateConnector("groq", {
         config: { apiKey: value },
       });
+      connectorsCtx?.upsert(connector);
       const ready =
         connector.status === "connected" &&
         Boolean(connector.config?.hasApiKey);
@@ -459,7 +517,12 @@ export function Playground() {
                 rows={3}
                 className="min-h-[5rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[7.5rem] sm:pr-12 sm:text-[15px]"
               />
-              <div className="flex items-end justify-end">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-0.5">
+                  {SOON_ACTIONS.map(({ id, label, icon }) => (
+                    <SoonIconButton key={id} label={label} icon={icon} />
+                  ))}
+                </div>
                 {busy ? (
                   <button
                     type="button"
@@ -543,7 +606,8 @@ export function Playground() {
         <>
           <div
             data-playground-scroll
-            className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6"
+            data-lenis-prevent
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 sm:px-6"
           >
             <div className="mx-auto max-w-2xl space-y-5 py-5 sm:space-y-7 sm:py-8">
               {messages.map((m) => {
@@ -646,40 +710,50 @@ export function Playground() {
                   className="min-h-[2.75rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[3.25rem] sm:pr-12 sm:text-[15px]"
                 />
                 <div className="flex items-center justify-between gap-2 sm:gap-3">
-                  <div className="flex items-center gap-2.5 sm:gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowDetails((v) => !v)}
-                      className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
-                    >
-                      {inspectorContext
-                        ? showDetails
-                          ? "Hide context"
-                          : "Show context"
-                        : null}
-                    </button>
-                    {messages.length > 0 ? (
+                  <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
+                    {SOON_ACTIONS.map(({ id, label, icon }) => (
+                      <SoonIconButton
+                        key={id}
+                        label={label}
+                        icon={icon}
+                        size="sm"
+                      />
+                    ))}
+                    <div className="ml-1 flex items-center gap-2.5 sm:ml-1.5 sm:gap-3">
                       <button
                         type="button"
-                        onClick={clearChat}
+                        onClick={() => setShowDetails((v) => !v)}
                         className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
                       >
-                        New chat
+                        {inspectorContext
+                          ? showDetails
+                            ? "Hide context"
+                            : "Show context"
+                          : null}
                       </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => openKeyModal()}
-                      className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
-                    >
-                      {groqReady ? "Update Groq key" : "Add Groq key"}
-                    </button>
+                      {messages.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={clearChat}
+                          className="text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:text-[11px]"
+                        >
+                          New chat
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        onClick={() => openKeyModal()}
+                        className="hidden text-[10px] font-semibold text-neutral-400 hover:text-foreground sm:inline sm:text-[11px]"
+                      >
+                        {groqReady ? "Update Groq key" : "Add Groq key"}
+                      </button>
+                    </div>
                   </div>
                   {busy ? (
                     <button
                       type="button"
                       onClick={() => stop()}
-                      className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-900 text-white sm:size-9"
+                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-white sm:size-9"
                       aria-label="Stop"
                     >
                       <Square size={11} fill="currentColor" />
@@ -689,7 +763,7 @@ export function Playground() {
                       type="submit"
                       disabled={!canSend}
                       className={cn(
-                        "inline-flex size-8 items-center justify-center rounded-full transition-colors sm:size-9",
+                        "inline-flex size-8 shrink-0 items-center justify-center rounded-full transition-colors sm:size-9",
                         canSend
                           ? "bg-neutral-900 text-white"
                           : "bg-neutral-200/80 text-neutral-500",

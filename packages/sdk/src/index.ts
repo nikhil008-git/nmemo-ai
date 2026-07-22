@@ -1,13 +1,14 @@
-import type { GetContextResult } from "@contextengine/retriever-interface";
+import type { GetContextResult } from "./types.js";
 
 export type {
   GetContextResult,
   Citation,
   ContextItem,
   Diagnostics,
+  MemoryItem,
   SourceStatus,
   TokenUsage,
-} from "@contextengine/retriever-interface";
+} from "./types.js";
 
 export type CreateEngineOptions = {
   apiKey: string;
@@ -45,7 +46,10 @@ export type ContextEngine = {
 };
 
 export function createEngine(opts: CreateEngineOptions): ContextEngine {
-  const baseUrl = (opts.baseUrl ?? "http://localhost:8080").replace(/\/$/, "");
+  const baseUrl = (opts.baseUrl ?? "https://api.nmemo.cloud").replace(
+    /\/$/,
+    "",
+  );
 
   async function postJson<T>(path: string, body: unknown): Promise<T> {
     const res = await fetch(`${baseUrl}${path}`, {
