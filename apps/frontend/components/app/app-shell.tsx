@@ -32,6 +32,7 @@ import {
   useConnectors,
 } from "@/lib/connectors-store";
 import type { Connector } from "@/lib/api";
+import { getWorkspace } from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -356,6 +357,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (!isPending && !session?.user) {
       router.push(`/sign-in?next=${encodeURIComponent(pathname)}`);
     }
+  }, [isPending, session, router, pathname]);
+
+  useEffect(() => {
+    if (isPending || !session?.user) return;
+    if (pathname === "/create-workspace") return;
+
+    let cancelled = false;
+    void getWorkspace()
+      .then(() => {
+        /* workspace exists */
+      })
+      .catch(() => {
+        if (!cancelled) router.replace("/create-workspace");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [isPending, session, router, pathname]);
 
   if (isPending || !session?.user) {

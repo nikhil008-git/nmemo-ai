@@ -111,6 +111,10 @@ export function ConnectorsProvider({
         return r.connectors;
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to load";
+        if (/no workspace/i.test(msg)) {
+          setAll([]);
+          return [];
+        }
         setError(msg);
         throw err;
       } finally {

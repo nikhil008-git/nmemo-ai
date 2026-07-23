@@ -21,7 +21,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [compact, setCompact] = useState(false);
   const loggedIn = Boolean(session?.user);
-  const isAuthPage = pathname === "/sign-in" || pathname === "/sign-up";
+  const isAuthPage =
+    pathname === "/sign-in" ||
+    pathname === "/sign-up" ||
+    pathname === "/create-workspace";
   const isAppShell =
     pathname === "/home" ||
     pathname.startsWith("/playground") ||
@@ -95,7 +98,7 @@ export function SiteHeader() {
               </div>
             ) : loggedIn ? (
               <CtaButton
-                href="/home"
+                href="/create-workspace"
                 size="compact"
                 className="!min-w-0 px-3 sm:!min-w-36 sm:px-5"
               >

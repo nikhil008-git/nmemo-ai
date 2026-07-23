@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Link2 } from "lucide-react";
 
 import {
   PageHeader,
@@ -12,19 +13,68 @@ import {
 import { WorkspaceIdsCard } from "@/components/app/workspace-ids";
 import { CtaButton } from "@/components/ui/cta-button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getWorkspace } from "@/lib/api";
+import {
+  getWorkspace,
+  updateWorkspace,
+  type Workspace,
+} from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+
+const INDUSTRIES = [
+  "Technology",
+  "Finance",
+  "Healthcare",
+  "Education",
+  "Media",
+  "Retail",
+  "Other",
+] as const;
+
+const COMPANY_SIZES = [
+  "1-10 employees",
+  "11-50 employees",
+  "51-200 employees",
+  "201-1000 employees",
+  "1000+ employees",
+] as const;
+
+const fieldClass =
+  "w-full rounded-sm border border-border bg-white px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30";
+
+function asIndustry(value: string | null | undefined) {
+  if (value && (INDUSTRIES as readonly string[]).includes(value)) {
+    return value as (typeof INDUSTRIES)[number];
+  }
+  return "Other";
+}
+
+function asCompanySize(value: string | null | undefined) {
+  if (value && (COMPANY_SIZES as readonly string[]).includes(value)) {
+    return value as (typeof COMPANY_SIZES)[number];
+  }
+  return "1-10 employees";
+}
 
 export default function SettingsPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user;
-  const [workspace, setWorkspace] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [name, setName] = useState("");
+  const [domain, setDomain] = useState("");
+  const [industry, setIndustry] =
+    useState<(typeof INDUSTRIES)[number]>("Other");
+  const [companySize, setCompanySize] =
+    useState<(typeof COMPANY_SIZES)[number]>("1-10 employees");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
   const [confirmText, setConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -35,12 +85,51 @@ export default function SettingsPage() {
 
   useEffect(() => {
     void getWorkspace()
-      .then((ws) => setWorkspace({ id: ws.id, name: ws.name }))
+      .then((ws) => {
+        setWorkspace(ws);
+        setName(ws.name);
+        setDomain(ws.domain ?? "");
+        setIndustry(asIndustry(ws.industry));
+        setCompanySize(asCompanySize(ws.companySize));
+      })
       .catch((err: unknown) =>
         setError(err instanceof Error ? err.message : "Failed to load workspace"),
       )
       .finally(() => setLoading(false));
   }, []);
+
+  async function saveCompanyDetails(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = name.trim();
+    if (!trimmed) {
+      setSaveError("Enter a workspace name");
+      return;
+    }
+    setSaving(true);
+    setSaveError(null);
+    setSaved(false);
+    try {
+      const updated = await updateWorkspace({
+        name: trimmed,
+        ...(domain.trim() ? { domain: domain.trim() } : {}),
+        industry,
+        companySize,
+      });
+      setWorkspace(updated);
+      setName(updated.name);
+      setDomain(updated.domain ?? "");
+      setIndustry(asIndustry(updated.industry));
+      setCompanySize(asCompanySize(updated.companySize));
+      setSaved(true);
+      window.setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Failed to save company details",
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function deleteAccount() {
     if (!canDelete || deleting) return;
@@ -71,7 +160,7 @@ export default function SettingsPage() {
         title="Account"
         description={
           <>
-            Profile and workspace IDs for your agents. Keys live under{" "}
+            Profile, company details, and workspace IDs. Keys live under{" "}
             <Link
               href="/keys"
               className="text-foreground underline underline-offset-4"
@@ -104,14 +193,130 @@ export default function SettingsPage() {
       {loading ? (
         <div className="space-y-3">
           <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-40 w-full rounded-sm" />
+          <Skeleton className="h-4 w-40" />
           <Skeleton className="h-28 w-full rounded-sm" />
         </div>
       ) : workspace ? (
-        <WorkspaceIdsCard
-          workspaceName={workspace.name}
-          workspaceId={workspace.id}
-          accountUserId={user?.id}
-        />
+        <>
+          <section className="space-y-3">
+            <div className="space-y-1">
+              <SectionLabel>Company details</SectionLabel>
+              <p className="max-w-xl text-sm font-semibold leading-relaxed text-neutral-500">
+                Same details you set when creating the workspace.
+              </p>
+            </div>
+
+            <form
+              onSubmit={(e) => void saveCompanyDetails(e)}
+              className={`${appPanelClass} space-y-4 px-4 py-4`}
+            >
+              <label className="block space-y-1.5">
+                <span className="text-xs font-semibold text-neutral-500">
+                  Company domain
+                </span>
+                <div className="flex items-center gap-2 rounded-sm border border-border bg-white px-3 py-1.5 focus-within:border-foreground/30">
+                  <Link2 className="size-4 shrink-0 text-neutral-400" />
+                  <input
+                    value={domain}
+                    onChange={(e) => setDomain(e.target.value)}
+                    placeholder="acme.com"
+                    disabled={saving}
+                    className="min-w-0 flex-1 border-0 bg-transparent py-1 text-sm font-medium outline-none placeholder:text-neutral-400"
+                  />
+                </div>
+              </label>
+
+              <label className="block space-y-1.5">
+                <span className="text-xs font-semibold text-neutral-500">
+                  Workspace name
+                </span>
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your workspace name"
+                  maxLength={80}
+                  disabled={saving}
+                  className={fieldClass}
+                />
+              </label>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="block space-y-1.5">
+                  <span className="text-xs font-semibold text-neutral-500">
+                    Industry
+                  </span>
+                  <select
+                    value={industry}
+                    onChange={(e) =>
+                      setIndustry(e.target.value as (typeof INDUSTRIES)[number])
+                    }
+                    disabled={saving}
+                    className={fieldClass}
+                  >
+                    {INDUSTRIES.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="block space-y-1.5">
+                  <span className="text-xs font-semibold text-neutral-500">
+                    Company size
+                  </span>
+                  <select
+                    value={companySize}
+                    onChange={(e) =>
+                      setCompanySize(
+                        e.target.value as (typeof COMPANY_SIZES)[number],
+                      )
+                    }
+                    disabled={saving}
+                    className={fieldClass}
+                  >
+                    {COMPANY_SIZES.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {saveError ? (
+                <p className="text-sm font-semibold text-red-500">{saveError}</p>
+              ) : null}
+
+              <div className="flex flex-wrap items-center gap-3">
+                <CtaButton
+                  type="submit"
+                  size="compact"
+                  loading={saving}
+                  disabled={saving}
+                >
+                  Save changes
+                </CtaButton>
+                {saved ? (
+                  <span
+                    className={cn(
+                      "text-xs font-semibold text-emerald-600",
+                    )}
+                  >
+                    Saved
+                  </span>
+                ) : null}
+              </div>
+            </form>
+          </section>
+
+          <WorkspaceIdsCard
+            workspaceName={workspace.name}
+            workspaceId={workspace.id}
+            accountUserId={user?.id}
+          />
+        </>
       ) : null}
 
       <section className="space-y-3">

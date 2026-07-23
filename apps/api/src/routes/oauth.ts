@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { prisma, ensureDefaultWorkspace } from "@repo/db";
+import { prisma } from "@repo/db";
+import { getWorkspaceForUser } from "./workspace.js";
 import { resolveSessionUser } from "../middleware/requireSession.js";
 import {
   authorizeUrl,
@@ -31,7 +32,11 @@ oauthRouter.get("/:provider/start", async (req, res) => {
       res.redirect(`${frontendUrl()}/connectors?error=unknown_provider`);
       return;
     }
-    const workspace = await ensureDefaultWorkspace(user.id, user.name);
+    const workspace = await getWorkspaceForUser(user.id);
+    if (!workspace) {
+      res.redirect(`${frontendUrl()}/create-workspace`);
+      return;
+    }
 
     // No platform OAuth app → user must paste a token on Connectors.
     if (!providerConfigured(provider)) {

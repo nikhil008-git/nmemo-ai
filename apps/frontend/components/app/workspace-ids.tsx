@@ -90,7 +90,7 @@ export function WorkspaceIdsCard({
         <IdRow
           label="Workspace name"
           value={workspaceName}
-          hint="Your default workspace. Connectors and keys live here."
+          hint="Your workspace. Connectors and keys live here."
           mono={false}
         />
         <IdRow

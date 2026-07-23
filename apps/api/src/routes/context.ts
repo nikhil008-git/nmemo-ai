@@ -6,7 +6,8 @@ import {
   writeMemory,
   writeMemoryAsync,
 } from "@contextengine/core";
-import { prisma, ensureDefaultWorkspace } from "@repo/db";
+import { prisma } from "@repo/db";
+import { getWorkspaceForUser } from "./workspace.js";
 import { requireApiKey } from "../middleware/requireApiKey.js";
 import { requireSession } from "../middleware/requireSession.js";
 import { contextLimiter } from "../middleware/rateLimit.js";
@@ -44,7 +45,7 @@ async function resolveWorkspace(opts: {
       include: { connectors: true },
     });
   }
-  return ensureDefaultWorkspace(opts.userId);
+  return getWorkspaceForUser(opts.userId);
 }
 
 async function handleContext(req: Request, res: Response, fast: boolean) {

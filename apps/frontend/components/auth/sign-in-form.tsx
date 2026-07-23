@@ -9,7 +9,11 @@ import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 function safeNext(raw: string | null) {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/home";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) {
+    return "/create-workspace";
+  }
+  // New sign-ins land on workspace naming first (skips /home flash).
+  if (raw === "/" || raw === "/home") return "/create-workspace";
   return raw;
 }
 

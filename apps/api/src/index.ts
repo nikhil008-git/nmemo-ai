@@ -2,19 +2,22 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import multer from "multer";
+import { inviteRouter } from "./routes/invite.js";
 import { getContext, writeMemoryAsync } from "@contextengine/core";
 import {
   deleteDocument,
   ingestPdf,
   listDocuments,
 } from "@contextengine/rag-retriever";
-import { ensureDefaultWorkspace } from "@repo/db";
 import { requireSession } from "./middleware/requireSession.js";
 import { completeFromPrompt } from "./lib/llm.js";
 import { pipeAskStream } from "./lib/stream-ask.js";
 import { contextRouter } from "./routes/context.js";
 import { oauthRouter } from "./routes/oauth.js";
-import { workspaceRouter } from "./routes/workspace.js";
+import {
+  getWorkspaceForUser,
+  workspaceRouter,
+} from "./routes/workspace.js";
 import {
   apiLimiter,
   contextLimiter,
@@ -88,12 +91,19 @@ app.use("/context", contextRouter);
 app.use("/workspaces", workspaceRouter);
 app.use("/oauth", oauthRouter);
 
+
+
+/// these are invite routes 
+app.use("/invites", inviteRouter);
+
+
 app.get("/documents", requireSession, async (req, res) => {
   try {
-    const workspace = await ensureDefaultWorkspace(
-      req.user!.id,
-      req.user!.name,
-    );
+    const workspace = await getWorkspaceForUser(req.user!.id);
+    if (!workspace) {
+      res.status(404).json({ error: "No workspace" });
+      return;
+    }
     const documents = await listDocuments(workspace.id);
     res.json({ documents });
   } catch (err) {
@@ -105,10 +115,11 @@ app.get("/documents", requireSession, async (req, res) => {
 
 app.delete("/documents", requireSession, async (req, res) => {
   try {
-    const workspace = await ensureDefaultWorkspace(
-      req.user!.id,
-      req.user!.name,
-    );
+    const workspace = await getWorkspaceForUser(req.user!.id);
+    if (!workspace) {
+      res.status(404).json({ error: "No workspace" });
+      return;
+    }
     const source =
       typeof req.query.source === "string"
         ? req.query.source
@@ -136,10 +147,11 @@ app.post(
   upload.single("file"),
   async (req, res) => {
     try {
-      const workspace = await ensureDefaultWorkspace(
-        req.user!.id,
-        req.user!.name,
-      );
+      const workspace = await getWorkspaceForUser(req.user!.id);
+      if (!workspace) {
+        res.status(404).json({ error: "No workspace" });
+        return;
+      }
       const siteId = workspace.id;
 
       if (req.file) {
@@ -206,10 +218,10 @@ app.post(
 );
 
 async function prepareAsk(req: express.Request, question: string) {
-  const workspace = await ensureDefaultWorkspace(
-    req.user!.id,
-    req.user!.name,
-  );
+  const workspace = await getWorkspaceForUser(req.user!.id);
+  if (!workspace) {
+    return { error: "Create a workspace first" } as const;
+  }
 
   const connectorRefs = await connectorsForContext(workspace.connectors);
   const connected = connectorRefs

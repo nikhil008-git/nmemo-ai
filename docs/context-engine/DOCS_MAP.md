@@ -84,7 +84,7 @@ Single index for specs, SDK, API, and dashboard docs.
 | What | Path |
 |------|------|
 | Prisma schema | [`packages/database/prisma/schema.prisma`](../../packages/database/prisma/schema.prisma) |
-| Workspace helpers | `packages/database/src/workspace.ts` |
+| Workspace routes | `apps/api/src/routes/workspace.ts` |
 
 ---
 

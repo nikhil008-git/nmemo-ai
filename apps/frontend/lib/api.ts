@@ -96,8 +96,19 @@ export type ApiKeyRow = {
 export type Workspace = {
   id: string;
   name: string;
+  domain?: string | null;
+  industry?: string | null;
+  companySize?: string | null;
+  maxMembers?: number;
   connectors: Connector[];
   apiKeys: ApiKeyRow[];
+};
+
+export type CreateWorkspaceInput = {
+  name: string;
+  domain?: string;
+  industry?: string;
+  companySize?: string;
 };
 
 export function askQuestion(question: string): Promise<AskResponse> {
@@ -140,6 +151,24 @@ export function deleteDocument(
 
 export function getWorkspace(): Promise<Workspace> {
   return api("/workspaces/current");
+}
+
+export function createWorkspace(
+  input: CreateWorkspaceInput,
+): Promise<Workspace> {
+  return api("/workspaces", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function updateWorkspace(
+  input: CreateWorkspaceInput,
+): Promise<Workspace> {
+  return api("/workspaces/current", {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
 }
 
 export function getConnectors(): Promise<{ connectors: Connector[] }> {
