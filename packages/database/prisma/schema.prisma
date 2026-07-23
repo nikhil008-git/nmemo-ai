@@ -18,6 +18,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   memberships   WorkspaceMember[]
+    invitesSent   WorkspaceInvite[]   
 
   @@unique([email])
   @@map("user")
@@ -68,19 +69,53 @@ model Verification {
   @@map("verification")
 }
 
-model Workspace {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  members    WorkspaceMember[]
-  apiKeys    ApiKey[]
-  connectors Connector[]
-  usageEvents UsageEvent[]
+model WorkspaceInvite {
+  id          String   @id @default(cuid())
+
+  workspaceId String
+  email       String
+  role        String   @default("member")
+
+  token       String   @unique
+
+  invitedById String
+
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy User @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([workspaceId, email])
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+
+  domain      String?  @unique
+  industry    String?
+  companySize String?
+
+  maxMembers  Int      @default(5)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members      WorkspaceMember[]
+  invites      WorkspaceInvite[]
+  apiKeys      ApiKey[]
+  connectors   Connector[]
+  usageEvents  UsageEvent[]
 
   @@map("workspace")
 }
+
+
+
 
 model UsageEvent {
   id          String   @id @default(cuid())
