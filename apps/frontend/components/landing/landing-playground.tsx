@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { RoadmapSidebar } from "@/components/app/roadmap-sidebar";
+import { HeroNatureBackdrop } from "@/components/landing/landing-hero-backdrop";
 import { cn } from "@/lib/utils";
 
 const FRAME_W = 1180;
@@ -896,96 +897,79 @@ export function LandingPlayground({
     />
   );
 
-  return (
-    <div
-      className={
-        isAuth
-          ? "relative h-full min-h-screen w-full overflow-hidden rounded-l-2xl"
-          : "hero-visual relative mx-auto w-full max-w-7xl overflow-hidden pl-2 sm:overflow-visible sm:px-4"
-      }
-    >
-      <div
-        className={
-          isAuth
-            ? "relative h-full w-full overflow-hidden"
-            : "relative w-full overflow-hidden rounded-l-xl rounded-r-none sm:rounded-2xl"
-        }
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-            radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255, 190, 120, 0.95) 0%, transparent 55%),
-            radial-gradient(ellipse 70% 55% at 88% 18%, rgba(255, 150, 80, 0.8) 0%, transparent 50%),
-            radial-gradient(ellipse 85% 55% at 45% 100%, rgba(249, 115, 22, 0.65) 0%, transparent 55%),
-            radial-gradient(ellipse 45% 35% at 65% 55%, rgba(254, 215, 170, 0.85) 0%, transparent 45%),
-            linear-gradient(165deg, #fff7ed 0%, #ffedd5 42%, #fdba74 100%)
-          `,
-          }}
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
-          style={{
-            background:
-              "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)",
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Mobile: zoomed landscape desktop, orange + shell clipped on the right */}
-        {!isAuth ? (
-          <div className="relative h-[300px] overflow-hidden sm:hidden">
-            <div
-              className="absolute left-[4%] top-[6%] origin-top-left"
-              style={{ transform: "scale(0.58)" }}
-            >
-              <div className="overflow-hidden rounded-sm shadow-[0_18px_50px_rgba(0,0,0,0.14)]">
-                <ProductShell
-                  tab={tab}
-                  onTab={setTab}
-                  rail={rail}
-                  onRail={setRail}
-                />
-              </div>
+  if (isAuth) {
+    return (
+      <div className="relative h-full min-h-screen w-full overflow-hidden rounded-l-2xl">
+        <div className="relative h-full w-full overflow-hidden">
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `
+              radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255, 190, 120, 0.95) 0%, transparent 55%),
+              radial-gradient(ellipse 70% 55% at 88% 18%, rgba(255, 150, 80, 0.8) 0%, transparent 50%),
+              radial-gradient(ellipse 85% 55% at 45% 100%, rgba(249, 115, 22, 0.65) 0%, transparent 55%),
+              radial-gradient(ellipse 45% 35% at 65% 55%, rgba(254, 215, 170, 0.85) 0%, transparent 45%),
+              linear-gradient(165deg, #fff7ed 0%, #ffedd5 42%, #fdba74 100%)
+            `,
+            }}
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)",
+            }}
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute left-[6%] top-[8%] h-[720px] w-[1180px]">
+              {shell}
             </div>
           </div>
-        ) : null}
+        </div>
+      </div>
+    );
+  }
 
-        <div
-          className={
-            isAuth
-              ? "absolute inset-0 overflow-hidden"
-              : "relative hidden min-h-[36rem] items-center justify-center px-10 py-14 sm:flex lg:min-h-[42rem] lg:px-14 lg:py-16"
-          }
-        >
+  // Landing: the shell sits inset on a warm panel, not on the page itself.
+  return (
+    <div className="hero-visual relative mx-auto w-full max-w-7xl overflow-hidden pl-2 sm:overflow-visible sm:px-4">
+      <div className="relative w-full overflow-hidden rounded-l-xl rounded-r-none sm:rounded-2xl">
+        <HeroNatureBackdrop className="z-0" />
+
+        {/* Mobile: zoomed landscape desktop, panel + shell clipped on the right */}
+        <div className="relative z-[1] h-[300px] overflow-hidden sm:hidden">
           <div
-            ref={isAuth ? undefined : frameRef}
-            className={
-              isAuth
-                ? "absolute left-[6%] top-[8%] h-[720px] w-[1180px]"
-                : "relative w-[94%] max-w-[1080px]"
-            }
-            style={
-              isAuth
-                ? undefined
-                : {
-                    height: scale > 0 ? FRAME_H * scale : undefined,
-                    aspectRatio:
-                      scale > 0 ? undefined : `${FRAME_W} / ${FRAME_H}`,
-                  }
-            }
+            className="absolute left-[4%] top-[6%] origin-top-left"
+            style={{ transform: "scale(0.58)" }}
+          >
+            <div className="overflow-hidden rounded-sm shadow-[0_18px_50px_rgba(0,0,0,0.14)]">
+              <ProductShell
+                tab={tab}
+                onTab={setTab}
+                rail={rail}
+                onRail={setRail}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-[1] hidden min-h-[36rem] items-center justify-center px-10 py-14 sm:flex lg:min-h-[42rem] lg:px-14 lg:py-16">
+          <div
+            ref={frameRef}
+            className="relative w-[94%] max-w-[1080px]"
+            style={{
+              height: scale > 0 ? FRAME_H * scale : undefined,
+              aspectRatio: scale > 0 ? undefined : `${FRAME_W} / ${FRAME_H}`,
+            }}
           >
             <div
-              className={isAuth ? undefined : "origin-top-left"}
-              style={
-                isAuth
-                  ? undefined
-                  : {
-                      transform: `scale(${scale || 0.01})`,
-                      visibility: scale > 0 ? "visible" : "hidden",
-                    }
-              }
+              className="origin-top-left"
+              style={{
+                transform: `scale(${scale || 0.01})`,
+                visibility: scale > 0 ? "visible" : "hidden",
+              }}
             >
               {shell}
             </div>

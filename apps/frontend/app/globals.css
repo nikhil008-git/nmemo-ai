@@ -13,8 +13,8 @@
   --primary-foreground: #ffffff;
   --secondary: #ea580c;
   --secondary-foreground: #ffffff;
-  --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: var(--font-geist), ui-sans-serif, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 @theme inline {
@@ -28,11 +28,11 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --font-sans: var(--font-body);
-  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
 }
 
 html {
-  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
 }
 
 body {
@@ -47,14 +47,14 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
   font-weight: 600;
 }
 
 .btn-cta-primary,
 .btn-cta-secondary,
 .btn-cta-outline {
-  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
 }
 
 .btn-cta-primary {

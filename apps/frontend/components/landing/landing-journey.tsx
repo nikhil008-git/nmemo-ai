@@ -2,21 +2,11 @@
 
 import { useState } from "react";
 
+import { HeroNatureBackdrop } from "@/components/landing/landing-hero-backdrop";
 import {
   ProductShell,
   type DemoTab,
 } from "@/components/landing/landing-playground";
-import { stageBackgrounds } from "@/lib/stage-backgrounds";
-
-type StageStyle = {
-  background: string;
-};
-
-const stages: Record<"home" | "connectors" | "playground", StageStyle> = {
-  home: { background: stageBackgrounds.orange },
-  connectors: { background: stageBackgrounds.slate },
-  playground: { background: stageBackgrounds.neutral },
-};
 
 const sections = [
   {
@@ -32,7 +22,6 @@ const sections = [
     ],
     tab: "Home" as const,
     rail: 0,
-    stage: "home" as const,
     preferContext: false,
     // Crop into the main checklist pane
     frame: { left: "18%", top: "6%", scale: 0.92 },
@@ -50,7 +39,6 @@ const sections = [
     ],
     tab: "Connectors" as const,
     rail: 2,
-    stage: "connectors" as const,
     preferContext: false,
     // Crop into the source tile grid
     frame: { left: "20%", top: "4%", scale: 0.95 },
@@ -68,7 +56,6 @@ const sections = [
     ],
     tab: "Playground" as const,
     rail: 1,
-    stage: "playground" as const,
     preferContext: true,
     // Crop into the chat + context panel
     frame: { left: "22%", top: "2%", scale: 1.02 },
@@ -91,7 +78,7 @@ function JourneyPreview({
 
   return (
     <div
-      className="absolute h-[720px] w-[1180px] overflow-hidden rounded-sm shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
+      className="absolute z-[1] h-[720px] w-[1180px] overflow-hidden rounded-sm shadow-[0_24px_60px_rgba(0,0,0,0.18)]"
       style={{
         left: frame.left,
         top: frame.top,
@@ -148,22 +135,8 @@ export function LandingJourney() {
             </div>
           </div>
 
-          <div
-            className="relative mt-6 h-[70vh] min-h-[420px] overflow-hidden rounded-2xl lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-1/2 lg:rounded-none lg:rounded-l-3xl"
-            style={stages[section.stage]}
-          >
-            <div
-              className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
-              style={{
-                background:
-                  section.stage === "home"
-                    ? "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)"
-                    : section.stage === "connectors"
-                      ? "radial-gradient(circle at 70% 25%, rgba(255,255,255,0.65), transparent 55%)"
-                      : "radial-gradient(circle at 55% 30%, rgba(255,255,255,0.75), transparent 55%)",
-              }}
-              aria-hidden
-            />
+          <div className="relative mt-6 h-[70vh] min-h-[420px] overflow-hidden rounded-2xl lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-1/2 lg:rounded-none lg:rounded-l-3xl">
+            <HeroNatureBackdrop className="z-0" />
             <JourneyPreview
               key={section.tab}
               tab={section.tab}

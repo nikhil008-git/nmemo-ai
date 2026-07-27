@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Geist, Poppins } from "next/font/google";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -9,6 +9,11 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+});
+
+const geist = Geist({
+  variable: "--font-geist",
+  subsets: ["latin"],
 });
 
 const siteUrl = (
@@ -92,7 +97,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${poppins.className} h-full antialiased bg-background text-foreground`}
+      className={`${poppins.variable} ${geist.variable} h-full antialiased bg-background text-foreground`}
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <SmoothScroll>
