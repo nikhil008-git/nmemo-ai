@@ -336,7 +336,7 @@ export default function SettingsPage() {
 
       <section className="space-y-3">
         <SectionLabel>Danger zone</SectionLabel>
-        <div className={`${appPanelClass} space-y-4 border-red-200 px-4 py-4`}>
+        <div className={`${appPanelClass} space-y-4 border-red-500/40 px-4 py-4`}>
           <div className="space-y-1">
             <p className="text-sm font-semibold text-foreground">
               Delete account permanently
@@ -369,7 +369,7 @@ export default function SettingsPage() {
             loading={deleting}
             disabled={!canDelete || deleting}
             onClick={() => void deleteAccount()}
-            className="!border-red-300 !text-red-600 hover:!bg-red-50"
+            className="!border-red-500/50 !text-red-500 hover:!bg-red-500/10"
           >
             Delete account forever
           </CtaButton>

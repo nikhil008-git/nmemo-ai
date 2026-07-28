@@ -258,15 +258,17 @@ export function CommandSearch({
                           className={cn(
                             "flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-left text-sm font-semibold",
                             selected
-                              ? "bg-neutral-900 text-white"
-                              : "text-foreground hover:bg-neutral-100",
+                              ? "bg-secondary text-secondary-foreground"
+                              : "text-foreground hover:bg-foreground/5",
                           )}
                         >
                           <Icon
                             size={14}
                             strokeWidth={1.75}
                             className={
-                              selected ? "text-neutral-400" : "text-neutral-500"
+                              selected
+                                ? "text-secondary-foreground/55"
+                                : "text-neutral-500"
                             }
                           />
                           <span className="min-w-0 flex-1 truncate">
@@ -277,7 +279,7 @@ export function CommandSearch({
                               className={cn(
                                 "max-w-[40%] truncate text-[11px] font-medium",
                                 selected
-                                  ? "text-neutral-500"
+                                  ? "text-secondary-foreground/55"
                                   : "text-neutral-400",
                               )}
                             >

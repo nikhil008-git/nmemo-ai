@@ -26,8 +26,17 @@
   /* Raised surfaces: cards, header pill — white in light, warm grey in dark. */
   --surface: #ffffff;
   --surface-soft: #fafafa;
+  /*
+   * Floats above the page — modals, the command palette, tooltip cards. Has to
+   * stay lighter than `--surface` in light and *lighter* than it in dark too,
+   * otherwise a dialog over the black product shell has no edge of its own.
+   */
+  --surface-raised: #ffffff;
   /* Inset panels inside the product shell: composer, chat bubbles. */
   --panel: #f3f1ee;
+  /* Code blocks read dark in both themes — never inverted by the ramp. */
+  --code-bg: #29251e;
+  --code-fg: #f4f2ef;
   /* Icon rail — stays dark in both themes. */
   --rail: #171717;
   --grid-line: rgba(0, 0, 0, 0.04);
@@ -83,7 +92,10 @@
   --secondary-foreground: #131316;
   --surface: #1d1d21;
   --surface-soft: #18181b;
+  --surface-raised: #26262c;
   --panel: #26262b;
+  --code-bg: #0f0f12;
+  --code-fg: #e9e9ec;
   --rail: #0a0a0c;
   --grid-line: rgba(255, 255, 255, 0.05);
   --stage-glow: rgba(226, 238, 232, 0.14);
@@ -125,7 +137,9 @@
 [data-theme="dark"] .product-shell {
   --surface: #000000;
   --surface-soft: #0b0b0b;
-  --panel: #151515;
+  --surface-raised: #202024;
+  /* Lifted off pure black — the composer has to read as a panel, not a hole. */
+  --panel: #1a1a1c;
   --rail: #000000;
   --foreground: #fafafa;
   --muted-foreground: #b5b5b5;
@@ -157,8 +171,11 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-surface: var(--surface);
   --color-surface-soft: var(--surface-soft);
+  --color-surface-raised: var(--surface-raised);
   --color-panel: var(--panel);
   --color-rail: var(--rail);
+  --color-code-bg: var(--code-bg);
+  --color-code-fg: var(--code-fg);
   /* Every font utility resolves to the same stack — Inter. */
   --font-sans: var(--font-body);
   --font-display: var(--font-body);

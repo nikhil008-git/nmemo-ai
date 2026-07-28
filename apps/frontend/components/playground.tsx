@@ -63,7 +63,7 @@ function SoonIconButton({
       <button
         type="button"
         className={cn(
-          "inline-flex items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-black/[0.04] hover:text-neutral-600",
+          "inline-flex items-center justify-center rounded-full text-neutral-400 transition-colors hover:bg-foreground/10 hover:text-foreground",
           size === "sm" ? "size-7 sm:size-8" : "size-8 sm:size-9",
         )}
         aria-label={`${label}, coming soon`}
@@ -75,7 +75,7 @@ function SoonIconButton({
       </button>
       <span
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-neutral-900 px-2 py-1 text-[10px] font-semibold tracking-[-0.01em] text-neutral-100 opacity-0 shadow-[0_6px_16px_rgba(0,0,0,0.18)] transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+        className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-secondary px-2 py-1 text-[10px] font-semibold tracking-[-0.01em] text-secondary-foreground opacity-0 shadow-[0_6px_16px_rgba(0,0,0,0.18)] transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
       >
         Soon
       </span>
@@ -395,14 +395,14 @@ export function Playground() {
   }
 
   if (!chatHydrated) {
-    return <div className="h-full min-h-0 bg-[#fafafa]" />;
+    return <div className="h-full min-h-0 bg-surface" />;
   }
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col bg-[#fafafa]">
+    <div className="relative flex h-full min-h-0 flex-col bg-surface">
       {keyModalOpen ? (
         <div
-          className="absolute inset-0 z-20 flex items-center justify-center bg-black/25 px-4"
+          className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 px-4"
           onClick={() => {
             setKeyModalOpen(false);
             setPendingAsk(null);
@@ -413,7 +413,7 @@ export function Playground() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="groq-key-title"
-            className="w-full max-w-sm rounded-2xl border border-black/8 bg-white p-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] sm:p-5"
+            className="w-full max-w-sm rounded-2xl border border-border bg-surface-raised p-4 shadow-[0_16px_40px_rgba(0,0,0,0.24)] sm:p-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
@@ -437,7 +437,7 @@ export function Playground() {
                   setPendingAsk(null);
                   setError(null);
                 }}
-                className="inline-flex size-7 items-center justify-center rounded-full text-neutral-400 hover:bg-neutral-100 hover:text-foreground"
+                className="inline-flex size-7 items-center justify-center rounded-full text-neutral-400 hover:bg-foreground/10 hover:text-foreground"
                 aria-label="Close"
               >
                 <X size={14} />
@@ -455,7 +455,7 @@ export function Playground() {
                 onChange={(e) => setGroqKey(e.target.value)}
                 placeholder="Paste API key"
                 autoComplete="off"
-                className="w-full rounded-xl border border-black/8 bg-[#f3f1ee] px-3.5 py-2.5 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-black/15"
+                className="w-full rounded-xl border border-border bg-panel px-3.5 py-2.5 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30"
               />
               {error ? (
                 <p className="text-[12px] font-medium text-red-500">{error}</p>
@@ -475,7 +475,7 @@ export function Playground() {
                   className={cn(
                     "inline-flex h-8 items-center justify-center rounded-full px-4 text-[12px] font-semibold transition-colors",
                     canSaveKey
-                      ? "bg-neutral-900 text-white"
+                      ? "bg-secondary text-secondary-foreground"
                       : "bg-neutral-200 text-neutral-500",
                   )}
                 >
@@ -490,7 +490,7 @@ export function Playground() {
       {empty ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-6 sm:px-6 sm:py-10">
           <div className="flex w-full max-w-2xl flex-col items-center">
-            <h1 className="text-center font-heading text-[1.45rem] font-semibold tracking-[-0.035em] text-balance leading-[1.15] text-neutral-950 sm:text-[2.35rem] md:text-[2.6rem]">
+            <h1 className="text-center font-heading text-[1.45rem] font-semibold tracking-[-0.035em] text-balance leading-[1.15] text-foreground sm:text-[2.35rem] md:text-[2.6rem]">
               See what context your agents get
             </h1>
             <p className="mt-2 max-w-md text-center text-[12px] font-medium leading-relaxed text-neutral-500 sm:mt-3 sm:text-[13px]">
@@ -502,7 +502,7 @@ export function Playground() {
 
             <form
               onSubmit={(e) => void onSubmit(e)}
-              className="relative mt-5 w-full rounded-2xl border border-black/[0.06] bg-[#f3f1ee] px-3.5 pb-3 pt-3 shadow-[0_1px_0_rgba(0,0,0,0.02)] sm:mt-8 sm:rounded-[1.75rem] sm:px-5 sm:pb-4 sm:pt-4"
+              className="relative mt-5 w-full rounded-2xl border border-border bg-panel px-3.5 pb-3 pt-3 shadow-[0_1px_0_rgba(0,0,0,0.02)] sm:mt-8 sm:rounded-[1.75rem] sm:px-5 sm:pb-4 sm:pt-4"
             >
               <textarea
                 ref={inputRef}
@@ -515,7 +515,7 @@ export function Playground() {
                 placeholder="Ask something your sources should know…"
                 disabled={busy}
                 rows={3}
-                className="min-h-[5rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed text-neutral-900 outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[7.5rem] sm:pr-12 sm:text-[15px]"
+                className="min-h-[5rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed text-foreground outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[7.5rem] sm:pr-12 sm:text-[15px]"
               />
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-0.5">
@@ -527,7 +527,7 @@ export function Playground() {
                   <button
                     type="button"
                     onClick={() => stop()}
-                    className="inline-flex size-8 items-center justify-center rounded-full bg-neutral-900 text-white transition-opacity hover:opacity-90 sm:size-9"
+                    className="inline-flex size-8 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-opacity hover:opacity-90 sm:size-9"
                     aria-label="Stop"
                   >
                     <Square size={11} fill="currentColor" />
@@ -539,7 +539,7 @@ export function Playground() {
                     className={cn(
                       "inline-flex size-8 items-center justify-center rounded-full transition-colors sm:size-9",
                       canSend
-                        ? "bg-neutral-900 text-white hover:bg-neutral-800"
+                        ? "bg-secondary text-secondary-foreground hover:opacity-90"
                         : "bg-neutral-200/80 text-neutral-500",
                     )}
                     aria-label="Send"
@@ -568,7 +568,7 @@ export function Playground() {
                   type="button"
                   disabled={busy}
                   onClick={() => void ask(prompt)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-black/20 hover:bg-neutral-50 disabled:opacity-40 sm:gap-2 sm:px-3.5 sm:py-2 sm:text-[13px]"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-transparent px-2.5 py-1.5 text-[11px] font-semibold text-foreground transition-colors hover:border-foreground/25 hover:bg-foreground/5 disabled:opacity-40 sm:gap-2 sm:px-3.5 sm:py-2 sm:text-[13px]"
                 >
                   <Icon
                     size={12}
@@ -644,7 +644,7 @@ export function Playground() {
                       )}
                     >
                       {isUser ? (
-                        <p className="inline-block rounded-xl bg-[#f3f1ee] px-3 py-2 text-left text-[13px] font-medium leading-relaxed sm:rounded-2xl sm:px-4 sm:py-2.5 sm:text-sm">
+                        <p className="inline-block rounded-xl bg-panel px-3 py-2 text-left text-[13px] font-medium leading-relaxed sm:rounded-2xl sm:px-4 sm:py-2.5 sm:text-sm">
                           {text}
                         </p>
                       ) : (
@@ -652,10 +652,10 @@ export function Playground() {
                           <p className="font-heading text-[9px] font-semibold uppercase tracking-[0.14em] text-neutral-400 sm:text-[10px]">
                             nmemo
                           </p>
-                          <p className="whitespace-pre-wrap text-[13px] font-medium leading-[1.6] text-neutral-900 sm:text-[0.9375rem] sm:leading-[1.65]">
+                          <p className="whitespace-pre-wrap text-[13px] font-medium leading-[1.6] text-foreground sm:text-[0.9375rem] sm:leading-[1.65]">
                             {text}
                             {streamingHere ? (
-                              <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse bg-orange-500 align-middle sm:h-3.5" />
+                              <span className="ml-0.5 inline-block h-3 w-1.5 animate-pulse bg-foreground align-middle sm:h-3.5" />
                             ) : null}
                           </p>
                           {ctx?.citations?.length ? (
@@ -694,7 +694,7 @@ export function Playground() {
 
               <form
                 onSubmit={(e) => void onSubmit(e)}
-                className="relative rounded-2xl border border-black/[0.06] bg-[#f3f1ee] px-3 pb-2.5 pt-2.5 sm:rounded-[1.5rem] sm:px-4 sm:pb-3 sm:pt-3"
+                className="relative rounded-2xl border border-border bg-panel px-3 pb-2.5 pt-2.5 sm:rounded-[1.5rem] sm:px-4 sm:pb-3 sm:pt-3"
               >
                 <textarea
                   ref={inputRef}
@@ -753,7 +753,7 @@ export function Playground() {
                     <button
                       type="button"
                       onClick={() => stop()}
-                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-white sm:size-9"
+                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground sm:size-9"
                       aria-label="Stop"
                     >
                       <Square size={11} fill="currentColor" />
@@ -765,7 +765,7 @@ export function Playground() {
                       className={cn(
                         "inline-flex size-8 shrink-0 items-center justify-center rounded-full transition-colors sm:size-9",
                         canSend
-                          ? "bg-neutral-900 text-white"
+                          ? "bg-secondary text-secondary-foreground"
                           : "bg-neutral-200/80 text-neutral-500",
                       )}
                       aria-label="Send"
@@ -782,7 +782,7 @@ export function Playground() {
               </form>
 
               {showDetails && inspectorContext ? (
-                <div className="space-y-3 rounded-2xl border border-black/8 bg-white px-3.5 py-3">
+                <div className="space-y-3 rounded-2xl border border-border bg-surface-raised px-3.5 py-3">
                   <ul className="space-y-1.5 text-xs font-semibold">
                     {(inspectorContext.context.sources ?? []).length === 0 ? (
                       <li className="text-neutral-500">No sources used.</li>

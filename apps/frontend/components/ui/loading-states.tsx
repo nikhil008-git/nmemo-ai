@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 export function AppShellSkeleton() {
   return (
     <div
-      className="fixed inset-0 z-40 flex overflow-hidden bg-surface"
+      className="product-shell fixed inset-0 z-40 flex overflow-hidden bg-surface"
       role="status"
       aria-label="Loading workspace"
     >
-      <aside className="flex w-12 shrink-0 flex-col items-center gap-3 bg-neutral-900 py-3">
+      <aside className="flex w-12 shrink-0 flex-col items-center gap-3 bg-rail py-3">
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton
             key={i}

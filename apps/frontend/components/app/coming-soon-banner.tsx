@@ -37,14 +37,14 @@ export function ComingSoonBanner({
   }
 
   return (
-    <div className="flex h-7 shrink-0 items-center justify-center gap-3 border-b border-black/5 bg-neutral-900 px-3 text-[11px] font-medium text-neutral-300">
+    <div className="flex h-7 shrink-0 items-center justify-center gap-3 border-b border-border bg-panel px-3 text-[11px] font-medium text-neutral-500">
       <p className="truncate text-center tracking-[-0.01em]">
         Next up: voice context, real-time turns, and multi-language
       </p>
       <button
         type="button"
         onClick={dismiss}
-        className="inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-500 transition-colors hover:bg-white/10 hover:text-white"
+        className="inline-flex size-5 shrink-0 items-center justify-center rounded-sm text-neutral-500 transition-colors hover:bg-foreground/10 hover:text-foreground"
         aria-label="Dismiss banner"
       >
         <X size={12} strokeWidth={2} />

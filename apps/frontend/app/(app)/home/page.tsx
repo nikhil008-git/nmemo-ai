@@ -85,7 +85,7 @@ export function HomeView() {
               href={step.href}
               className="flex gap-3 rounded-sm border border-border px-3 py-2.5 transition-colors hover:border-neutral-300 hover:bg-neutral-50 active:bg-neutral-50"
             >
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-secondary text-[10px] font-bold text-secondary-foreground">
                 {i + 1}
               </span>
               <span className="min-w-0">

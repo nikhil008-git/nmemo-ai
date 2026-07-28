@@ -29,7 +29,7 @@ const docsNav = [
 function GridBackdrop() {
   return (
     <div
-      className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(0,0,0,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.04)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
+      className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
       aria-hidden
     />
   );
@@ -52,8 +52,8 @@ function DocsNav() {
             className={cn(
               "rounded-sm px-3 py-1.5 text-sm font-semibold transition-colors",
               active
-                ? "bg-neutral-900 text-white"
-                : "text-neutral-500 hover:bg-neutral-100 hover:text-foreground",
+                ? "bg-secondary text-secondary-foreground"
+                : "text-neutral-500 hover:bg-foreground/5 hover:text-foreground",
             )}
           >
             {item.label}
@@ -158,7 +158,7 @@ export function DocCode({
   caption?: string;
 }) {
   return (
-    <div className="overflow-hidden rounded-sm bg-neutral-950 text-neutral-100">
+    <div className="overflow-hidden rounded-sm bg-code-bg text-code-fg">
       {caption ? (
         <div className="flex items-center justify-between px-4 py-2.5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
@@ -267,7 +267,7 @@ export function DocFlow({
           key={step.title}
           className="relative flex gap-4 border-l border-neutral-200 pb-8 pl-6 last:pb-0"
         >
-          <span className="absolute -left-[7px] top-0 size-3.5 rounded-full border-2 border-white bg-neutral-900" />
+          <span className="absolute -left-[7px] top-0 size-3.5 rounded-full border-2 border-background bg-foreground" />
           <div className="min-w-0 max-w-xl space-y-1.5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-neutral-400">
               {String(i + 1).padStart(2, "0")}

@@ -157,7 +157,7 @@ function SidebarNavBody({
                       className={cn(
                         "flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold hover:bg-foreground/5",
                         tabActive(pathname, item.href)
-                          ? "bg-black/5 text-foreground"
+                          ? "bg-foreground/10 text-foreground"
                           : "text-foreground",
                       )}
                     >
@@ -202,7 +202,7 @@ function SidebarNavBody({
                 className={cn(
                   "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
                   tabActive(pathname, "/connectors")
-                    ? "bg-black/5 text-foreground"
+                    ? "bg-foreground/10 text-foreground"
                     : "text-foreground",
                 )}
               >
@@ -219,7 +219,7 @@ function SidebarNavBody({
                 className={cn(
                   "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
                   tabActive(pathname, "/home")
-                    ? "bg-black/5 text-foreground"
+                    ? "bg-foreground/10 text-foreground"
                     : "text-foreground",
                 )}
               >
@@ -293,7 +293,7 @@ function SidebarNavBody({
                   className={cn(
                     "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
                     tabActive(pathname, item.href)
-                      ? "bg-black/5 text-foreground"
+                      ? "bg-foreground/10 text-foreground"
                       : "text-foreground",
                   )}
                 >
@@ -491,7 +491,8 @@ function AppShellChrome({
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Desktop icon rail */}
-        <aside className="hidden w-12 shrink-0 flex-col items-center gap-3 bg-neutral-900 py-3 md:flex">
+        {/* `bg-rail`, not a neutral step — the ramp inverts in dark, the rail doesn't. */}
+        <aside className="hidden w-12 shrink-0 flex-col items-center gap-3 bg-rail py-3 md:flex">
           {rail.map((item, i) => {
             const Icon = item.icon;
             const active = tabActive(pathname, item.href);
@@ -660,7 +661,7 @@ function AppShellChrome({
       {soonPop ? (
         <div
           role="status"
-          className="pointer-events-none absolute bottom-4 left-4 z-50 w-[min(18rem,calc(100vw-2rem))] rounded-sm border border-black/8 bg-neutral-900 px-3.5 py-2.5 text-[11px] font-medium leading-snug text-neutral-200 shadow-[0_12px_40px_rgba(0,0,0,0.28)] md:left-16"
+          className="pointer-events-none absolute bottom-4 left-4 z-50 w-[min(18rem,calc(100vw-2rem))] rounded-sm border border-border bg-surface-raised px-3.5 py-2.5 text-[11px] font-medium leading-snug text-foreground shadow-[0_12px_40px_rgba(0,0,0,0.28)] md:left-16"
         >
           <p className="font-heading text-[9px] font-semibold uppercase tracking-widest text-neutral-500">
             Next up

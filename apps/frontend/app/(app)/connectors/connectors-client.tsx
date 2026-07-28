@@ -308,7 +308,7 @@ export function ConnectorsClient() {
                     className={cn(
                       "flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold",
                       connected
-                        ? "bg-neutral-900 text-white"
+                        ? "bg-secondary text-secondary-foreground"
                         : "bg-neutral-100 text-neutral-500",
                     )}
                   >
@@ -417,7 +417,7 @@ export function ConnectorsClient() {
                             disabled={
                               !tokenValue.trim() || needsSignIn || busy
                             }
-                            className="shrink-0 rounded-sm bg-neutral-900 px-3 py-2 text-xs font-semibold text-white disabled:opacity-40"
+                            className="shrink-0 rounded-sm bg-secondary px-3 py-2 text-xs font-semibold text-secondary-foreground disabled:opacity-40"
                           >
                             {busy ? "…" : "Save"}
                           </button>
