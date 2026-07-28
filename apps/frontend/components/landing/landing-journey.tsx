@@ -6,88 +6,29 @@ import {
   ProductShell,
   type DemoTab,
 } from "@/components/landing/landing-playground";
-import { stageBackgrounds } from "@/lib/stage-backgrounds";
+import { stageBackground } from "@/lib/stage-backgrounds";
 
-type StageStyle = {
-  background: string;
-};
+/** One section covering the whole product — the shell itself carries the tour. */
+const section = {
+  title: "Start from one workspace",
+  body: "See what’s connected, connect the multi-source stack, and ask for the context your agents need — all from the same shell.",
+  group: "Inside nmemo",
+  features: [
+    "Sources connected",
+    "Live connectors",
+    "Ranked context",
+    "Streaming answers",
+    "Long-term memory",
+    "Scoped keys",
+  ],
+} as const;
 
-const stages: Record<"home" | "connectors" | "playground", StageStyle> = {
-  home: { background: stageBackgrounds.orange },
-  connectors: { background: stageBackgrounds.slate },
-  playground: { background: stageBackgrounds.neutral },
-};
+/** Crop into the main pane of the shell. */
+const frame = { left: "18%", top: "6%", scale: 0.92 } as const;
 
-const sections = [
-  {
-    n: "01",
-    title: "Start from one workspace",
-    body: "See what’s connected, then decide context for every agent from the same shell.",
-    group: "Inside Home",
-    features: [
-      "Sources connected",
-      "See it work",
-      "Connect sources",
-      "Ship to agents",
-    ],
-    tab: "Home" as const,
-    rail: 0,
-    stage: "home" as const,
-    preferContext: false,
-    // Crop into the main checklist pane
-    frame: { left: "18%", top: "6%", scale: 0.92 },
-  },
-  {
-    n: "02",
-    title: "Connect the multi-source stack",
-    body: "Bring every source into one workspace. Connect once; nmemo decides the rest.",
-    group: "Inside Connectors",
-    features: [
-      "Workspace sources",
-      "Live connectors",
-      "Long-term memory",
-      "Scoped keys",
-    ],
-    tab: "Connectors" as const,
-    rail: 2,
-    stage: "connectors" as const,
-    preferContext: false,
-    // Crop into the source tile grid
-    frame: { left: "20%", top: "4%", scale: 0.95 },
-  },
-  {
-    n: "03",
-    title: "Ask for the context agents need",
-    body: "Playground shows decisions live — ranked prompt, citations, and what got used.",
-    group: "Inside Playground",
-    features: [
-      "Ask across sources",
-      "Ranked context",
-      "Streaming answers",
-      "Manage sources",
-    ],
-    tab: "Playground" as const,
-    rail: 1,
-    stage: "playground" as const,
-    preferContext: true,
-    // Crop into the chat + context panel
-    frame: { left: "22%", top: "2%", scale: 1.02 },
-  },
-] as const;
-
-function JourneyPreview({
-  tab,
-  rail,
-  preferContext,
-  frame,
-}: {
-  tab: DemoTab;
-  rail: number;
-  preferContext: boolean;
-  frame: { left: string; top: string; scale: number };
-}) {
-  const [currentTab, setCurrentTab] = useState<DemoTab>(tab);
-  const [currentRail, setCurrentRail] = useState(rail);
+function JourneyPreview() {
+  const [tab, setTab] = useState<DemoTab>("Home");
+  const [rail, setRail] = useState(0);
 
   return (
     <div
@@ -100,11 +41,10 @@ function JourneyPreview({
       }}
     >
       <ProductShell
-        tab={currentTab}
-        onTab={setCurrentTab}
-        rail={currentRail}
-        onRail={setCurrentRail}
-        preferContext={preferContext}
+        tab={tab}
+        onTab={setTab}
+        rail={rail}
+        onRail={setRail}
         fill
       />
     </div>
@@ -113,71 +53,50 @@ function JourneyPreview({
 
 export function LandingJourney() {
   return (
-    <section className="relative mt-20 w-full sm:mt-24">
-      {sections.map((section) => (
-        <article
-          key={section.n}
-          className="relative min-h-screen lg:h-screen"
-        >
-          <div className="relative z-10 mx-auto w-full max-w-6xl px-6">
-            <div className="w-full max-w-md space-y-5 pb-10 pt-16 lg:w-1/2 lg:max-w-none lg:pr-14 lg:pt-20">
-              <p className="text-[13px] font-medium text-neutral-500">
-                {section.n}
+    <section className="relative mt-28 w-full sm:mt-32">
+      <article className="relative min-h-screen lg:h-screen">
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-6">
+          <div className="w-full max-w-md space-y-5 pb-10 pt-16 lg:w-1/2 lg:max-w-none lg:pr-14 lg:pt-20">
+            <h2 className="display-lg font-normal text-balance text-neutral-950">
+              {section.title}
+            </h2>
+            <p className="text-sm font-semibold leading-relaxed text-neutral-500">
+              {section.body}
+            </p>
+            <div className="border-t border-border pt-5">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                {section.group}
               </p>
-              <h2 className="text-[1.75rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] text-neutral-950 sm:text-3xl md:text-[2.15rem]">
-                {section.title}
-              </h2>
-              <p className="text-sm font-semibold leading-relaxed text-neutral-500">
-                {section.body}
-              </p>
-              <div className="border-t border-border pt-5">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
-                  {section.group}
-                </p>
-                <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2">
-                  {section.features.map((f) => (
-                    <li
-                      key={f}
-                      className="text-sm font-semibold text-foreground"
-                    >
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2">
+                {section.features.map((f) => (
+                  <li key={f} className="text-sm font-semibold text-foreground">
+                    {f}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
+        </div>
 
+        <div
+          className="relative mt-6 h-[70vh] min-h-[420px] overflow-hidden rounded-2xl lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-1/2 lg:rounded-none lg:rounded-l-3xl"
+          style={{ background: stageBackground }}
+        >
           <div
-            className="relative mt-6 h-[70vh] min-h-[420px] overflow-hidden rounded-2xl lg:absolute lg:inset-y-0 lg:right-0 lg:mt-0 lg:h-auto lg:w-1/2 lg:rounded-none lg:rounded-l-3xl"
-            style={stages[section.stage]}
-          >
-            <div
-              className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
-              style={{
-                background:
-                  section.stage === "home"
-                    ? "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)"
-                    : section.stage === "connectors"
-                      ? "radial-gradient(circle at 70% 25%, rgba(255,255,255,0.65), transparent 55%)"
-                      : "radial-gradient(circle at 55% 30%, rgba(255,255,255,0.75), transparent 55%)",
-              }}
-              aria-hidden
-            />
-            <JourneyPreview
-              key={section.tab}
-              tab={section.tab}
-              rail={section.rail}
-              preferContext={section.preferContext}
-              frame={section.frame}
-            />
-            <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-white from-15% via-white/90 via-45% to-transparent"
-              aria-hidden
-            />
-          </div>
-        </article>
-      ))}
+            className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(circle at 35% 35%, var(--stage-glow), transparent 55%)",
+            }}
+            aria-hidden
+          />
+          <JourneyPreview />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-background from-15% via-background/90 via-45% to-transparent"
+            aria-hidden
+          />
+        </div>
+      </article>
     </section>
   );
 }

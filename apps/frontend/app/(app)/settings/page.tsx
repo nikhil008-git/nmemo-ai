@@ -40,7 +40,7 @@ const COMPANY_SIZES = [
 ] as const;
 
 const fieldClass =
-  "w-full rounded-sm border border-border bg-white px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30";
+  "w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30";
 
 function asIndustry(value: string | null | undefined) {
   if (value && (INDUSTRIES as readonly string[]).includes(value)) {
@@ -215,7 +215,7 @@ export default function SettingsPage() {
                 <span className="text-xs font-semibold text-neutral-500">
                   Company domain
                 </span>
-                <div className="flex items-center gap-2 rounded-sm border border-border bg-white px-3 py-1.5 focus-within:border-foreground/30">
+                <div className="flex items-center gap-2 rounded-sm border border-border bg-surface px-3 py-1.5 focus-within:border-foreground/30">
                   <Link2 className="size-4 shrink-0 text-neutral-400" />
                   <input
                     value={domain}
@@ -356,7 +356,7 @@ export default function SettingsPage() {
               value={confirmText}
               onChange={(e) => setConfirmText(e.target.value)}
               placeholder={user?.email || "you@example.com"}
-              className="w-full rounded-sm border border-border bg-white px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30"
+              className="w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30"
             />
           </label>
           {deleteError ? (

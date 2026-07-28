@@ -101,7 +101,7 @@ export function SignInForm({ className }: { className?: string }) {
         fullWidth
         loading={busy}
         onClick={() => void handleGoogle()}
-        className="!bg-white !text-foreground border border-border shadow-none hover:!bg-neutral-50"
+        className="!bg-surface !text-foreground border border-border shadow-none hover:!bg-neutral-50"
       >
         <span className="inline-flex items-center gap-2.5">
           {!busy && <GoogleIcon className="size-4 shrink-0" />}

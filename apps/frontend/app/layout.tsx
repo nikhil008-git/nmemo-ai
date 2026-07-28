@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Poppins } from "next/font/google";
+import { Inter } from "next/font/google";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { ThemeProvider, themeScript } from "@/lib/theme";
 import "./globals.css";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const geist = Geist({
-  variable: "--font-geist",
+/** The one face — headings, body, UI chrome. */
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -97,18 +93,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${geist.variable} h-full antialiased bg-background text-foreground`}
+      suppressHydrationWarning
+      className={`${inter.variable} h-full antialiased bg-background text-foreground`}
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
-        <SmoothScroll>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-          <NavigationProgress />
-          <SiteHeader />
-          {children}
-        </SmoothScroll>
+        {/* Sets data-theme before the first paint — must stay ahead of the tree. */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <ThemeProvider>
+          <SmoothScroll>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+            <NavigationProgress />
+            <SiteHeader />
+            {children}
+          </SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   );

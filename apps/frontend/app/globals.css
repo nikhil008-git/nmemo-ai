@@ -1,20 +1,148 @@
 @import "tailwindcss";
 
-:root {
+/*
+ * Themes are driven by `data-theme` on <html> (see lib/theme.tsx). The
+ * selector is attribute-only — not `:root[data-theme]` — so any nested element
+ * can pin its own subtree back to a theme. The product mockups on the landing
+ * page use `data-theme="light"` for exactly that: they stay a light app UI even
+ * while the page canvas is dark.
+ */
+:root,
+[data-theme="light"] {
   --background: #ffffff;
   --background-soft: #fafafa;
   --background-cool: #f8fafc;
   --background-warm: #f5f3ff;
-  --foreground: #000000;
-  --muted-foreground: #737373;
-  --border: #e5e5e5;
+  /* Warm ink rather than pure black — rgb(41, 37, 30). */
+  --foreground: #29251e;
+  --muted-foreground: #78736b;
+  --border: #e7e4df;
   --input: #f5f5f5;
   --primary: #000000;
   --primary-foreground: #ffffff;
-  --secondary: #ea580c;
+  /* In-app accent: ink in light, white in dark — no orange anywhere. */
+  --secondary: #131316;
   --secondary-foreground: #ffffff;
-  --font-body: var(--font-geist), ui-sans-serif, -apple-system,
+  /* Raised surfaces: cards, header pill — white in light, warm grey in dark. */
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  /* Inset panels inside the product shell: composer, chat bubbles. */
+  --panel: #f3f1ee;
+  /* Icon rail — stays dark in both themes. */
+  --rail: #171717;
+  --grid-line: rgba(0, 0, 0, 0.04);
+  /* Soft highlight blurred over a stage. */
+  --stage-glow: rgba(255, 255, 255, 0.5);
+  --cta-primary-bg: #131316;
+  --cta-primary-fg: #ffffff;
+  --cta-secondary-bg: #ffffff;
+  --cta-secondary-fg: #131316;
+  --cta-outline-hover: rgba(0, 0, 0, 0.05);
+
+  /*
+   * The one stage photograph — behind every product shell and the closing
+   * panel. Same image in both themes; dark only lays a veil over it (see the
+   * dark block) so light text keeps its contrast.
+   */
+  --stage-photo: url("/marketing/ladakh-valley.jpg") center / cover no-repeat;
+  /* One face everywhere: Inter. */
+  --font-body: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display-stack: var(--font-body);
+
+  /*
+   * Warm-neutral ramp — same hue family as the dark canvas, so the two themes
+   * read as one system instead of "brown site" and "grey site".
+   */
+  --color-neutral-50: #faf9f7;
+  --color-neutral-100: #f4f2ef;
+  --color-neutral-200: #e7e4df;
+  --color-neutral-300: #d5d0c9;
+  --color-neutral-400: #a8a29a;
+  --color-neutral-500: #78736b;
+  --color-neutral-600: #5c574f;
+  --color-neutral-700: #47433c;
+  --color-neutral-800: #35312b;
+  --color-neutral-900: #2e2a24;
+  --color-neutral-950: #29251e;
+}
+
+[data-theme="dark"] {
+  /* Ink black — near-black, faintly cool, so the black shell sits flush. */
+  --background: #131316;
+  --background-soft: #1a1a1e;
+  --background-cool: #131317;
+  --background-warm: #191918;
+  --foreground: #f7f7f8;
+  --muted-foreground: #b4b4bb;
+  --border: rgba(255, 255, 255, 0.13);
+  --input: rgba(255, 255, 255, 0.07);
+  --primary: #f7f7f8;
+  --primary-foreground: #17171a;
+  --secondary: #f7f7f8;
+  --secondary-foreground: #131316;
+  --surface: #1d1d21;
+  --surface-soft: #18181b;
+  --panel: #26262b;
+  --rail: #0a0a0c;
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --stage-glow: rgba(226, 238, 232, 0.14);
+  /* Same photograph, veiled so it sits on the ink canvas instead of glaring. */
+  --stage-photo:
+    linear-gradient(rgba(10, 12, 16, 0.5), rgba(10, 12, 16, 0.5)),
+    url("/marketing/ladakh-valley.jpg") center / cover no-repeat;
+  --cta-primary-bg: #f7f7f8;
+  --cta-primary-fg: #131316;
+  /* Transparent so it reads as the quiet option next to the filled primary. */
+  --cta-secondary-bg: transparent;
+  --cta-secondary-fg: #f7f7f8;
+  --cta-outline-hover: rgba(255, 255, 255, 0.08);
+
+
+  /*
+   * Ramp inverted: page-level `neutral-*` utilities keep their intent
+   * (400 dimmer than 500 dimmer than 950 headings) against the ink canvas.
+   * Kept bright on purpose — a low-contrast ramp reads as washed out here.
+   */
+  --color-neutral-50: #17171a;
+  --color-neutral-100: #1d1d21;
+  --color-neutral-200: #2a2a30;
+  --color-neutral-300: #3a3a42;
+  --color-neutral-400: #8e8e97;
+  --color-neutral-500: #b4b4bb;
+  --color-neutral-600: #c8c8ce;
+  --color-neutral-700: #d9d9de;
+  --color-neutral-800: #e9e9ec;
+  --color-neutral-900: #f2f2f4;
+  --color-neutral-950: #f7f7f8;
+}
+
+/*
+ * The product shell is its own screen inside the page: black in dark mode, so
+ * it reads as an app window rather than another warm card. Scoped overrides —
+ * page cards, the header pill, and CTAs keep the warm surfaces above.
+ */
+[data-theme="dark"] .product-shell {
+  --surface: #000000;
+  --surface-soft: #0b0b0b;
+  --panel: #151515;
+  --rail: #000000;
+  --foreground: #fafafa;
+  --muted-foreground: #b5b5b5;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.06);
+
+  --color-neutral-50: #0b0b0b;
+  --color-neutral-100: #151515;
+  --color-neutral-200: #232323;
+  --color-neutral-300: #333333;
+  --color-neutral-400: #8f8f8f;
+  --color-neutral-500: #b5b5b5;
+  --color-neutral-600: #c9c9c9;
+  --color-neutral-700: #d9d9d9;
+  --color-neutral-800: #e8e8e8;
+  --color-neutral-900: #f2f2f2;
+  --color-neutral-950: #fafafa;
 }
 
 @theme inline {
@@ -27,132 +155,177 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-surface: var(--surface);
+  --color-surface-soft: var(--surface-soft);
+  --color-panel: var(--panel);
+  --color-rail: var(--rail);
+  /* Every font utility resolves to the same stack — Inter. */
   --font-sans: var(--font-body);
-  --font-heading: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
+  --font-display: var(--font-body);
+  --font-heading: var(--font-body);
 }
 
-html {
-  font-family: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
+/*
+ * In `base` on purpose: utilities beat base, so a heading carrying
+ * `font-heading` / `font-semibold` (product shell, UI chrome) still overrides
+ * the display serif below. Unlayered rules would win over those utilities.
+ */
+@layer base {
+  html {
+    font-family: var(--font-body);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-body);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display-stack);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
 }
 
-body {
-  background-color: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-body);
-}
+/*
+ * Components live in `components` so Tailwind utilities (a later layer) can
+ * override them from a className — an unlayered rule here would beat, say,
+ * `border-border` on a CtaButton and quietly win.
+ */
+@layer components {
+  /*
+   * Display scale — one place for every big serif heading on the landing page.
+   * clamp() keeps them large on desktop without a stack of breakpoint classes.
+   */
+  /* Hero: 56px / 56px / 400, matching the reference spec. */
+  .display-xl {
+    font-size: clamp(2.25rem, 5.6vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
-  font-weight: 600;
-}
+  .display-lg {
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.018em;
+  }
 
-.btn-cta-primary,
-.btn-cta-secondary,
-.btn-cta-outline {
-  font-family: var(--font-poppins), var(--font-geist), ui-sans-serif, sans-serif;
-}
+  .display-md {
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+  }
 
-.btn-cta-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.25rem;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #ff8c42 0%, #ea580c 100%);
-  padding: 0.4375rem 1.75rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #ffffff;
-  white-space: nowrap;
-  /* box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35); */
-}
+  .btn-cta-primary,
+  .btn-cta-secondary,
+  .btn-cta-outline {
+    font-family: var(--font-body);
+  }
 
-.btn-cta-primary:focus-visible {
-  outline: 2px solid #1a1a1a;
-  outline-offset: 2px;
-}
+  .btn-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: var(--cta-primary-bg);
+    padding: 0.4375rem 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--cta-primary-fg);
+    white-space: nowrap;
+    /* box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35); */
+  }
 
-.btn-cta-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.25rem;
-  border-radius: 8px;
-  background: #1a1a1a;
-  padding: 0.4375rem 1.75rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #ffffff;
-  white-space: nowrap;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-}
+  .btn-cta-primary:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 2px;
+  }
 
-.btn-cta-secondary:focus-visible {
-  outline: 2px solid #1a1a1a;
-  outline-offset: 2px;
-}
+  .btn-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--cta-secondary-bg);
+    padding: 0.4375rem 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--cta-secondary-fg);
+    white-space: nowrap;
+  }
 
-.btn-cta-outline {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.25rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: transparent;
-  padding: 0.4375rem 1.75rem;
-  font-size: 0.9375rem;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--foreground);
-  white-space: nowrap;
-}
+  .btn-cta-secondary:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 2px;
+  }
 
-.btn-cta-outline:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
+  .btn-cta-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.25rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    padding: 0.4375rem 1.75rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--foreground);
+    white-space: nowrap;
+  }
 
-.btn-cta-outline:focus-visible {
-  outline: 2px solid #1a1a1a;
-  outline-offset: 2px;
-}
+  .btn-cta-outline:hover {
+    background: var(--cta-outline-hover);
+  }
 
-.btn-cta-primary:disabled,
-.btn-cta-secondary:disabled,
-.btn-cta-outline:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
+  .btn-cta-outline:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: 2px;
+  }
 
-.btn-cta-compact {
-  min-height: 2rem;
-  min-width: 9rem;
-  padding: 0.375rem 1.25rem;
-  font-size: 0.8125rem;
-}
+  .btn-cta-primary:disabled,
+  .btn-cta-secondary:disabled,
+  .btn-cta-outline:disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
 
-.cta-button-row {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: stretch;
-  gap: 0.625rem;
-  width: 100%;
-}
+  .btn-cta-compact {
+    min-height: 2rem;
+    min-width: 9rem;
+    padding: 0.375rem 1.25rem;
+    font-size: 0.8125rem;
+  }
 
-.cta-button-row .btn-cta-primary,
-.cta-button-row .btn-cta-secondary,
-.cta-button-row .btn-cta-outline {
-  flex: 1 1 0;
-  min-width: 0;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  .cta-button-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 0.625rem;
+    width: 100%;
+  }
+
+  .cta-button-row .btn-cta-primary,
+  .cta-button-row .btn-cta-secondary,
+  .cta-button-row .btn-cta-outline {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 
 @keyframes landing-how-bar {

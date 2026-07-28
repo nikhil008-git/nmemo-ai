@@ -27,7 +27,7 @@ function SkeletonPanel({
     >
       <div className="relative h-[200px] p-4 sm:h-[220px] sm:p-5">{children}</div>
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white from-15% via-white/90 via-45% to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background from-15% via-background/90 via-45% to-transparent"
         aria-hidden
       />
     </div>
@@ -45,7 +45,7 @@ function FeatureTag({
     <span
       className={cn(
         "inline-flex items-center rounded-sm px-2 py-0.5 text-[10px] font-semibold tracking-tight",
-        active ? "bg-neutral-900 text-white" : "bg-neutral-200/80 text-neutral-500",
+        active ? "bg-foreground text-background" : "bg-neutral-200/80 text-neutral-500",
       )}
     >
       {children}
@@ -215,15 +215,17 @@ export function LandingHow() {
   }, []);
 
   return (
-    <section className="mt-4 w-full scroll-mt-28" id="how-it-works">
-      <div className="max-w-2xl space-y-1.5">
-        <p className="text-[13px] font-medium text-neutral-500">How it works</p>
-        <p className="text-sm font-semibold text-neutral-500">
-          Three moves between your sources and the model.
+    <section className="mt-6 w-full scroll-mt-28" id="how-it-works">
+      <div className="max-w-3xl space-y-3">
+        <p className="font-heading text-[13px] font-medium text-neutral-500">
+          How it works
         </p>
+        <h2 className="display-lg font-normal text-balance text-neutral-950">
+          Three moves between your sources and the model.
+        </h2>
       </div>
 
-      <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+      <div className="mt-14 grid gap-12 md:grid-cols-3 md:gap-8">
         {steps.map((step, i) => {
           const Demo = step.Demo;
           const on = active === i;
@@ -234,7 +236,7 @@ export function LandingHow() {
                 <p className="text-[13px] font-medium text-neutral-500">
                   {step.n}
                 </p>
-                <h3 className="text-sm font-semibold text-foreground">
+                <h3 className="font-heading text-sm font-semibold text-foreground">
                   {step.title}
                 </h3>
                 <p className="text-xs font-medium leading-relaxed text-neutral-500">

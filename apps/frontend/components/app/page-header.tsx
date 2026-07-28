@@ -58,6 +58,6 @@ export function SectionLabel({
 export const appFieldClass =
   "min-w-0 w-full rounded-sm border border-border bg-input px-3 py-2.5 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30 disabled:opacity-50";
 
-export const appPanelClass = "rounded-sm border border-border bg-white";
+export const appPanelClass = "rounded-sm border border-border bg-surface";
 
 export const appMetaClass = "text-xs font-semibold text-neutral-500";

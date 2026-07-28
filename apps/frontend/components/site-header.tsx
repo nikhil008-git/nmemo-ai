@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 
 import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { CtaButton } from "@/components/ui/cta-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth-client";
@@ -19,7 +19,6 @@ const marketingNav = [
 export function SiteHeader() {
   const { data: session, isPending } = useSession();
   const pathname = usePathname();
-  const [compact, setCompact] = useState(false);
   const loggedIn = Boolean(session?.user);
   const isAuthPage =
     pathname === "/sign-in" ||
@@ -33,33 +32,15 @@ export function SiteHeader() {
     pathname.startsWith("/keys") ||
     pathname.startsWith("/settings");
 
-  useEffect(() => {
-    const onScroll = () => setCompact(window.scrollY > 20);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   // App shell has its own chrome — marketing header stays for / and docs.
   if (isAuthPage || isAppShell) return null;
 
   return (
-    <div className="fixed left-0 right-0 top-0 z-50">
+    // Sits in flow, not fixed — it scrolls away with the page.
+    <div className="relative z-50 w-full">
       <ComingSoonBanner storageKey="nmemo:dismiss-coming-soon-banner-site" />
-      <header
-        className={cn(
-          "px-4 transition-[padding] duration-300 ease-out sm:px-6",
-          compact ? "pt-3" : "pt-0",
-        )}
-      >
-        <div
-          className={cn(
-            "mx-auto flex w-full max-w-6xl items-center justify-between gap-3 transition-all duration-300 ease-out md:grid md:grid-cols-[1fr_auto_1fr] md:gap-4",
-            compact
-              ? "rounded-full bg-white px-3 py-2.5 shadow-[0_10px_40px_rgba(0,0,0,0.08)] sm:px-5 sm:py-3"
-              : "bg-transparent py-3 sm:py-4",
-          )}
-        >
+      <header className="px-4 sm:px-6">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 bg-transparent py-3 sm:py-4 md:grid md:grid-cols-[1fr_auto_1fr] md:gap-4">
           <Link
             href="/"
             className="inline-flex shrink-0 items-center gap-2 justify-self-start font-heading text-[15px] font-semibold tracking-tight text-foreground sm:gap-2.5"
@@ -90,7 +71,8 @@ export function SiteHeader() {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center justify-end gap-2 justify-self-end text-sm font-semibold sm:gap-4">
+          <div className="flex shrink-0 items-center justify-end gap-2 justify-self-end text-sm font-semibold sm:gap-3">
+            <ThemeToggle />
             {isPending ? (
               <div className="flex items-center gap-2 sm:gap-3" aria-hidden>
                 <Skeleton className="hidden h-4 w-16 sm:block" />

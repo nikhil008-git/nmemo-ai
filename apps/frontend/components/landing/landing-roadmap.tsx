@@ -229,12 +229,12 @@ function FallbackMark({ className }: MarkProps) {
 
 export function LandingRoadmap() {
   return (
-    <section className="mt-16 w-full sm:mt-20" id="roadmap">
+    <section className="mt-28 w-full sm:mt-32" id="roadmap">
       <div className="max-w-2xl space-y-3">
         <p className="text-[13px] font-medium text-neutral-500">Coming soon</p>
-        <h2 className="text-[1.65rem] font-semibold tracking-[-0.03em] leading-[1.15] text-neutral-950 sm:text-[1.85rem]">
+        <h2 className="display-lg font-normal text-neutral-950">
           Deeper decisions.
-          <span className="mt-1.5 block font-semibold text-neutral-400">
+          <span className="mt-1.5 block font-normal text-neutral-400">
             Same one call.
           </span>
         </h2>
@@ -244,7 +244,7 @@ export function LandingRoadmap() {
         </p>
       </div>
 
-      <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-14 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
         {allRoadmapItems.map((item) => {
           const Mark = marks[item.id] ?? FallbackMark;
           return (

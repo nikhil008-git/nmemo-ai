@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { RoadmapSidebar } from "@/components/app/roadmap-sidebar";
+import { stageBackground } from "@/lib/stage-backgrounds";
 import { cn } from "@/lib/utils";
 
 const FRAME_W = 1180;
@@ -129,7 +130,7 @@ export function HomeDemo({
             onRail(1);
             onTab("Playground");
           }}
-          className="inline-flex flex-1 items-center justify-center rounded-sm bg-secondary px-4 py-2.5 text-sm font-bold text-white"
+          className="inline-flex flex-1 items-center justify-center rounded-sm bg-secondary px-4 py-2.5 text-sm font-bold text-secondary-foreground"
         >
           See it work
         </button>
@@ -156,7 +157,7 @@ export function HomeDemo({
               }}
               className="flex w-full gap-3 rounded-sm border border-border px-3 py-2.5 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50"
             >
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-neutral-900 text-[10px] font-bold text-white">
+              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-foreground text-[10px] font-bold text-background">
                 {i + 1}
               </span>
               <span className="min-w-0">
@@ -290,7 +291,7 @@ export function PlaygroundDemo({
             Ask across your sources
           </h2>
 
-          <div className="relative mt-7 w-full rounded-[1.75rem] border border-black/[0.06] bg-[#f3f1ee] px-5 pb-4 pt-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
+          <div className="relative mt-7 w-full rounded-[1.75rem] border border-border bg-panel px-5 pb-4 pt-4 shadow-[0_1px_0_rgba(0,0,0,0.02)]">
             <p className="min-h-[7rem] text-[15px] font-medium leading-relaxed text-neutral-400">
               Ask anything across connected sources…
             </p>
@@ -307,7 +308,7 @@ export function PlaygroundDemo({
                 key={label}
                 type="button"
                 onClick={() => ask(i)}
-                className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-2 text-[13px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-black/20 hover:bg-neutral-50"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-2 text-[13px] font-semibold text-neutral-800 shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-foreground/20 hover:bg-surface-soft"
               >
                 <Icon
                   size={14}
@@ -336,12 +337,12 @@ export function PlaygroundDemo({
       <div className="min-h-0 flex-1 overflow-auto px-6 py-5">
         <div className="mx-auto max-w-2xl space-y-4">
           <div className="flex justify-end">
-            <p className="max-w-[85%] rounded-2xl bg-[#f3f1ee] px-4 py-2.5 text-left text-sm font-medium leading-relaxed">
+            <p className="max-w-[85%] rounded-2xl bg-panel px-4 py-2.5 text-left text-sm font-medium leading-relaxed">
               {flow.q}
             </p>
           </div>
           <div className="flex gap-3">
-            <div className="mt-0.5 flex size-[26px] shrink-0 items-center justify-center rounded-[7px] bg-neutral-900 text-[11px] font-bold text-white">
+            <div className="mt-0.5 flex size-[26px] shrink-0 items-center justify-center rounded-[7px] bg-foreground text-[11px] font-bold text-background">
               n
             </div>
             <div className="min-w-0 space-y-1.5">
@@ -369,7 +370,7 @@ export function PlaygroundDemo({
 
       <div className="shrink-0 px-4 pb-5 pt-2 sm:px-6">
         <div className="mx-auto max-w-2xl space-y-2">
-          <div className="relative rounded-[1.5rem] border border-black/[0.06] bg-[#f3f1ee] px-4 pb-3 pt-3">
+          <div className="relative rounded-[1.5rem] border border-border bg-panel px-4 pb-3 pt-3">
             <p className="min-h-[3.25rem] text-[15px] font-medium leading-relaxed text-neutral-400">
               Ask anything across connected sources…
             </p>
@@ -404,8 +405,8 @@ export function PlaygroundDemo({
                     className={cn(
                       "rounded-full px-2.5 py-1 text-[11px] font-semibold",
                       i === active
-                        ? "bg-neutral-900 text-white"
-                        : "bg-white/80 text-neutral-500",
+                        ? "bg-foreground text-background"
+                        : "bg-surface/80 text-neutral-500",
                     )}
                   >
                     {label}
@@ -416,7 +417,7 @@ export function PlaygroundDemo({
           </div>
 
           {showDetails && phase === "done" ? (
-            <div className="space-y-3 rounded-2xl border border-black/8 bg-white px-3.5 py-3">
+            <div className="space-y-3 rounded-2xl border border-border bg-surface px-3.5 py-3">
               <ul className="space-y-1.5 text-xs font-semibold">
                 {flow.sources.map((s) => (
                   <li
@@ -483,7 +484,7 @@ function SourcesDemo() {
             Ingested files your agents can cite.
           </p>
         </div>
-        <span className="rounded-sm bg-secondary px-3 py-1.5 text-xs font-bold text-white">
+        <span className="rounded-sm bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground">
           Upload
         </span>
       </div>
@@ -590,7 +591,7 @@ export function ConnectorsDemo({
         <button
           type="button"
           onClick={() => onTab("Playground")}
-          className="shrink-0 rounded-sm bg-secondary px-3 py-1.5 text-xs font-bold text-white"
+          className="shrink-0 rounded-sm bg-secondary px-3 py-1.5 text-xs font-bold text-secondary-foreground"
         >
           Test ask
         </button>
@@ -606,8 +607,8 @@ export function ConnectorsDemo({
             className={cn(
               "rounded-sm border px-3 py-3 text-left transition-colors",
               row.connected
-                ? "border-neutral-900/15 bg-neutral-950 text-white"
-                : "border-border bg-white hover:border-neutral-300",
+                ? "border-foreground/15 bg-foreground text-background"
+                : "border-border bg-surface hover:border-neutral-300",
             )}
           >
             <span className="flex items-center justify-between gap-2">
@@ -615,7 +616,7 @@ export function ConnectorsDemo({
               <span
                 className={cn(
                   "text-[10px] font-bold uppercase tracking-wider",
-                  row.connected ? "text-white/70" : "text-neutral-400",
+                  row.connected ? "text-background/70" : "text-neutral-400",
                 )}
               >
                 {busy === row.type ? "…" : row.connected ? "On" : "Off"}
@@ -627,7 +628,7 @@ export function ConnectorsDemo({
             <span
               className={cn(
                 "mt-0.5 block text-[11px] font-semibold",
-                row.connected ? "text-white/65" : "text-neutral-500",
+                row.connected ? "text-background/65" : "text-neutral-500",
               )}
             >
               {row.description}
@@ -659,13 +660,13 @@ export function ProductShell({
   return (
     <div
       className={cn(
-        "flex overflow-hidden border border-black/8 bg-white",
+        "product-shell flex overflow-hidden border border-border bg-surface text-foreground",
         fill
           ? "absolute inset-0 h-full w-full rounded-none shadow-none"
           : "h-[720px] w-[1180px] rounded-sm shadow-[0_18px_50px_rgba(0,0,0,0.14)]",
       )}
     >
-      <aside className="flex w-12 shrink-0 flex-col items-center gap-3 bg-neutral-900 py-3">
+      <aside className="flex w-12 shrink-0 flex-col items-center gap-3 bg-rail py-3">
         {railIcons.map((Icon, i) => (
           <button
             key={Icon.displayName ?? i}
@@ -726,8 +727,8 @@ export function ProductShell({
                   type="button"
                   onClick={() => onTab("Connectors")}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
-                    tab === "Connectors" ? "bg-black/5" : "",
+                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
+                    tab === "Connectors" ? "bg-foreground/5" : "",
                   )}
                 >
                   <span>All sources</span>
@@ -739,8 +740,8 @@ export function ProductShell({
                   type="button"
                   onClick={() => onTab("Home")}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
-                    tab === "Home" ? "bg-black/5" : "",
+                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
+                    tab === "Home" ? "bg-foreground/5" : "",
                   )}
                 >
                   <span>My context</span>
@@ -763,7 +764,7 @@ export function ProductShell({
                       if (item.name === "Documents") onTab("Sources");
                       else onTab("Connectors");
                     }}
-                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-black/5"
+                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-foreground/5"
                   >
                     <span className="flex items-center gap-2">
                       <span className={cn("size-2 rounded-full", item.tone)} />
@@ -797,9 +798,9 @@ export function ProductShell({
                       if (item.live) onTab(item.tab);
                     }}
                     className={cn(
-                      "flex w-full cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold transition-colors hover:bg-black/5 hover:text-foreground",
+                      "flex w-full cursor-pointer items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold transition-colors hover:bg-foreground/5 hover:text-foreground",
                       item.live && tab === item.tab
-                        ? "bg-black/5 text-foreground"
+                        ? "bg-foreground/5 text-foreground"
                         : "text-foreground",
                     )}
                   >
@@ -859,7 +860,7 @@ export function ProductShell({
 
         <div
           className={cn(
-            "min-h-0 flex-1 bg-white",
+            "min-h-0 flex-1 bg-surface",
             tab === "Playground" ? "overflow-hidden p-0" : "overflow-auto p-4",
           )}
         >
@@ -911,24 +912,25 @@ export function LandingPlayground({
             : "relative w-full overflow-hidden rounded-l-xl rounded-r-none sm:rounded-2xl"
         }
       >
+        {/*
+          Ladakh backdrop, lightly out of focus. Inset past the clip so the blur
+          has photo to pull from instead of fading at the edges — and it must be
+          its own layer, since blurring the wrapper would blur the shell too.
+        */}
         <div
-          className="absolute inset-0"
-          style={{
-            background: `
-            radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255, 168, 84, 0.95) 0%, transparent 55%),
-            radial-gradient(ellipse 70% 55% at 88% 18%, rgba(251, 124, 38, 0.85) 0%, transparent 52%),
-            radial-gradient(ellipse 85% 55% at 45% 100%, rgba(234, 88, 12, 0.85) 0%, transparent 58%),
-            radial-gradient(ellipse 45% 35% at 65% 55%, rgba(253, 196, 132, 0.8) 0%, transparent 45%),
-            linear-gradient(165deg, #fff3e0 0%, #ffdcae 42%, #f78b26 100%)
-          `,
-          }}
+          className="absolute -inset-6 blur-[6px]"
+          style={{ background: stageBackground }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.14] [background-image:radial-gradient(circle,rgba(0,0,0,0.5)_0.7px,transparent_0.8px)] [background-size:6px_6px]"
           aria-hidden="true"
         />
         <div
           className="pointer-events-none absolute inset-0 opacity-50 blur-2xl"
           style={{
             background:
-              "radial-gradient(circle at 35% 35%, rgba(255,255,255,0.45), transparent 55%)",
+              "radial-gradient(circle at 35% 35%, var(--stage-glow), transparent 55%)",
           }}
           aria-hidden="true"
         />

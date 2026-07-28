@@ -34,6 +34,7 @@ import {
 import type { Connector } from "@/lib/api";
 import { getWorkspace } from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const rail = [
@@ -154,7 +155,7 @@ function SidebarNavBody({
                       href={item.href}
                       onClick={onNavigate}
                       className={cn(
-                        "flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold hover:bg-black/5",
+                        "flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold hover:bg-foreground/5",
                         tabActive(pathname, item.href)
                           ? "bg-black/5 text-foreground"
                           : "text-foreground",
@@ -176,7 +177,7 @@ function SidebarNavBody({
                         onSoon?.(item.message);
                         onNavigate?.();
                       }}
-                      className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold text-neutral-500 hover:bg-black/5 hover:text-foreground"
+                      className="flex w-full items-center gap-2 rounded-sm px-2 py-2 text-left text-xs font-semibold text-neutral-500 hover:bg-foreground/5 hover:text-foreground"
                     >
                       <Icon size={14} strokeWidth={1.75} />
                       {item.label}
@@ -199,7 +200,7 @@ function SidebarNavBody({
                 href="/connectors"
                 onClick={onNavigate}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
                   tabActive(pathname, "/connectors")
                     ? "bg-black/5 text-foreground"
                     : "text-foreground",
@@ -216,7 +217,7 @@ function SidebarNavBody({
                 href="/home"
                 onClick={onNavigate}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                  "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
                   tabActive(pathname, "/home")
                     ? "bg-black/5 text-foreground"
                     : "text-foreground",
@@ -248,7 +249,7 @@ function SidebarNavBody({
                   <Link
                     href={item.href}
                     onClick={onNavigate}
-                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-black/5"
+                    className="flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-foreground hover:bg-foreground/5"
                   >
                     <span className="flex items-center gap-2">
                       <span
@@ -290,7 +291,7 @@ function SidebarNavBody({
                   href={item.href}
                   onClick={onNavigate}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-black/5",
+                    "flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-xs font-semibold hover:bg-foreground/5",
                     tabActive(pathname, item.href)
                       ? "bg-black/5 text-foreground"
                       : "text-foreground",
@@ -316,7 +317,7 @@ function SidebarNavBody({
             onNavigate?.();
             void signOut();
           }}
-          className="w-full rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-neutral-500 hover:bg-black/5 hover:text-foreground"
+          className="w-full rounded-sm px-2 py-1.5 text-left text-xs font-semibold text-neutral-500 hover:bg-foreground/5 hover:text-foreground"
         >
           Sign out
         </button>
@@ -485,7 +486,7 @@ function AppShellChrome({
   };
 
   return (
-    <div className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-white">
+    <div className="product-shell fixed inset-0 z-40 flex flex-col overflow-hidden bg-surface text-foreground">
       <ComingSoonBanner />
 
       <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -539,7 +540,7 @@ function AppShellChrome({
           <SidebarNavBody {...navProps} />
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col bg-white">
+        <div className="flex min-w-0 flex-1 flex-col bg-surface">
           {/* Mobile header — tap title/workspace to open full nav */}
           <div className="flex items-center gap-2 border-b border-border px-3 py-2 md:hidden">
             <button
@@ -566,7 +567,10 @@ function AppShellChrome({
               </span>
             </button>
 
-            <SearchTrigger onClick={() => setSearchOpen(true)} />
+            <div className="flex shrink-0 items-center gap-2">
+              <SearchTrigger onClick={() => setSearchOpen(true)} />
+              <ThemeToggle className="size-8 rounded-[9px]" />
+            </div>
           </div>
 
           {/* Desktop tabs */}
@@ -617,11 +621,11 @@ function AppShellChrome({
         <div className="fixed inset-0 z-50 md:hidden" id="mobile-nav-drawer">
           <button
             type="button"
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-foreground/30"
             aria-label="Close menu"
             onClick={() => setMenuOpen(false)}
           />
-          <div className="absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col bg-neutral-50 shadow-[8px_0_40px_rgba(0,0,0,0.18)]">
+          <div className="absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] flex-col bg-surface-soft shadow-[8px_0_40px_rgba(0,0,0,0.18)]">
             <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
               <p className="font-heading text-sm font-semibold tracking-[-0.02em]">
                 Menu
@@ -629,7 +633,7 @@ function AppShellChrome({
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="flex size-8 items-center justify-center rounded-sm text-neutral-500 hover:bg-black/5 hover:text-foreground"
+                className="flex size-8 items-center justify-center rounded-sm text-neutral-500 hover:bg-foreground/5 hover:text-foreground"
                 aria-label="Close"
               >
                 <X size={16} />

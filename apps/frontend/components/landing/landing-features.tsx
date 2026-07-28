@@ -7,26 +7,18 @@ import {
   HomeDemo,
   PlaygroundDemo,
 } from "@/components/landing/landing-playground";
-import {
-  stageBackgrounds,
-  type StageKey,
-} from "@/lib/stage-backgrounds";
+import { stageBackground } from "@/lib/stage-backgrounds";
 
-function MiniPreview({
-  children,
-  stage,
-}: {
-  children: React.ReactNode;
-  stage: StageKey;
-}) {
+function MiniPreview({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative mt-auto h-[148px] overflow-hidden sm:h-[160px]">
       <div
         className="absolute inset-0"
-        style={{ background: stageBackgrounds[stage] }}
+        style={{ background: stageBackground }}
         aria-hidden
       />
-      <div className="absolute inset-x-3 bottom-0 top-4 overflow-hidden rounded-t-sm border border-b-0 border-black/10 bg-white shadow-[0_10px_28px_rgba(0,0,0,0.1)] sm:inset-x-4">
+      {/* Same app-window treatment as the full shell, minus the chrome. */}
+      <div className="product-shell absolute inset-x-3 bottom-0 top-4 overflow-hidden rounded-t-sm border border-b-0 border-border bg-surface shadow-[0_10px_28px_rgba(0,0,0,0.1)] sm:inset-x-4">
         <div
           className="origin-top-left pointer-events-none select-none"
           style={{
@@ -52,7 +44,7 @@ function KeysDemoPreview() {
       <div className="rounded-sm border border-border bg-neutral-50 px-3 py-2 font-mono text-[11px] text-neutral-500">
         nmemo_sk_••••••••••••3f2a
       </div>
-      <div className="h-8 w-28 rounded-sm bg-neutral-900" />
+      <div className="h-8 w-28 rounded-sm bg-foreground" />
     </div>
   );
 }
@@ -64,7 +56,6 @@ const cards = [
     body: "Sources and agents in the same shell.",
     href: "/home",
     view: "home" as const,
-    stage: "orange" as const,
   },
   {
     label: "Playground",
@@ -72,8 +63,6 @@ const cards = [
     body: "Ask once. Ranked context, live.",
     href: "/playground",
     view: "playground" as const,
-    // Mid — cool slate (neutral stays last on API)
-    stage: "slate" as const,
   },
   {
     label: "API",
@@ -81,7 +70,6 @@ const cards = [
     body: "Keys for getContext in your agents.",
     href: "/keys",
     view: "api" as const,
-    stage: "neutral" as const,
   },
 ] as const;
 
@@ -93,7 +81,7 @@ function CardView({ view }: { view: (typeof cards)[number]["view"] }) {
 
 export function LandingFeatures() {
   return (
-    <section className="mt-10 grid gap-3 md:grid-cols-3 md:gap-4">
+    <section className="mt-16 grid gap-3 md:grid-cols-3 md:gap-4">
       {cards.map((card) => (
         <article
           key={card.label}
@@ -105,7 +93,7 @@ export function LandingFeatures() {
               <p className="text-[11px] font-medium">{card.label}</p>
             </div>
             <Link href={card.href} className="group">
-              <h2 className="text-[1.15rem] font-semibold leading-tight tracking-tight text-neutral-950 group-hover:underline sm:text-[1.25rem]">
+              <h2 className="display-md font-normal text-neutral-950 group-hover:underline">
                 {card.title}
               </h2>
             </Link>
@@ -121,7 +109,7 @@ export function LandingFeatures() {
             </Link>
           </div>
 
-          <MiniPreview stage={card.stage}>
+          <MiniPreview>
             <CardView view={card.view} />
           </MiniPreview>
         </article>

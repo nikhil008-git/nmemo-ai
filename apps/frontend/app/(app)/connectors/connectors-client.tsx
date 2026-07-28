@@ -104,7 +104,7 @@ function placeholder(type: string): Connector {
 }
 
 const fieldClass =
-  "min-w-0 w-full rounded-sm border border-border bg-white px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30 disabled:opacity-50";
+  "min-w-0 w-full rounded-sm border border-border bg-surface px-3 py-2 text-sm font-medium outline-none placeholder:text-neutral-400 focus:border-foreground/30 disabled:opacity-50";
 
 export function ConnectorsClient() {
   const search = useSearchParams();

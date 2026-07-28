@@ -77,7 +77,7 @@ export function SearchTrigger({
       type="button"
       onClick={onClick}
       className={cn(
-        "group flex h-7 items-center gap-2 rounded-sm border border-border bg-white px-2 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50",
+        "group flex h-7 items-center gap-2 rounded-sm border border-border bg-surface px-2 text-left transition-colors hover:border-neutral-300 hover:bg-neutral-50",
         className,
       )}
     >
@@ -189,7 +189,7 @@ export function CommandSearch({
         onClick={() => onOpenChange(false)}
       />
 
-      <div className="relative w-full max-w-md overflow-hidden rounded-sm border border-border bg-white shadow-[0_16px_48px_rgba(0,0,0,0.14)]">
+      <div className="relative w-full max-w-md overflow-hidden rounded-sm border border-border bg-surface shadow-[0_16px_48px_rgba(0,0,0,0.14)]">
         <div className="flex items-center gap-2.5 border-b border-border px-3 py-2.5">
           <Search size={15} strokeWidth={1.75} className="text-neutral-400" />
           <input

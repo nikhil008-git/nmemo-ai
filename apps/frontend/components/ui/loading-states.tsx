@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export function AppShellSkeleton() {
   return (
     <div
-      className="fixed inset-0 z-40 flex overflow-hidden bg-white"
+      className="fixed inset-0 z-40 flex overflow-hidden bg-surface"
       role="status"
       aria-label="Loading workspace"
     >
@@ -57,7 +57,7 @@ export function AppShellSkeleton() {
           </div>
           <Skeleton className="h-7 w-40" />
         </div>
-        <div className="flex min-h-0 flex-1 items-center justify-center bg-white p-6">
+        <div className="flex min-h-0 flex-1 items-center justify-center bg-surface p-6">
           <div className="flex flex-col items-center gap-3">
             <Spinner size={20} />
             <Skeleton className="h-3 w-28" />

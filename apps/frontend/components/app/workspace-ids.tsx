@@ -23,7 +23,7 @@ function CopyButton({ value }: { value: string }) {
     <button
       type="button"
       onClick={() => void onCopy()}
-      className="inline-flex items-center gap-1 rounded-sm border border-border bg-white px-2 py-1 text-[11px] font-bold text-neutral-500 transition-colors hover:text-foreground"
+      className="inline-flex items-center gap-1 rounded-sm border border-border bg-surface px-2 py-1 text-[11px] font-bold text-neutral-500 transition-colors hover:text-foreground"
       aria-label="Copy"
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}

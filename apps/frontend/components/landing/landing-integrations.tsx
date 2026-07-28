@@ -77,12 +77,12 @@ const logos: Logo[] = [
 
 export function LandingIntegrations() {
   return (
-    <section className="mt-12 w-full sm:mt-14">
-      <p className="text-center text-sm font-medium text-neutral-500">
+    <section className="mt-20 w-full sm:mt-24">
+      <h2 className="display-md mx-auto max-w-2xl text-center font-normal text-balance text-neutral-950">
         Every source feeds the decision. More connectors shipping next.
-      </p>
+      </h2>
 
-      <ul className="mx-auto mt-8 grid max-w-5xl grid-cols-2 sm:grid-cols-5">
+      <ul className="mx-auto mt-12 grid max-w-5xl grid-cols-2 sm:grid-cols-5">
         {logos.map((logo, i) => {
           const Mark = logo.mark;
           return (
