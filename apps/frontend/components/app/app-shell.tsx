@@ -18,7 +18,6 @@ import {
 
 import { ReactLenis } from "lenis/react";
 
-import { AppTraceBackdrop } from "@/components/brand/nmemo-traces";
 import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
 import {
   CommandSearch,
@@ -34,7 +33,6 @@ import {
 import type { Connector } from "@/lib/api";
 import { getWorkspace } from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const rail = [
@@ -570,7 +568,6 @@ function AppShellChrome({
 
             <div className="flex shrink-0 items-center gap-2">
               <SearchTrigger onClick={() => setSearchOpen(true)} />
-              <ThemeToggle className="size-8 rounded-[9px]" />
             </div>
           </div>
 
@@ -599,7 +596,6 @@ function AppShellChrome({
           </div>
 
           <div className="relative min-h-0 flex-1">
-            <AppTraceBackdrop />
 
             {onPlayground ? (
               <div className="relative z-[1] h-full min-h-0 overflow-hidden bg-transparent p-0">

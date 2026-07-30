@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { Link2, Plus } from "lucide-react";
 
 import { AuthShell } from "@/components/auth/auth-shell";
-import { TraceBracket } from "@/components/brand/nmemo-traces";
 import { CtaButton } from "@/components/ui/cta-button";
 import { AuthFormSkeleton } from "@/components/ui/loading-states";
 import { createWorkspace, getWorkspace } from "@/lib/api";
@@ -143,16 +142,6 @@ export default function CreateWorkspacePage() {
     return (
       <AuthShell>
         <div className="relative space-y-6 text-foreground">
-          <TraceBracket
-            corner="tl"
-            size={52}
-            className="pointer-events-none absolute -left-2 -top-4 opacity-70"
-          />
-          <TraceBracket
-            corner="br"
-            size={52}
-            className="pointer-events-none absolute -bottom-4 -right-2 opacity-70"
-          />
 
           <form onSubmit={onSendInvites} className="space-y-6">
             <div className="space-y-2">
@@ -248,16 +237,6 @@ export default function CreateWorkspacePage() {
   return (
     <AuthShell>
       <div className="relative space-y-6 text-foreground">
-        <TraceBracket
-          corner="tl"
-          size={52}
-          className="pointer-events-none absolute -left-2 -top-4 opacity-70"
-        />
-        <TraceBracket
-          corner="br"
-          size={52}
-          className="pointer-events-none absolute -bottom-4 -right-2 opacity-70"
-        />
 
         <form onSubmit={onContinueDetails} className="space-y-5">
           <div className="space-y-2">

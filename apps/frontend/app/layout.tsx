@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { ThemeProvider, themeScript } from "@/lib/theme";
 import "./globals.css";
 
 /** The one face — headings, body, UI chrome. */
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+/**
+ * Not a second voice — only literals wear it: repo paths, CLI flags, tool
+ * calls, scores. Everything that reads as language stays Inter.
+ */
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -18,9 +26,9 @@ const siteUrl = (
   "https://nmemo.cloud"
 ).replace(/\/$/, "");
 
-const title = "nmemo · Context Decision Layer";
+const title = "nmemo · Project Continuity Layer for AI Coding";
 const description =
-  "The context decision layer for AI agents. Route, rank, and budget what the model sees — from every source, in one call. Works with AI SDK, LangChain, or plain messages.";
+  "nmemo remembers the context around your codebase — decisions, failed attempts, unfinished tasks, conventions — and hands any coding agent a verified resume packet with receipts.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -31,13 +39,13 @@ export const metadata: Metadata = {
   description,
   applicationName: "nmemo",
   keywords: [
-    "context decision layer",
+    "project continuity layer",
+    "agent memory",
+    "coding agent",
+    "memory with receipts",
+    "resume packet",
     "context engine",
-    "context orchestration",
     "AI agents",
-    "multi-source context",
-    "voice agents",
-    "real-time AI",
   ],
   authors: [{ name: "Nikhil Rajpurohit", url: "https://nikhilwho.in" }],
   creator: "Nikhil Rajpurohit",
@@ -91,25 +99,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // One theme, dark — no pre-paint theme script, nothing to flash.
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} h-full antialiased bg-background text-foreground`}
+      className={`${inter.variable} ${geistMono.variable} h-full antialiased bg-background text-foreground`}
     >
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
-        {/* Sets data-theme before the first paint — must stay ahead of the tree. */}
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-        <ThemeProvider>
-          <SmoothScroll>
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
-            <NavigationProgress />
-            <SiteHeader />
-            {children}
-          </SmoothScroll>
-        </ThemeProvider>
+        <SmoothScroll>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+          <NavigationProgress />
+          <SiteHeader />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

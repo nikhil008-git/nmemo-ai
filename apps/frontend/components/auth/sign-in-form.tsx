@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-import { TraceBracket } from "@/components/brand/nmemo-traces";
 import { CtaButton } from "@/components/ui/cta-button";
 import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
@@ -72,28 +71,20 @@ export function SignInForm({ className }: { className?: string }) {
   }
 
   return (
-    <div className={cn("relative space-y-6 text-foreground", className)}>
-      <TraceBracket
-        corner="tl"
-        size={52}
-        className="pointer-events-none absolute -left-2 -top-4 opacity-70"
-      />
-      <TraceBracket
-        corner="br"
-        size={52}
-        className="pointer-events-none absolute -bottom-4 -right-2 opacity-70"
-      />
-      <div className="space-y-1">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
+    <div className={cn("relative space-y-7 text-foreground", className)}>
+      <div className="space-y-2">
+        <h1 className="text-[28px] font-medium leading-[1.15] tracking-[-0.02em] text-white">
           Sign in
         </h1>
-        <p className="text-sm font-medium text-muted-foreground">
-          Continue with Google to open nmemo
+        <p className="text-[14px] leading-relaxed text-white/45">
+          Continue with Google to open your project brain.
         </p>
       </div>
 
       {error && (
-        <p className="text-sm font-medium text-red-600">{error}</p>
+        <p className="rounded-lg border border-rose-400/25 bg-rose-400/[0.07] px-3 py-2 text-[13px] leading-relaxed text-rose-200/80">
+          {error}
+        </p>
       )}
 
       <CtaButton
@@ -101,13 +92,18 @@ export function SignInForm({ className }: { className?: string }) {
         fullWidth
         loading={busy}
         onClick={() => void handleGoogle()}
-        className="!bg-surface !text-foreground border border-border shadow-none hover:!bg-neutral-50"
+        className="py-2.5"
       >
         <span className="inline-flex items-center gap-2.5">
           {!busy && <GoogleIcon className="size-4 shrink-0" />}
           {busy ? "Redirecting" : "Continue with Google"}
         </span>
       </CtaButton>
+
+      <p className="text-[13px] leading-relaxed text-white/30">
+        Memory is scoped per repository. nmemo never carries context from one
+        project into another.
+      </p>
     </div>
   );
 }

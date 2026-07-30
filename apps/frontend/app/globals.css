@@ -1,162 +1,91 @@
 @import "tailwindcss";
 
 /*
- * Themes are driven by `data-theme` on <html> (see lib/theme.tsx). The
- * selector is attribute-only — not `:root[data-theme]` — so any nested element
- * can pin its own subtree back to a theme. The product mockups on the landing
- * page use `data-theme="light"` for exactly that: they stay a light app UI even
- * while the page canvas is dark.
+ * One theme, dark. The canvas is #121110 — a warm near-black — and everything
+ * above it is white at an opacity. There is no light mode and no `data-theme`
+ * switch any more: a memory-native terminal product reads as a terminal.
+ *
+ * The token names below are the ones the rest of the app already consumes
+ * (`bg-surface`, `text-neutral-500`, `border-border`, the `btn-cta-*` classes),
+ * so re-pointing them here re-skins every route at once.
  */
-:root,
-[data-theme="light"] {
-  --background: #ffffff;
-  --background-soft: #fafafa;
-  --background-cool: #f8fafc;
-  --background-warm: #f5f3ff;
-  /* Warm ink rather than pure black — rgb(41, 37, 30). */
-  --foreground: #29251e;
-  --muted-foreground: #78736b;
-  --border: #e7e4df;
-  --input: #f5f5f5;
-  --primary: #000000;
-  --primary-foreground: #ffffff;
-  /* In-app accent: ink in light, white in dark — no orange anywhere. */
-  --secondary: #131316;
-  --secondary-foreground: #ffffff;
-  /* Raised surfaces: cards, header pill — white in light, warm grey in dark. */
-  --surface: #ffffff;
-  --surface-soft: #fafafa;
-  /*
-   * Floats above the page — modals, the command palette, tooltip cards. Has to
-   * stay lighter than `--surface` in light and *lighter* than it in dark too,
-   * otherwise a dialog over the black product shell has no edge of its own.
-   */
-  --surface-raised: #ffffff;
-  /* Inset panels inside the product shell: composer, chat bubbles. */
-  --panel: #f3f1ee;
-  /* Code blocks read dark in both themes — never inverted by the ramp. */
-  --code-bg: #29251e;
-  --code-fg: #f4f2ef;
-  /* Icon rail — stays dark in both themes. */
-  --rail: #171717;
-  --grid-line: rgba(0, 0, 0, 0.04);
-  /* Soft highlight blurred over a stage. */
-  --stage-glow: rgba(255, 255, 255, 0.5);
-  --cta-primary-bg: #131316;
-  --cta-primary-fg: #ffffff;
-  --cta-secondary-bg: #ffffff;
-  --cta-secondary-fg: #131316;
-  --cta-outline-hover: rgba(0, 0, 0, 0.05);
+:root {
+  --background: #121110;
+  /* Sections that need to lift a hair off the canvas without becoming a card. */
+  --background-soft: #141312;
+  --background-cool: #131211;
+  --background-warm: #141211;
+  --foreground: #ededed;
+  /* white/45 flattened — body copy and secondary labels. */
+  --muted-foreground: #8b8886;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.03);
+  --primary: #ffffff;
+  --primary-foreground: #121110;
+  --secondary: #ffffff;
+  --secondary-foreground: #121110;
+  /* Cards and panels: one step up from the canvas, never a grey. */
+  --surface: #141312;
+  --surface-soft: #131211;
+  /* Floats above a panel — menus, the command palette, dialogs. */
+  --surface-raised: #1b1a18;
+  /* Inset panels inside the product shell: composer, transcript blocks. */
+  --panel: #171615;
+  --code-bg: #0e0d0c;
+  --code-fg: #ededed;
+  /* Icon rail — the darkest surface in the system. */
+  --rail: #0f0e0d;
+  --grid-line: rgba(255, 255, 255, 0.045);
+  /* The one accent: dusk amber, from the wallpaper's horizon. */
+  --accent: #d99a55;
+  --stage-glow: rgba(217, 154, 85, 0.18);
 
-  /*
-   * The one stage photograph — behind every product shell and the closing
-   * panel. Same image in both themes; dark only lays a veil over it (see the
-   * dark block) so light text keeps its contrast.
-   */
-  --stage-photo: url("/marketing/ladakh-valley.jpg") center / cover no-repeat;
-  /* One face everywhere: Inter. */
+  --cta-primary-bg: #ffffff;
+  --cta-primary-fg: #121110;
+  --cta-secondary-bg: rgba(255, 255, 255, 0.03);
+  --cta-secondary-fg: #ffffff;
+  --cta-outline-hover: rgba(255, 255, 255, 0.07);
+
+  /* One face for every word on the site. */
   --font-body: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display-stack: var(--font-body);
+  /* Reserved for literals — paths, flags, commands, scores. */
+  --font-mono-stack: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
+    monospace;
 
   /*
-   * Warm-neutral ramp — same hue family as the dark canvas, so the two themes
-   * read as one system instead of "brown site" and "grey site".
+   * Warm-neutral ramp, inverted for the dark canvas: `neutral-400` is dimmer
+   * than `neutral-500`, and `neutral-950` is the brightest — so page-level
+   * utilities keep their intent without every call site changing.
    */
-  --color-neutral-50: #faf9f7;
-  --color-neutral-100: #f4f2ef;
-  --color-neutral-200: #e7e4df;
-  --color-neutral-300: #d5d0c9;
-  --color-neutral-400: #a8a29a;
-  --color-neutral-500: #78736b;
-  --color-neutral-600: #5c574f;
-  --color-neutral-700: #47433c;
-  --color-neutral-800: #35312b;
-  --color-neutral-900: #2e2a24;
-  --color-neutral-950: #29251e;
-}
-
-[data-theme="dark"] {
-  /* Ink black — near-black, faintly cool, so the black shell sits flush. */
-  --background: #131316;
-  --background-soft: #1a1a1e;
-  --background-cool: #131317;
-  --background-warm: #191918;
-  --foreground: #f7f7f8;
-  --muted-foreground: #b4b4bb;
-  --border: rgba(255, 255, 255, 0.13);
-  --input: rgba(255, 255, 255, 0.07);
-  --primary: #f7f7f8;
-  --primary-foreground: #17171a;
-  --secondary: #f7f7f8;
-  --secondary-foreground: #131316;
-  --surface: #1d1d21;
-  --surface-soft: #18181b;
-  --surface-raised: #26262c;
-  --panel: #26262b;
-  --code-bg: #0f0f12;
-  --code-fg: #e9e9ec;
-  --rail: #0a0a0c;
-  --grid-line: rgba(255, 255, 255, 0.05);
-  --stage-glow: rgba(226, 238, 232, 0.14);
-  /* Same photograph, veiled so it sits on the ink canvas instead of glaring. */
-  --stage-photo:
-    linear-gradient(rgba(10, 12, 16, 0.5), rgba(10, 12, 16, 0.5)),
-    url("/marketing/ladakh-valley.jpg") center / cover no-repeat;
-  --cta-primary-bg: #f7f7f8;
-  --cta-primary-fg: #131316;
-  /* Transparent so it reads as the quiet option next to the filled primary. */
-  --cta-secondary-bg: transparent;
-  --cta-secondary-fg: #f7f7f8;
-  --cta-outline-hover: rgba(255, 255, 255, 0.08);
-
-
-  /*
-   * Ramp inverted: page-level `neutral-*` utilities keep their intent
-   * (400 dimmer than 500 dimmer than 950 headings) against the ink canvas.
-   * Kept bright on purpose — a low-contrast ramp reads as washed out here.
-   */
-  --color-neutral-50: #17171a;
-  --color-neutral-100: #1d1d21;
-  --color-neutral-200: #2a2a30;
-  --color-neutral-300: #3a3a42;
-  --color-neutral-400: #8e8e97;
-  --color-neutral-500: #b4b4bb;
-  --color-neutral-600: #c8c8ce;
-  --color-neutral-700: #d9d9de;
-  --color-neutral-800: #e9e9ec;
-  --color-neutral-900: #f2f2f4;
-  --color-neutral-950: #f7f7f8;
+  --color-neutral-50: #141312;
+  --color-neutral-100: #171615;
+  --color-neutral-200: #201e1c;
+  --color-neutral-300: #2b2927;
+  --color-neutral-400: #7e7b78;
+  --color-neutral-500: #99958f;
+  --color-neutral-600: #b0aca7;
+  --color-neutral-700: #c7c3bf;
+  --color-neutral-800: #dbd8d5;
+  --color-neutral-900: #e8e6e4;
+  --color-neutral-950: #f4f3f2;
 }
 
 /*
- * The product shell is its own screen inside the page: black in dark mode, so
- * it reads as an app window rather than another warm card. Scoped overrides —
- * page cards, the header pill, and CTAs keep the warm surfaces above.
+ * The product shell is its own screen inside the page — one shade under the
+ * canvas so it reads as an app window rather than another card.
  */
-[data-theme="dark"] .product-shell {
-  --surface: #000000;
-  --surface-soft: #0b0b0b;
-  --surface-raised: #202024;
-  /* Lifted off pure black — the composer has to read as a panel, not a hole. */
-  --panel: #1a1a1c;
-  --rail: #000000;
-  --foreground: #fafafa;
-  --muted-foreground: #b5b5b5;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: rgba(255, 255, 255, 0.06);
-
-  --color-neutral-50: #0b0b0b;
-  --color-neutral-100: #151515;
-  --color-neutral-200: #232323;
-  --color-neutral-300: #333333;
-  --color-neutral-400: #8f8f8f;
-  --color-neutral-500: #b5b5b5;
-  --color-neutral-600: #c9c9c9;
-  --color-neutral-700: #d9d9d9;
-  --color-neutral-800: #e8e8e8;
-  --color-neutral-900: #f2f2f2;
-  --color-neutral-950: #fafafa;
+.product-shell {
+  --surface: #131211;
+  --surface-soft: #111010;
+  --surface-raised: #1b1a18;
+  --panel: #171615;
+  --rail: #0f0e0d;
+  --foreground: #ededed;
+  --muted-foreground: #8b8886;
+  --border: rgba(255, 255, 255, 0.07);
+  --input: rgba(255, 255, 255, 0.03);
 }
 
 @theme inline {
@@ -176,20 +105,20 @@
   --color-rail: var(--rail);
   --color-code-bg: var(--code-bg);
   --color-code-fg: var(--code-fg);
-  /* Every font utility resolves to the same stack — Inter. */
+  --color-accent: var(--accent);
+  /* Every sans utility resolves to Inter — headings, chrome, body alike. */
   --font-sans: var(--font-body);
   --font-display: var(--font-body);
   --font-heading: var(--font-body);
+  --font-mono: var(--font-mono-stack);
 }
 
-/*
- * In `base` on purpose: utilities beat base, so a heading carrying
- * `font-heading` / `font-semibold` (product shell, UI chrome) still overrides
- * the display serif below. Unlayered rules would win over those utilities.
- */
 @layer base {
   html {
     font-family: var(--font-body);
+    scroll-behavior: smooth;
+    /* Native form controls, scrollbars, and autofill follow the canvas. */
+    color-scheme: dark;
   }
 
   body {
@@ -198,6 +127,15 @@
     font-family: var(--font-body);
   }
 
+  ::selection {
+    background: var(--accent);
+    color: #121110;
+  }
+
+  /*
+   * Headings run medium, not bold, and tighten as they grow — the reference
+   * type: 40px/1.1/-0.02em at the top of a section.
+   */
   h1,
   h2,
   h3,
@@ -205,9 +143,20 @@
   h5,
   h6 {
     font-family: var(--font-display-stack);
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: -0.02em;
   }
+}
+
+/*
+ * Mono runs wider with a taller x-height than Inter, so at an equal font-size
+ * it reads a notch larger. `mono` corrects for that optically rather than
+ * asking every call site to remember a smaller size.
+ */
+@utility mono {
+  font-family: var(--font-mono-stack);
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
 }
 
 /*
@@ -216,100 +165,87 @@
  * `border-border` on a CtaButton and quietly win.
  */
 @layer components {
-  /*
-   * Display scale — one place for every big serif heading on the landing page.
-   * clamp() keeps them large on desktop without a stack of breakpoint classes.
-   */
-  /* Hero: 56px / 56px / 400, matching the reference spec. */
+  /* Display scale — one place for every large heading on the site. */
   .display-xl {
-    font-size: clamp(2.25rem, 5.6vw, 3.5rem);
-    line-height: 1;
+    font-size: clamp(2rem, 4.8vw, 2.75rem);
+    line-height: 1.08;
     letter-spacing: -0.02em;
+    font-weight: 500;
   }
 
   .display-lg {
-    font-size: clamp(2rem, 4.4vw, 3rem);
-    line-height: 1.05;
-    letter-spacing: -0.018em;
+    font-size: clamp(1.875rem, 3.8vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 500;
   }
 
   .display-md {
-    font-size: clamp(1.5rem, 2.4vw, 2rem);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
+    font-size: clamp(1.25rem, 2vw, 1.375rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: 500;
   }
 
+  /*
+   * Buttons are pills, 13px, medium — filled white for the one real action,
+   * a translucent hairline for everything beside it.
+   */
   .btn-cta-primary,
   .btn-cta-secondary,
   .btn-cta-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    min-height: 2.25rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    padding: 0.5rem 1.125rem;
     font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease;
   }
 
   .btn-cta-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.25rem;
-    border-radius: 8px;
-    border: 1px solid transparent;
     background: var(--cta-primary-bg);
-    padding: 0.4375rem 1.75rem;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    line-height: 1.2;
     color: var(--cta-primary-fg);
-    white-space: nowrap;
-    /* box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35); */
   }
 
-  .btn-cta-primary:focus-visible {
-    outline: 2px solid var(--foreground);
-    outline-offset: 2px;
+  .btn-cta-primary:hover {
+    background: rgba(255, 255, 255, 0.85);
   }
 
   .btn-cta-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.25rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border-color: rgba(255, 255, 255, 0.12);
     background: var(--cta-secondary-bg);
-    padding: 0.4375rem 1.75rem;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    line-height: 1.2;
     color: var(--cta-secondary-fg);
-    white-space: nowrap;
   }
 
-  .btn-cta-secondary:focus-visible {
-    outline: 2px solid var(--foreground);
-    outline-offset: 2px;
+  .btn-cta-secondary:hover {
+    background: var(--cta-outline-hover);
   }
 
   .btn-cta-outline {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.25rem;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    border-color: var(--border);
     background: transparent;
-    padding: 0.4375rem 1.75rem;
-    font-size: 0.9375rem;
-    font-weight: 700;
-    line-height: 1.2;
     color: var(--foreground);
-    white-space: nowrap;
   }
 
   .btn-cta-outline:hover {
     background: var(--cta-outline-hover);
   }
 
+  .btn-cta-primary:focus-visible,
+  .btn-cta-secondary:focus-visible,
   .btn-cta-outline:focus-visible {
-    outline: 2px solid var(--foreground);
+    outline: 2px solid rgba(255, 255, 255, 0.55);
     outline-offset: 2px;
   }
 
@@ -322,26 +258,15 @@
 
   .btn-cta-compact {
     min-height: 2rem;
-    min-width: 9rem;
-    padding: 0.375rem 1.25rem;
+    padding: 0.375rem 0.9375rem;
     font-size: 0.8125rem;
   }
 
   .cta-button-row {
     display: flex;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    gap: 0.625rem;
-    width: 100%;
-  }
-
-  .cta-button-row .btn-cta-primary,
-  .cta-button-row .btn-cta-secondary,
-  .cta-button-row .btn-cta-outline {
-    flex: 1 1 0;
-    min-width: 0;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
   }
 }
 

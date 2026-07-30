@@ -4,11 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { LandingFooter } from "@/components/landing/landing-footer";
-import {
-  NmemoTraceBackdrop,
-  TraceDivider,
-  TraceRule,
-} from "@/components/brand/nmemo-traces";
 import { CtaButton, CtaButtonRow } from "@/components/ui/cta-button";
 import { cn } from "@/lib/utils";
 
@@ -25,15 +20,6 @@ const docsNav = [
     match: (p: string) => p.startsWith("/docs/playground"),
   },
 ] as const;
-
-function GridBackdrop() {
-  return (
-    <div
-      className="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(var(--grid-line)_1px,transparent_1px),linear-gradient(90deg,var(--grid-line)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]"
-      aria-hidden
-    />
-  );
-}
 
 function DocsNav() {
   const pathname = usePathname();
@@ -75,8 +61,6 @@ export function DocsShell({
 }) {
   return (
     <main className="relative flex flex-1 flex-col overflow-hidden text-foreground">
-      <GridBackdrop />
-      <NmemoTraceBackdrop variant="docs" />
 
       <section className="relative z-[1] mx-auto flex w-full max-w-6xl flex-col px-6 pb-16 pt-28 sm:pt-32">
         <DocsNav />
@@ -97,7 +81,6 @@ export function DocsShell({
         </article>
       </section>
 
-      <TraceDivider className="relative z-[1]" />
 
       <LandingFooter />
     </main>
@@ -124,7 +107,6 @@ export function DocSection({
             </span>
           ) : null}
         </h2>
-        <TraceRule className="mt-3 opacity-60" />
       </div>
       {children ? <div className="mt-5 space-y-4">{children}</div> : null}
     </section>
