@@ -4,7 +4,11 @@ import { ReactLenis } from "lenis/react";
 import { usePathname } from "next/navigation";
 import "lenis/dist/lenis.css";
 
-/** Logged-in shell uses its own overflow containers — root Lenis breaks those. */
+/**
+ * Routes that scroll inside their own overflow containers — the logged-in
+ * shell. Root Lenis hijacks the window scroller and breaks them. Docs is not
+ * one of them: it scrolls as one document, exactly like the landing page.
+ */
 const APP_SCROLL_OWNERS = [
   "/home",
   "/playground",

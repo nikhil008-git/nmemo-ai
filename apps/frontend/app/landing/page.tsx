@@ -15,6 +15,15 @@ import {
 } from "@/components/landing/mockups";
 import { REPO_URL } from "@/lib/site";
 
+/* ---------------------------------------------------------------------------
+ * Page vocabulary
+ *
+ * One rule runs through the whole page: nothing is in a box. Sections are
+ * separated by air, groups of facts by type alone. The only objects with an
+ * edge are the product plates — because a screenshot has an edge — and even
+ * those are just a rounded corner and a cast shadow, no bezel and no hairline.
+ * ------------------------------------------------------------------------- */
+
 function Container({
   children,
   className = "",
@@ -29,6 +38,26 @@ function Container({
   );
 }
 
+/** The vertical rhythm of the page: one long breath between arguments. */
+function Section({
+  children,
+  id,
+  className = "",
+}: {
+  children: React.ReactNode;
+  id?: string;
+  className?: string;
+}) {
+  return (
+    <section
+      id={id}
+      className={`${id ? "scroll-mt-24 " : ""}pt-32 sm:pt-48 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
 function SectionHeading({
   children,
   className = "",
@@ -38,7 +67,7 @@ function SectionHeading({
 }) {
   return (
     <h2
-      className={`text-balance text-[32px] font-medium leading-[1.1] tracking-[-0.02em] text-white sm:text-[40px] ${className}`}
+      className={`text-balance text-[30px] font-medium leading-[1.12] tracking-[-0.02em] text-ink sm:text-[38px] ${className}`}
     >
       {children}
     </h2>
@@ -47,33 +76,104 @@ function SectionHeading({
 
 function Lede({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-4 max-w-2xl text-pretty text-[17px] leading-relaxed text-white/50">
+    <p className="mt-4 max-w-[52ch] text-pretty text-[17px] leading-relaxed text-ink/50">
       {children}
     </p>
   );
 }
 
-/** Hairline grid of cards — one border, one gap colour, no card shadows. */
-function CardGrid({
-  items,
-  className = "sm:grid-cols-2",
+/**
+ * A product plate on one side, the claim it proves on the other, alternating
+ * down the page. The copy is vertically centred against the plate so the two
+ * read as one statement rather than a caption under a picture.
+ */
+function Showcase({
+  media,
+  title,
+  body,
+  flip = false,
+  id,
 }: {
-  items: [string, string][];
+  media: React.ReactNode;
+  title: React.ReactNode;
+  body: React.ReactNode;
+  /** `true` puts the plate on the right at `lg`. */
+  flip?: boolean;
+  id?: string;
+}) {
+  return (
+    <Section id={id}>
+      <Container>
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-20">
+          <div className={flip ? "lg:order-2" : undefined}>{media}</div>
+          <div className={flip ? "lg:order-1" : undefined}>
+            <SectionHeading>{title}</SectionHeading>
+            <Lede>{body}</Lede>
+          </div>
+        </div>
+      </Container>
+    </Section>
+  );
+}
+
+/**
+ * Facts in columns, held together by alignment instead of cell borders. The
+ * label carries the weight, the line under it carries the detail, and the
+ * whitespace does the work a border used to do.
+ */
+function FactColumns({
+  items,
+  className = "sm:grid-cols-2 lg:grid-cols-3",
+}: {
+  items: { title: string; meta?: string; body: string }[];
   className?: string;
 }) {
   return (
-    <div
-      className={`grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] ${className}`}
-    >
-      {items.map(([title, body]) => (
-        <div key={title} className="bg-[#141312] p-7">
-          <h3 className="text-[17px] font-medium text-white">{title}</h3>
-          <p className="mt-2.5 text-[15px] leading-relaxed text-white/45">
-            {body}
+    <div className={`grid gap-x-12 gap-y-10 ${className}`}>
+      {items.map((item) => (
+        <div key={item.title} className="max-w-[42ch]">
+          <div className="flex items-baseline gap-3">
+            <h3 className="text-[17px] font-medium text-ink">{item.title}</h3>
+            {item.meta ? (
+              <span className="ml-auto shrink-0 text-[12px] text-ink/30">
+                {item.meta}
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-2.5 text-[15px] leading-relaxed text-ink/45">
+            {item.body}
           </p>
         </div>
       ))}
     </div>
+  );
+}
+
+/** A plain list: one dot, one line, no rule and no container. */
+function PlainList({
+  items,
+  dim = false,
+}: {
+  items: string[];
+  dim?: boolean;
+}) {
+  return (
+    <ul
+      className={`mt-4 space-y-2 text-[15px] leading-relaxed ${
+        dim ? "text-ink/40" : "text-ink/50"
+      }`}
+    >
+      {items.map((line) => (
+        <li key={line} className="flex gap-3">
+          <span
+            className={`mt-[9px] size-1 shrink-0 rounded-full ${
+              dim ? "bg-ink/15" : "bg-ink/30"
+            }`}
+          />
+          {line}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -86,12 +186,12 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         <section className="pt-8 sm:pt-10">
           <Container className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-14">
-            <h1 className="max-w-xs text-balance text-[19px] font-medium leading-[1.2] tracking-[-0.015em] text-white sm:text-[21px]">
+            <h1 className="max-w-xs text-balance text-[19px] font-medium leading-[1.2] tracking-[-0.015em] text-ink sm:text-[21px]">
               Memory with receipts.
             </h1>
 
             <div>
-              <p className="text-pretty text-[14px] leading-relaxed text-white/45 md:max-w-xs">
+              <p className="text-pretty text-[14px] leading-relaxed text-ink/45 md:max-w-xs">
                 The project continuity layer for AI coding. nmemo remembers your
                 repository&apos;s decisions, dead ends, and unfinished work.
               </p>
@@ -99,7 +199,7 @@ export default function LandingPage() {
               <div className="mt-4 flex flex-row items-center gap-2">
                 <Link
                   href="/home"
-                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-white px-4 py-2 text-[13px] font-medium text-[#121110] transition-colors hover:bg-white/85"
+                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-background transition-colors hover:bg-ink/85"
                 >
                   Open the workspace
                   <ArrowDownTray className="size-3.5 -rotate-90" />
@@ -108,7 +208,7 @@ export default function LandingPage() {
                   href={REPO_URL}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/[0.12] bg-white/[0.03] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-white/[0.07]"
+                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-ink/[0.12] bg-ink/[0.03] px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-ink/[0.07]"
                 >
                   <GitHub className="size-3.5" />
                   Star on GitHub
@@ -125,9 +225,9 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         {/* The premise: git vs nmemo                                        */}
         {/* ---------------------------------------------------------------- */}
-        <section className="pt-28 sm:pt-40">
+        <Section>
           <Container>
-            <SectionHeading>
+            <SectionHeading className="max-w-[26ch]">
               Git remembers the code. Nothing remembers the reasoning.
             </SectionHeading>
             <Lede>
@@ -137,37 +237,37 @@ export default function LandingPage() {
               it to whichever agent you open next.
             </Lede>
 
-            <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] sm:grid-cols-2">
-              <div className="bg-[#141312] p-7">
-                <p className="mono text-[13px] text-white/30">git log</p>
-                <p className="mt-3 text-[19px] font-medium leading-snug text-white/70">
+            <div className="mt-16 grid gap-12 sm:grid-cols-2 sm:gap-20">
+              <div className="max-w-[40ch]">
+                <p className="mono text-[13px] text-ink/30">git log</p>
+                <p className="mt-3 text-[21px] font-medium leading-snug text-ink/45">
                   What code changed?
                 </p>
-                <p className="mt-3 text-[15px] leading-relaxed text-white/40">
+                <p className="mt-3 text-[15px] leading-relaxed text-ink/40">
                   A perfect record of diffs, and no record at all of the thinking
                   that produced them.
                 </p>
               </div>
-              <div className="bg-[#141312] p-7">
-                <p className="mono text-[13px] text-white/30">
+              <div className="max-w-[40ch]">
+                <p className="mono text-[13px] text-ink/30">
                   nmemo resume --print
                 </p>
-                <p className="mt-3 text-[19px] font-medium leading-snug text-white">
+                <p className="mt-3 text-[21px] font-medium leading-snug text-ink">
                   Why it changed, what was tried, what failed, what is next.
                 </p>
-                <p className="mt-3 text-[15px] leading-relaxed text-white/45">
+                <p className="mt-3 text-[15px] leading-relaxed text-ink/45">
                   Decisions, conventions, failed attempts, test results, and the
                   next correct step — each one carrying its evidence.
                 </p>
               </div>
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* ---------------------------------------------------------------- */}
         {/* Memory model                                                     */}
         {/* ---------------------------------------------------------------- */}
-        <section id="memory" className="scroll-mt-20 pt-28 sm:pt-40">
+        <Section id="memory">
           <Container>
             <SectionHeading>Six kinds of memory, one budget.</SectionHeading>
             <Lede>
@@ -176,71 +276,42 @@ export default function LandingPage() {
               carry provenance back to the file, commit, or session it came from.
             </Lede>
 
-            <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-3">
-              {memoryLayers.map(({ name, scope, line }) => (
-                <div key={name} className="bg-[#141312] p-6">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-[15px] font-medium text-white">
-                      {name}
-                    </span>
-                    <span className="ml-auto text-[12px] text-white/30">
-                      {scope}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-[14px] leading-relaxed text-white/45">
-                    {line}
-                  </p>
-                </div>
-              ))}
+            <div className="mt-16">
+              <FactColumns
+                items={memoryLayers.map(({ name, scope, line }) => ({
+                  title: name,
+                  meta: scope,
+                  body: line,
+                }))}
+              />
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* ---------------------------------------------------------------- */}
         {/* Receipts + resume                                                */}
         {/* ---------------------------------------------------------------- */}
-        <section id="receipts" className="scroll-mt-20 pt-28 sm:pt-40">
-          <Container>
-            <SectionHeading>
-              Memory you can trust, because you can check it.
-            </SectionHeading>
+        <Showcase
+          id="receipts"
+          media={<ReceiptPlate />}
+          title="Every memory arrives with a receipt."
+          body="Why it was selected, the score behind that ranking, the file or commit it came from, whether it was confirmed against the current repository, and how confident nmemo is. Nothing is pasted into a prompt anonymously."
+        />
 
-            <div className="mt-12 grid gap-12 lg:grid-cols-2 lg:gap-10">
-              <div>
-                <ReceiptPlate />
-                <h3 className="mt-7 text-[22px] font-medium tracking-[-0.01em] text-white">
-                  Every memory arrives with a receipt
-                </h3>
-                <p className="mt-3 text-[16px] leading-relaxed text-white/50">
-                  Why it was selected, the score behind that ranking, the file or
-                  commit it came from, whether it was confirmed against the
-                  current repository, and how confident nmemo is. Nothing is
-                  pasted into a prompt anonymously.
-                </p>
-              </div>
-
-              <div id="resume" className="scroll-mt-20">
-                <ResumePlate />
-                <h3 className="mt-7 text-[22px] font-medium tracking-[-0.01em] text-white">
-                  Resume, don&apos;t re-explain
-                </h3>
-                <p className="mt-3 text-[16px] leading-relaxed text-white/50">
-                  Stop mid-task on Tuesday, come back Thursday in a different
-                  agent. nmemo checks the repository and git state, validates
-                  memories against the live code, and prints a packet that says
-                  what is done, what is failing, and the next correct step.
-                </p>
-              </div>
-            </div>
-          </Container>
-        </section>
+        <Showcase
+          id="resume"
+          flip
+          media={<ResumePlate />}
+          title="Resume, don't re-explain."
+          body="Stop mid-task on Tuesday, come back Thursday in a different agent. nmemo checks the repository and git state, validates memories against the live code, and prints a packet that says what is done, what is failing, and the next correct step."
+        />
 
         {/* ---------------------------------------------------------------- */}
         {/* Freshness: the repo is the source of truth                       */}
         {/* ---------------------------------------------------------------- */}
-        <section className="pt-28 sm:pt-40">
+        <Section>
           <Container>
-            <SectionHeading>
+            <SectionHeading className="max-w-[30ch]">
               When memory and the repository disagree, the repository wins.
             </SectionHeading>
             <Lede>
@@ -250,99 +321,62 @@ export default function LandingPage() {
               instruction is never treated as a command.
             </Lede>
 
-            <div className="mt-12 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-12">
+            <div className="mt-14">
               <FreshnessReport />
+            </div>
 
-              <div className="grid gap-px self-start overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06]">
-                {(
-                  [
-                    [
-                      "Stale memory",
-                      "Claims about the code are re-checked against files, configs, and git state on every recall.",
-                    ],
-                    [
-                      "Contradiction",
-                      "Conflicting facts are surfaced and superseded with history kept, never silently picked.",
-                    ],
-                    [
-                      "Scope leak",
-                      "Every record carries a user, workspace, and repository scope, filtered before ranking — not after.",
-                    ],
-                    [
-                      "Prompt injection",
-                      "A memory is data. Stored text asking to skip approvals is quarantined, not executed.",
-                    ],
-                  ] as [string, string][]
-                ).map(([title, body]) => (
-                  <div key={title} className="bg-[#141312] px-6 py-5">
-                    <h3 className="text-[14px] font-medium text-white/85">
-                      {title}
-                    </h3>
-                    <p className="mt-1.5 text-[14px] leading-relaxed text-white/45">
-                      {body}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            <div className="mt-14">
+              <FactColumns
+                className="sm:grid-cols-2 lg:grid-cols-4"
+                items={[
+                  {
+                    title: "Stale memory",
+                    body: "Claims about the code are re-checked against files, configs, and git state on every recall.",
+                  },
+                  {
+                    title: "Contradiction",
+                    body: "Conflicting facts are surfaced and superseded with history kept, never silently picked.",
+                  },
+                  {
+                    title: "Scope leak",
+                    body: "Every record carries a user, workspace, and repository scope, filtered before ranking — not after.",
+                  },
+                  {
+                    title: "Prompt injection",
+                    body: "A memory is data. Stored text asking to skip approvals is quarantined, not executed.",
+                  },
+                ]}
+              />
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* ---------------------------------------------------------------- */}
         {/* Scoping, portability, processes                                  */}
         {/* ---------------------------------------------------------------- */}
-        <section className="pt-28 sm:pt-40">
-          <Container>
-            <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-              <ProjectsPlate />
-              <div>
-                <SectionHeading>
-                  Work across repos without leaking between them.
-                </SectionHeading>
-                <Lede>
-                  Memory belongs to a repository, not to a chat window. What your
-                  client project decided about Mongo never surfaces while
-                  you&apos;re working on your own product.
-                </Lede>
-              </div>
-            </div>
+        <Showcase
+          media={<ProjectsPlate />}
+          title="Work across repos without leaking between them."
+          body="Memory belongs to a repository, not to a chat window. What your client project decided about Mongo never surfaces while you're working on your own product."
+        />
 
-            <div className="mt-24 grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16 sm:mt-32">
-              <HandoffPlate />
-              <div>
-                <SectionHeading>
-                  Switch agents without starting over.
-                </SectionHeading>
-                <Lede>
-                  The resume packet is plain structured text, so every tool is
-                  already integrated: Claude Code, Codex, Cursor, Gemini, or the
-                  nmemo TUI. Paste it and the agent begins with verified context
-                  instead of a blank chat.
-                </Lede>
-              </div>
-            </div>
+        <Showcase
+          flip
+          media={<HandoffPlate />}
+          title="Switch agents without starting over."
+          body="The resume packet is plain structured text, so every tool is already integrated: Claude Code, Codex, Cursor, Gemini, or the nmemo TUI. Paste it and the agent begins with verified context instead of a blank chat."
+        />
 
-            <div className="mt-24 grid items-center gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16 sm:mt-32">
-              <div>
-                <SectionHeading>Every step, in sight.</SectionHeading>
-                <Lede>
-                  The loop reports each step, each tool call, the context it
-                  selected, and the tokens it spent. Approval gates stop writes
-                  and shell commands before they run, and paths outside the
-                  repository root are rejected by the runtime.
-                </Lede>
-              </div>
-              <div>
-                <ProcessPlate />
-              </div>
-            </div>
-          </Container>
-        </section>
+        <Showcase
+          media={<ProcessPlate />}
+          title="Every step, in sight."
+          body="The loop reports each step, each tool call, the context it selected, and the tokens it spent. Approval gates stop writes and shell commands before they run, and paths outside the repository root are rejected by the runtime."
+        />
 
         {/* ---------------------------------------------------------------- */}
         {/* The CLI                                                          */}
         {/* ---------------------------------------------------------------- */}
-        <section id="cli" className="scroll-mt-20 pt-28 sm:pt-40">
+        <Section id="cli">
           <Container>
             <SectionHeading>Five commands, one project brain.</SectionHeading>
             <Lede>
@@ -351,64 +385,55 @@ export default function LandingPage() {
               the episode when you stop.
             </Lede>
 
-            <div className="mt-12">
+            <div className="mt-14">
               <CommandBlock />
             </div>
 
-            <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.06] sm:grid-cols-2">
-              <div className="bg-[#141312] p-7">
-                <h3 className="text-[17px] font-medium text-white">
+            <div className="mt-14 grid gap-12 sm:grid-cols-2 sm:gap-20">
+              <div className="max-w-[42ch]">
+                <h3 className="text-[17px] font-medium text-ink">
                   In the first release
                 </h3>
-                <ul className="mt-4 space-y-2 text-[15px] leading-relaxed text-white/50">
-                  {[
+                <PlainList
+                  items={[
                     "The terminal TUI and its agent runtime",
                     "Repository detection and task sessions",
                     "Episode memory with receipts",
                     "Safe read-file and search-files tools",
                     "nmemo start · status · resume · resume --print",
                     "The dashboard as a visual project brain",
-                  ].map((line) => (
-                    <li key={line} className="flex gap-3">
-                      <span className="mt-[9px] size-1 shrink-0 rounded-full bg-white/30" />
-                      {line}
-                    </li>
-                  ))}
-                </ul>
+                  ]}
+                />
               </div>
-              <div className="bg-[#141312] p-7">
-                <h3 className="text-[17px] font-medium text-white">
+              <div className="max-w-[42ch]">
+                <h3 className="text-[17px] font-medium text-ink">
                   Deliberately later
                 </h3>
-                <ul className="mt-4 space-y-2 text-[15px] leading-relaxed text-white/40">
-                  {[
+                <PlainList
+                  dim
+                  items={[
                     "SDK for custom agents",
                     "MCP server for automatic retrieval",
                     "Editor-native integrations",
                     "GitHub issue and PR automation",
                     "Cloud sync and billing",
-                  ].map((line) => (
-                    <li key={line} className="flex gap-3">
-                      <span className="mt-[9px] size-1 shrink-0 rounded-full bg-white/15" />
-                      {line}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-5 border-t border-white/[0.07] pt-4 text-[13px] leading-relaxed text-white/30">
+                  ]}
+                />
+                <p className="mt-5 text-[13px] leading-relaxed text-ink/30">
                   A paste-able packet works with every coding tool today. Plugins
                   come after the local loop is reliable.
                 </p>
               </div>
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* ---------------------------------------------------------------- */}
         {/* What is defensible                                               */}
         {/* ---------------------------------------------------------------- */}
-        <section className="pt-28 sm:pt-40">
+        <Section>
           <Container>
-            <SectionHeading>
+            <SectionHeading className="max-w-[30ch]">
               Not another code generator. The layer underneath them.
             </SectionHeading>
             <Lede>
@@ -418,39 +443,40 @@ export default function LandingPage() {
               my project from scratch again&quot;.
             </Lede>
 
-            <div className="mt-12">
-              <CardGrid
+            <div className="mt-16">
+              <FactColumns
+                className="sm:grid-cols-2"
                 items={[
-                  [
-                    "Portable continuity",
-                    "Continuity lives with the repository, not inside one vendor's chat history. Change tools without losing the thread.",
-                  ],
-                  [
-                    "Project-scoped, not chat-scoped",
-                    "Recall is filtered by repository and workspace first, so context stays about the project in front of you.",
-                  ],
-                  [
-                    "Visible selection",
-                    "You can see which memories were chosen, why, and what they cost against the prompt budget.",
-                  ],
-                  [
-                    "Local-first storage",
-                    "Sessions, episodes, and memories live in a database you can open, audit, and delete from.",
-                  ],
+                  {
+                    title: "Portable continuity",
+                    body: "Continuity lives with the repository, not inside one vendor's chat history. Change tools without losing the thread.",
+                  },
+                  {
+                    title: "Project-scoped, not chat-scoped",
+                    body: "Recall is filtered by repository and workspace first, so context stays about the project in front of you.",
+                  },
+                  {
+                    title: "Visible selection",
+                    body: "You can see which memories were chosen, why, and what they cost against the prompt budget.",
+                  },
+                  {
+                    title: "Local-first storage",
+                    body: "Sessions, episodes, and memories live in a database you can open, audit, and delete from.",
+                  },
                 ]}
               />
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* ---------------------------------------------------------------- */}
         {/* FAQ                                                              */}
         {/* ---------------------------------------------------------------- */}
-        <section id="faq" className="scroll-mt-20 pt-28 sm:pt-40">
+        <Section id="faq">
           <Container>
             <SectionHeading>The practical bits, answered.</SectionHeading>
 
-            <div className="mt-10 divide-y divide-white/[0.07] border-y border-white/[0.07]">
+            <div className="mt-10 max-w-3xl">
               {(
                 [
                   [
@@ -483,42 +509,42 @@ export default function LandingPage() {
                   ],
                 ] as [string, string][]
               ).map(([q, a]) => (
-                <details key={q} className="group">
-                  <summary className="flex cursor-pointer list-none items-center gap-4 py-5 text-[17px] text-white/85 transition-colors hover:text-white [&::-webkit-details-marker]:hidden">
+                <details key={q} className="group py-1">
+                  <summary className="flex cursor-pointer list-none items-center gap-4 py-4 text-[17px] text-ink/85 transition-colors hover:text-ink [&::-webkit-details-marker]:hidden">
                     {q}
-                    <ChevronDown className="ml-auto size-[18px] shrink-0 text-white/35 transition-transform group-open:rotate-180" />
+                    <ChevronDown className="ml-auto size-[18px] shrink-0 text-ink/35 transition-transform group-open:rotate-180" />
                   </summary>
-                  <p className="max-w-3xl pb-6 text-[16px] leading-relaxed text-white/45">
+                  <p className="max-w-[70ch] pb-5 text-[16px] leading-relaxed text-ink/45">
                     {a}
                   </p>
                 </details>
               ))}
             </div>
           </Container>
-        </section>
+        </Section>
 
         {/* ---------------------------------------------------------------- */}
         {/* Final CTA                                                        */}
         {/* ---------------------------------------------------------------- */}
-        <section className="py-28 sm:py-40">
+        <Section className="pb-32 sm:pb-48">
           <Container>
-            <div className="relative overflow-hidden rounded-[24px] border border-white/[0.08] px-8 py-16 text-center sm:px-16 sm:py-24">
+            <div className="relative overflow-hidden rounded-[28px] px-8 py-20 text-center sm:px-16 sm:py-28">
               <div
                 aria-hidden
-                className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_115%,rgba(217,154,85,0.22),transparent_62%)]"
+                className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_115%,var(--stage-glow),transparent_62%)]"
               />
               <div className="relative">
-                <h2 className="mx-auto max-w-3xl text-balance text-[32px] font-medium leading-[1.1] tracking-[-0.02em] text-white sm:text-[44px]">
+                <h2 className="mx-auto max-w-3xl text-balance text-[32px] font-medium leading-[1.1] tracking-[-0.02em] text-ink sm:text-[44px]">
                   Stop re-explaining your codebase every morning.
                 </h2>
-                <p className="mx-auto mt-5 max-w-xl text-pretty text-[17px] leading-relaxed text-white/50">
+                <p className="mx-auto mt-5 max-w-xl text-pretty text-[17px] leading-relaxed text-ink/50">
                   Start a task, let nmemo keep the episode, and pick it back up
                   in whichever agent you open next — with receipts.
                 </p>
                 <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
                   <Link
                     href="/home"
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-[#121110] transition-colors hover:bg-white/85"
+                    className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-background transition-colors hover:bg-ink/85"
                   >
                     Open the workspace
                     <ArrowDownTray className="size-[18px] -rotate-90" />
@@ -527,7 +553,7 @@ export default function LandingPage() {
                     href={REPO_URL}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2.5 rounded-full border border-white/[0.12] bg-white/[0.03] px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-white/[0.07]"
+                    className="inline-flex items-center gap-2.5 rounded-full border border-ink/[0.12] bg-ink/[0.03] px-6 py-3 text-[15px] font-medium text-ink transition-colors hover:bg-ink/[0.07]"
                   >
                     <GitHub className="size-[18px]" />
                     Read the source
@@ -536,7 +562,7 @@ export default function LandingPage() {
               </div>
             </div>
           </Container>
-        </section>
+        </Section>
       </main>
 
       <LandingFooter />

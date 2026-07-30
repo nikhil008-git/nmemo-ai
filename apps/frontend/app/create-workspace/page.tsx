@@ -260,7 +260,7 @@ export default function CreateWorkspacePage() {
               <input
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
-                placeholder="ycombinator.com"
+                placeholder="https://nmemo.cloud"
                 disabled={busy}
                 className="min-w-0 flex-1 border-0 bg-transparent py-1.5 text-sm font-semibold outline-none placeholder:text-neutral-400"
               />

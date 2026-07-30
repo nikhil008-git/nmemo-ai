@@ -73,10 +73,10 @@ export function SignInForm({ className }: { className?: string }) {
   return (
     <div className={cn("relative space-y-7 text-foreground", className)}>
       <div className="space-y-2">
-        <h1 className="text-[28px] font-medium leading-[1.15] tracking-[-0.02em] text-white">
+        <h1 className="text-[28px] font-medium leading-[1.15] tracking-[-0.02em] text-ink">
           Sign in
         </h1>
-        <p className="text-[14px] leading-relaxed text-white/45">
+        <p className="text-[14px] leading-relaxed text-ink/45">
           Continue with Google to open your project brain.
         </p>
       </div>
@@ -100,7 +100,7 @@ export function SignInForm({ className }: { className?: string }) {
         </span>
       </CtaButton>
 
-      <p className="text-[13px] leading-relaxed text-white/30">
+      <p className="text-[13px] leading-relaxed text-ink/30">
         Memory is scoped per repository. nmemo never carries context from one
         project into another.
       </p>

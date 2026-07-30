@@ -501,8 +501,8 @@ function AppShellChrome({
                 className={cn(
                   "flex size-8 items-center justify-center rounded-sm transition-colors",
                   active || railIndex === i
-                    ? "bg-white/15 text-white"
-                    : "text-neutral-400 hover:bg-white/10 hover:text-white",
+                    ? "bg-ink/15 text-ink"
+                    : "text-neutral-400 hover:bg-ink/10 hover:text-ink",
                 )}
                 aria-label={item.label}
               >
@@ -511,7 +511,7 @@ function AppShellChrome({
             );
           })}
 
-          <div className="mt-auto flex w-full flex-col items-center gap-2 border-t border-white/10 pt-3">
+          <div className="mt-auto flex w-full flex-col items-center gap-2 border-t border-ink/10 pt-3">
             {upcomingRail.map((item) => {
               const Icon = item.icon;
               return (
@@ -519,7 +519,7 @@ function AppShellChrome({
                   key={item.id}
                   type="button"
                   onClick={() => setSoonPop(item.message)}
-                  className="flex size-8 items-center justify-center rounded-sm text-neutral-500 transition-colors hover:bg-white/10 hover:text-white"
+                  className="flex size-8 items-center justify-center rounded-sm text-neutral-500 transition-colors hover:bg-ink/10 hover:text-ink"
                   aria-label={`${item.label}, coming soon`}
                   title={`${item.label}, coming soon`}
                 >

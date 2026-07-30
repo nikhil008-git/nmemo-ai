@@ -11,15 +11,8 @@ import {
 export default function DocsPlaygroundPage() {
   return (
     <DocsShell
-      title={
-        <>
-          Playground
-          <span className="mt-1.5 block font-semibold text-neutral-400">
-            Ask once. See the context behind it.
-          </span>
-        </>
-      }
-      subtitle="A live view of what getContext() returns, prompt, sources, and citations, before you wire the SDK into your product."
+      title="Ask once. See the context behind it."
+      subtitle="A live view of what getContext() returns — prompt, sources, and citations — before you wire the SDK into your product."
     >
       <DocCtas
         primary={{ href: "/sign-in", label: "Try it" }}

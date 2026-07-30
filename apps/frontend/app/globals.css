@@ -1,23 +1,33 @@
 @import "tailwindcss";
 
 /*
- * One theme, dark. The canvas is #121110 — a warm near-black — and everything
- * above it is white at an opacity. There is no light mode and no `data-theme`
- * switch any more: a memory-native terminal product reads as a terminal.
+ * Two themes, one system. The canvas is a warm near-black (dusk) or a warm
+ * paper (day), and everything above it is *ink* at an opacity — `--ink` is
+ * white on dusk and near-black on paper, so a single `text-ink/45` reads
+ * correctly in both. Call sites never name a literal colour.
+ *
+ * `:root` carries dusk; `[data-theme="light"]` overrides only what changes.
+ * The pre-paint script in `app/layout.tsx` stamps `data-theme` before first
+ * paint, so there is no flash and no-JS still gets a complete dark theme.
  *
  * The token names below are the ones the rest of the app already consumes
  * (`bg-surface`, `text-neutral-500`, `border-border`, the `btn-cta-*` classes),
  * so re-pointing them here re-skins every route at once.
  */
 :root {
+  /*
+   * The ink channel. Every translucent foreground in the app — `text-ink/45`,
+   * `border-ink/[0.08]`, `bg-ink/[0.06]` — is this colour at an opacity.
+   */
+  --ink: #f2efec;
   --background: #121110;
   /* Sections that need to lift a hair off the canvas without becoming a card. */
   --background-soft: #141312;
   --background-cool: #131211;
   --background-warm: #141211;
-  --foreground: #ededed;
-  /* white/45 flattened — body copy and secondary labels. */
-  --muted-foreground: #8b8886;
+  --foreground: #e7e4e0;
+  /* ink/45 flattened — body copy and secondary labels. */
+  --muted-foreground: #837f7c;
   --border: rgba(255, 255, 255, 0.08);
   --input: rgba(255, 255, 255, 0.03);
   --primary: #ffffff;
@@ -35,16 +45,40 @@
   --code-fg: #ededed;
   /* Icon rail — the darkest surface in the system. */
   --rail: #0f0e0d;
+  /* One step under the rail: the inspector column in the product mockups. */
+  --rail-deep: #0c0b0a;
+  /* A full-bleed screen plate — the terminal blocks on the landing page. */
+  --plate: #0e0d0c;
   --grid-line: rgba(255, 255, 255, 0.045);
   /* The one accent: dusk amber, from the wallpaper's horizon. */
   --accent: #d99a55;
   --stage-glow: rgba(217, 154, 85, 0.18);
 
+  /*
+   * Status hues for the product mockups — kept, stale, rejected, and the
+   * budget bar's segments. Named rather than reached for as `emerald-400`,
+   * because paper needs a darker value at the same meaning.
+   */
+  --status-ok: #4ade80;
+  --status-warn: #fbbf24;
+  --status-bad: #fda4af;
+  --status-info: #38bdf8;
+  --status-alt: #a78bfa;
+
+  /* Mockup depth: the bezel's cast shadow and the floating panel's. */
+  --bezel-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.45);
+  --panel-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.95);
+
   --cta-primary-bg: #ffffff;
   --cta-primary-fg: #121110;
+  /* Hover moves the fill *away* from the label, never towards it. */
+  --cta-primary-hover: rgba(255, 255, 255, 0.85);
   --cta-secondary-bg: rgba(255, 255, 255, 0.03);
   --cta-secondary-fg: #ffffff;
+  --cta-secondary-border: rgba(255, 255, 255, 0.12);
   --cta-outline-hover: rgba(255, 255, 255, 0.07);
+  /* Keyboard focus has to be visible on whichever canvas is underneath. */
+  --focus-ring: rgba(255, 255, 255, 0.55);
 
   /* One face for every word on the site. */
   --font-body: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system,
@@ -73,6 +107,138 @@
 }
 
 /*
+ * Day. Same warmth, inverted: paper instead of dusk, ink instead of white.
+ * Only the values that actually change are listed — the font stacks, the
+ * accent, and the display scale are shared with the dark theme above.
+ */
+:root[data-theme="light"] {
+  --ink: #17130f;
+
+  /*
+   * Cream, not white. A near-white canvas reads as "unstyled page" and leaves
+   * white cards with nothing to lift off of; pulling the paper down into warm
+   * cream gives the surfaces somewhere to sit and matches the dusk canvas's
+   * warmth rather than fighting it.
+   */
+  --background: #f7f2e8;
+  --background-soft: #f2ece0;
+  --background-cool: #f3eee4;
+  --background-warm: #f5efe3;
+  --foreground: #17130f;
+  --muted-foreground: #6b645d;
+  --border: rgba(23, 19, 15, 0.1);
+  --input: rgba(23, 19, 15, 0.03);
+  --primary: #17130f;
+  --primary-foreground: #fffcf6;
+  --secondary: #17130f;
+  --secondary-foreground: #fffcf6;
+  /*
+   * Cards lift *up* off the paper — a warm white, where dusk cards lift up
+   * into grey. It stays a shade above `--background`, never equal to it.
+   */
+  --surface: #fffcf6;
+  --surface-soft: #f4eee3;
+  --surface-raised: #fffcf6;
+  --panel: #f2ece0;
+  --rail: #ede6d8;
+  --grid-line: rgba(23, 19, 15, 0.05);
+  /*
+   * Code stays dusk in both themes. A terminal product shows a terminal, and
+   * the reference docs set code as a dark plate on paper — see `.dark-island`,
+   * which every code panel wears so its contents keep dark-theme ink.
+   */
+  --code-bg: #16130f;
+  --code-fg: #ededed;
+  --rail-deep: #e7dfd0;
+  --plate: #fffcf6;
+  /* Amber has to work against paper too — drop the value, keep the hue. */
+  --accent: #b3702a;
+  --stage-glow: rgba(179, 112, 42, 0.16);
+
+  /*
+   * The status hues, darkened for paper. Call sites use them at 70–80% alpha,
+   * so the base has to start well below mid-tone or the label goes pale.
+   */
+  --status-ok: #0f6b3f;
+  --status-warn: #7a4a08;
+  --status-bad: #a11026;
+  --status-info: #0b5b85;
+  --status-alt: #4c3a9e;
+
+  /* Paper casts a soft warm shadow, never a black one. */
+  --bezel-shadow: 0 30px 90px -40px rgba(23, 19, 15, 0.28);
+  --panel-shadow: 0 18px 50px -24px rgba(23, 19, 15, 0.22);
+
+  --cta-primary-bg: #17130f;
+  --cta-primary-fg: #fffcf6;
+  /*
+   * On paper the primary pill is ink, so hover has to *lift the ink*, not fade
+   * to white — fading to white left a near-white label on a near-white pill.
+   */
+  --cta-primary-hover: #332d27;
+  --cta-secondary-bg: rgba(23, 19, 15, 0.03);
+  --cta-secondary-fg: #17130f;
+  --cta-secondary-border: rgba(23, 19, 15, 0.14);
+  --cta-outline-hover: rgba(23, 19, 15, 0.06);
+  --focus-ring: rgba(23, 19, 15, 0.45);
+
+  /* The warm ramp, right way up: 50 lightest, 950 darkest. */
+  --color-neutral-50: #f7f2e8;
+  --color-neutral-100: #f2ece0;
+  --color-neutral-200: #e7dfd0;
+  --color-neutral-300: #d6ccba;
+  --color-neutral-400: #918a81;
+  --color-neutral-500: #6b645d;
+  --color-neutral-600: #565049;
+  --color-neutral-700: #423d37;
+  --color-neutral-800: #2f2b26;
+  --color-neutral-900: #201c18;
+  --color-neutral-950: #17130f;
+}
+
+/*
+ * A dusk island on a paper page: code plates, terminal mockups, anything that
+ * is a *picture of the product* rather than part of it. Re-pinning `--ink` and
+ * the surface tokens here means the markup inside needs no theme awareness —
+ * `text-ink/45` keeps meaning "dimmed white" inside one of these.
+ */
+.dark-island,
+:root[data-theme="light"] .dark-island {
+  --ink: #f2efec;
+  --background: #121110;
+  --foreground: #e7e4e0;
+  --muted-foreground: #837f7c;
+  --surface: #141312;
+  --surface-soft: #131211;
+  --surface-raised: #1b1a18;
+  --panel: #171615;
+  --rail: #0f0e0d;
+  --rail-deep: #0c0b0a;
+  --plate: #0e0d0c;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.03);
+  --grid-line: rgba(255, 255, 255, 0.045);
+  --status-ok: #4ade80;
+  --status-warn: #fbbf24;
+  --status-bad: #fda4af;
+  --status-info: #38bdf8;
+  --status-alt: #a78bfa;
+  --panel-shadow: 0 24px 70px -24px rgba(0, 0, 0, 0.95);
+  --color-neutral-50: #141312;
+  --color-neutral-100: #171615;
+  --color-neutral-200: #201e1c;
+  --color-neutral-300: #2b2927;
+  --color-neutral-400: #7e7b78;
+  --color-neutral-500: #99958f;
+  --color-neutral-600: #b0aca7;
+  --color-neutral-700: #c7c3bf;
+  --color-neutral-800: #dbd8d5;
+  --color-neutral-900: #e8e6e4;
+  --color-neutral-950: #f4f3f2;
+  color-scheme: dark;
+}
+
+/*
  * The product shell is its own screen inside the page — one shade under the
  * canvas so it reads as an app window rather than another card.
  */
@@ -82,13 +248,28 @@
   --surface-raised: #1b1a18;
   --panel: #171615;
   --rail: #0f0e0d;
-  --foreground: #ededed;
-  --muted-foreground: #8b8886;
+  --foreground: #e7e4e0;
+  --muted-foreground: #837f7c;
   --border: rgba(255, 255, 255, 0.07);
   --input: rgba(255, 255, 255, 0.03);
 }
 
+/* On paper the shell inverts the same way: a hair *under* the page, not over. */
+:root[data-theme="light"] .product-shell {
+  --surface: #fffcf6;
+  --surface-soft: #f4efe4;
+  --surface-raised: #fffcf6;
+  --panel: #f2ece0;
+  --rail: #ede6d8;
+  --foreground: #17130f;
+  --muted-foreground: #6b645d;
+  --border: rgba(23, 19, 15, 0.09);
+  --input: rgba(23, 19, 15, 0.03);
+}
+
 @theme inline {
+  --color-ink: var(--ink);
+  --color-grid-line: var(--grid-line);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
@@ -103,9 +284,16 @@
   --color-surface-raised: var(--surface-raised);
   --color-panel: var(--panel);
   --color-rail: var(--rail);
+  --color-rail-deep: var(--rail-deep);
+  --color-plate: var(--plate);
   --color-code-bg: var(--code-bg);
   --color-code-fg: var(--code-fg);
   --color-accent: var(--accent);
+  --color-status-ok: var(--status-ok);
+  --color-status-warn: var(--status-warn);
+  --color-status-bad: var(--status-bad);
+  --color-status-info: var(--status-info);
+  --color-status-alt: var(--status-alt);
   /* Every sans utility resolves to Inter — headings, chrome, body alike. */
   --font-sans: var(--font-body);
   --font-display: var(--font-body);
@@ -121,6 +309,10 @@
     color-scheme: dark;
   }
 
+  html[data-theme="light"] {
+    color-scheme: light;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
@@ -129,7 +321,15 @@
 
   ::selection {
     background: var(--accent);
-    color: #121110;
+    color: var(--background);
+  }
+
+  /* The theme swap is instant — no cross-fade on the canvas. */
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   /*
@@ -219,11 +419,11 @@
   }
 
   .btn-cta-primary:hover {
-    background: rgba(255, 255, 255, 0.85);
+    background: var(--cta-primary-hover);
   }
 
   .btn-cta-secondary {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--cta-secondary-border);
     background: var(--cta-secondary-bg);
     color: var(--cta-secondary-fg);
   }
@@ -245,7 +445,7 @@
   .btn-cta-primary:focus-visible,
   .btn-cta-secondary:focus-visible,
   .btn-cta-outline:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.55);
+    outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
 
@@ -268,6 +468,7 @@
     align-items: center;
     gap: 0.5rem;
   }
+
 }
 
 @keyframes landing-how-bar {

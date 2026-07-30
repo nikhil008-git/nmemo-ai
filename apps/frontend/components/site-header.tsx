@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
 import { GitHub } from "@/components/landing/icons";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { CtaButton } from "@/components/ui/cta-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth-client";
@@ -36,7 +37,7 @@ export function SiteHeader() {
     pathname.startsWith("/keys") ||
     pathname.startsWith("/settings");
 
-  // App shell has its own chrome — marketing header stays for / and docs.
+  // The app shell and the auth pages carry their own chrome.
   if (isAuthPage || isAppShell) return null;
 
   return (
@@ -47,13 +48,43 @@ export function SiteHeader() {
         <div className="mx-auto flex h-14 w-full max-w-[1180px] items-center gap-6 px-6">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2 text-[13px] font-medium tracking-tight text-white"
+            className="flex shrink-0 items-center gap-2 text-[13px] font-medium tracking-tight text-ink"
           >
             <Logo size={16} className="rounded-[4px]" />
             <span>nmemo</span>
           </Link>
 
-          <nav className="mx-auto hidden items-center gap-6 text-[13px] text-white/50 md:flex">
+          {/* Actions sit beside the logo; the section links close the row. */}
+          <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
+            <ThemeToggle className="text-ink/50" />
+
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="nmemo on GitHub"
+              className="rounded-full p-1.5 text-ink/50 transition-colors hover:text-ink"
+            >
+              <GitHub className="size-4" />
+            </a>
+
+            {isPending ? (
+              // One pill resolves here either way, so the placeholder is one pill.
+              <Skeleton className="h-8 w-24 rounded-full" aria-hidden />
+            ) : loggedIn ? (
+              <CtaButton href="/create-workspace" size="compact">
+                Open the workspace
+              </CtaButton>
+            ) : (
+              // Auth is OAuth only and `/sign-up` redirects to `/sign-in`, so
+              // signing in and signing up are the same click. One pill.
+              <CtaButton href="/sign-in" size="compact">
+                Get started
+              </CtaButton>
+            )}
+          </div>
+
+          <nav className="ml-auto hidden items-center gap-6 text-[13px] text-ink/50 md:flex">
             {marketingNav.map((item) => {
               const active =
                 !item.href.startsWith("/#") &&
@@ -64,8 +95,8 @@ export function SiteHeader() {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "shrink-0 transition-colors hover:text-white",
-                    active && "text-white",
+                    "shrink-0 transition-colors hover:text-ink",
+                    active && "text-ink",
                   )}
                 >
                   {item.label}
@@ -73,41 +104,6 @@ export function SiteHeader() {
               );
             })}
           </nav>
-
-          <div className="ml-auto flex shrink-0 items-center gap-2 md:ml-0">
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="nmemo on GitHub"
-              className="rounded-full p-1.5 text-white/50 transition-colors hover:text-white"
-            >
-              <GitHub className="size-4" />
-            </a>
-
-            {isPending ? (
-              <div className="flex items-center gap-2" aria-hidden>
-                <Skeleton className="hidden h-4 w-14 sm:block" />
-                <Skeleton className="h-8 w-24 rounded-full" />
-              </div>
-            ) : loggedIn ? (
-              <CtaButton href="/create-workspace" size="compact">
-                Open the workspace
-              </CtaButton>
-            ) : (
-              <>
-                <Link
-                  href="/sign-in"
-                  className="hidden px-2 text-[13px] text-white/60 transition-colors hover:text-white sm:block"
-                >
-                  Sign in
-                </Link>
-                <CtaButton href="/sign-up" size="compact">
-                  Get started
-                </CtaButton>
-              </>
-            )}
-          </div>
         </div>
       </header>
     </div>

@@ -98,6 +98,21 @@ export default function SettingsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  /**
+   * The field accepts what a person pastes — `https://nmemo.cloud`, `www.`, a
+   * trailing path — and stores the host, matching what create-workspace writes.
+   */
+  function normalizeDomain(raw: string) {
+    return (
+      raw
+        .trim()
+        .replace(/^https?:\/\//i, "")
+        .replace(/^www\./i, "")
+        .split("/")[0]
+        ?.toLowerCase() ?? ""
+    );
+  }
+
   async function saveCompanyDetails(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = name.trim();
@@ -109,9 +124,10 @@ export default function SettingsPage() {
     setSaveError(null);
     setSaved(false);
     try {
+      const host = normalizeDomain(domain);
       const updated = await updateWorkspace({
         name: trimmed,
-        ...(domain.trim() ? { domain: domain.trim() } : {}),
+        ...(host ? { domain: host } : {}),
         industry,
         companySize,
       });
@@ -220,7 +236,7 @@ export default function SettingsPage() {
                   <input
                     value={domain}
                     onChange={(e) => setDomain(e.target.value)}
-                    placeholder="acme.com"
+                    placeholder="https://nmemo.cloud"
                     disabled={saving}
                     className="min-w-0 flex-1 border-0 bg-transparent py-1 text-sm font-medium outline-none placeholder:text-neutral-400"
                   />

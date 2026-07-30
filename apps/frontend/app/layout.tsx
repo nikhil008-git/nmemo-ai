@@ -3,6 +3,7 @@ import { Geist_Mono, Inter } from "next/font/google";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
+import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 /** The one face — headings, body, UI chrome. */
@@ -99,12 +100,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // One theme, dark — no pre-paint theme script, nothing to flash.
+    // `data-theme` is stamped by the head script below before the first paint,
+    // so the server's markup and the client's differ by design here.
     <html
       lang="en"
       suppressHydrationWarning
       className={`${inter.variable} ${geistMono.variable} h-full antialiased bg-background text-foreground`}
     >
+      <head>
+        <script
+          id="nmemo-theme"
+          dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background font-sans text-foreground">
         <SmoothScroll>
           <script

@@ -72,14 +72,7 @@ const RETURN_SHAPE = `type GetContextResult = {
 export default function DocsSdkPage() {
   return (
     <DocsShell
-      title={
-        <>
-          SDK
-          <span className="mt-1.5 block font-semibold text-neutral-400">
-            We give context. Your agent does the rest.
-          </span>
-        </>
-      }
+      title="We give context. Your agent does the rest."
       subtitle="nmemo decides what the agent should know for this turn. You pass that context into whatever agent or model you already run."
     >
       <DocCtas

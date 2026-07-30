@@ -1,42 +1,58 @@
 import {
   DocCtas,
+  DocFeatureGrid,
   DocLinkList,
   DocP,
   DocSection,
   DocsShell,
+  DocTabbedCode,
 } from "@/components/docs/docs-shell";
+
+const INSTALL_TABS = [
+  {
+    label: "CLI",
+    code: `npx nmemo start "Add retry handling to GitHub sync"`,
+  },
+  {
+    label: "Resume",
+    code: `nmemo resume --print   # portable packet, paste into any agent`,
+  },
+  {
+    label: "Context",
+    code: `nmemo context "Why does GitHub sync use a queue?"`,
+  },
+];
 
 export default function DocsHomePage() {
   return (
     <DocsShell
-      title={
-        <>
-          Documentation
-          <span className="mt-1.5 block font-semibold text-neutral-400">
-            Get from zero to context in minutes.
-          </span>
-        </>
-      }
-      subtitle="nmemo gives your agents the right context from your tools and files, in one call. Start in the playground, then ship with the SDK."
+      title="Documentation"
+      subtitle="nmemo runs where you already work: inside a git repository, in the terminal. It keeps the context around your codebase and hands any coding agent a packet it can verify."
     >
-      <DocCtas
-        primary={{ href: "/docs/sdk", label: "Get the SDK" }}
-        secondary={{ href: "/docs/playground", label: "Open playground" }}
-      />
+      <section className="space-y-8">
+        <DocCtas
+          primary={{ href: "/sign-up", label: "Get started" }}
+          secondary={{ href: "/docs/playground", label: "Try the playground" }}
+        />
+        <DocTabbedCode tabs={INSTALL_TABS} />
+      </section>
 
-      <DocSection title="Suggested path">
+      <DocSection
+        title="Start here"
+        muted="Three steps from an empty terminal to a resumable project brain."
+      >
         <DocLinkList
           items={[
             {
-              href: "/sign-in",
+              href: "/sign-up",
               title: "Create a workspace",
-              body: "Book a demo or sign up, then connect the tools your team already uses.",
+              body: "Sign up, then point nmemo at the repository you are already working in.",
               step: "01",
             },
             {
               href: "/docs/playground",
               title: "Try the playground",
-              body: "Ask a question and inspect the prompt, sources, and citations before you code.",
+              body: "Ask a question and inspect the context, sources, and receipts before you code.",
               step: "02",
             },
             {
@@ -49,11 +65,55 @@ export default function DocsHomePage() {
         />
       </DocSection>
 
-      <DocSection title="What you get">
+      <DocSection
+        title="What nmemo keeps"
+        muted="Six kinds of memory, each scoped to a repository and each carrying its evidence."
+      >
+        <DocFeatureGrid
+          items={[
+            {
+              title: "Decisions and conventions.",
+              body: "What the project agreed on, why, and the commit or file that proves it.",
+              chips: ["decision", "convention"],
+            },
+            {
+              title: "Failed attempts.",
+              body: "The approach that already broke twice, so the next agent does not try it a third time.",
+              chips: ["dead-end", "retry"],
+            },
+            {
+              title: "Unfinished work.",
+              body: "What is in flight, what is failing, and the next correct step to take.",
+              chips: ["in-flight", "next-step"],
+            },
+            {
+              title: "Receipts on everything.",
+              body: "Why a memory was selected, its score, its source, and how confident nmemo is.",
+              chips: ["score", "source", "confidence"],
+            },
+            {
+              title: "Freshness checks.",
+              body: "When memory and the repository disagree, the repository wins and the stale record is superseded.",
+              chips: ["stale", "superseded"],
+            },
+            {
+              title: "Repository scope.",
+              body: "Every record carries a user, workspace, and repo scope, filtered before ranking — never after.",
+              chips: ["user", "workspace", "repo"],
+            },
+          ]}
+        />
+      </DocSection>
+
+      <DocSection title="How it fits your stack">
         <DocP>
-          Connect sources once. Every agent turn, nmemo retrieves what matters,
-          ranks it, and returns a prompt you can pass straight to your model,
-          with citations your UI can show.
+          Claude Code, Codex, and Cursor write the code. nmemo gives them a
+          shared, portable project brain. The resume packet is plain structured
+          text, so every tool is already integrated — paste it and the agent
+          begins with verified context instead of a blank chat.
+        </DocP>
+        <DocP>
+          When you want it programmatic, the same context is one SDK call away.
         </DocP>
       </DocSection>
     </DocsShell>

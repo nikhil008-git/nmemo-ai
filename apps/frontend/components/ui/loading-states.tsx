@@ -14,7 +14,7 @@ export function AppShellSkeleton() {
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton
             key={i}
-            className="size-8 rounded-sm bg-white/10"
+            className="size-8 rounded-sm bg-ink/10"
           />
         ))}
       </aside>

@@ -16,21 +16,41 @@ import { WallpaperPlate } from "@/components/landing/wallpaper";
  * screen, so it must not resize with the reader's root font.
  * ------------------------------------------------------------------------- */
 
-/** Outer bezel every mockup sits in. */
+/**
+ * The plate every mockup sits on: the wallpaper runs to the rounded edge, and
+ * depth comes from the cast shadow alone — no hairline, no padding ring.
+ *
+ * `bezel` is the exception, and it is used exactly once. The hero is the first
+ * screen anyone sees, so it gets the framed treatment — a hairline ring with a
+ * hair of inset — which reads as a device. Every plate further down the page
+ * stays bare so the sections don't turn back into a wall of boxes.
+ */
 export function Frame({
   children,
   className = "",
+  bezel = false,
 }: {
   children: React.ReactNode;
   className?: string;
+  bezel?: boolean;
 }) {
+  if (bezel) {
+    return (
+      <div
+        className={`rounded-[20px] border border-border bg-ink/[0.03] p-2 shadow-[var(--bezel-shadow)] ${className}`}
+      >
+        <div className="overflow-hidden rounded-xl border border-ink/[0.06]">
+          {children}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
-      className={`rounded-[20px] border border-white/[0.08] bg-white/[0.03] p-2 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.9)] ${className}`}
+      className={`overflow-hidden rounded-[20px] shadow-[var(--bezel-shadow)] ${className}`}
     >
-      <div className="overflow-hidden rounded-xl border border-white/[0.06]">
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
@@ -54,7 +74,7 @@ function Panel({
 }) {
   return (
     <div
-      className={`rounded-xl border border-white/10 bg-[#141312] shadow-[0_24px_70px_-24px_rgba(0,0,0,0.95)] ${className}`}
+      className={`rounded-xl border border-ink/10 bg-surface shadow-[var(--panel-shadow)] ${className}`}
     >
       {children}
     </div>
@@ -74,28 +94,28 @@ const episodes = [
 
 export function AgentWindow() {
   return (
-    <Frame>
+    <Frame bezel>
       <div className="relative aspect-[16/10] w-full">
         <WallpaperPlate>
-          <div className="absolute inset-[3.5%] flex overflow-hidden rounded-lg border border-white/10 bg-[#131211] text-[9.5px] leading-relaxed sm:text-[10.5px] lg:text-[11.5px]">
+          <div className="absolute inset-[3.5%] flex overflow-hidden rounded-lg border border-ink/10 bg-surface-soft text-[9.5px] leading-relaxed sm:text-[10.5px] lg:text-[11.5px]">
             {/* sessions rail */}
-            <aside className="hidden w-[24%] shrink-0 flex-col border-r border-white/[0.07] bg-[#0f0e0d] md:flex">
+            <aside className="hidden w-[24%] shrink-0 flex-col border-r border-ink/[0.07] bg-rail md:flex">
               <div className="flex items-center gap-2 px-3 py-2.5">
                 <TrafficLights />
               </div>
 
               <div className="px-3 pb-3">
-                <div className="flex rounded-md bg-white/[0.05] p-0.5 text-[9px]">
-                  <span className="flex-1 rounded bg-white/[0.09] py-1 text-center text-white/90">
+                <div className="flex rounded-md bg-ink/[0.05] p-0.5 text-[9px]">
+                  <span className="flex-1 rounded bg-ink/[0.09] py-1 text-center text-ink/90">
                     Sessions
                   </span>
-                  <span className="flex-1 py-1 text-center text-white/35">
+                  <span className="flex-1 py-1 text-center text-ink/35">
                     Memory
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-1 px-3 pb-3 text-white/50">
+              <div className="space-y-1 px-3 pb-3 text-ink/50">
                 <div className="flex items-center gap-2">
                   <Plus className="size-3" /> New task
                 </div>
@@ -105,16 +125,16 @@ export function AgentWindow() {
                 </div>
               </div>
 
-              <p className="px-3 pb-1.5 text-[8.5px] font-medium tracking-widest text-white/25">
+              <p className="px-3 pb-1.5 text-[8.5px] font-medium tracking-widest text-ink/25">
                 REPOSITORY
               </p>
-              <div className="mx-2 mb-3 flex items-center gap-2 rounded-md bg-white/[0.04] px-2 py-1.5 text-white/70">
-                <Folder className="size-3 text-white/40" />
+              <div className="mx-2 mb-3 flex items-center gap-2 rounded-md bg-ink/[0.04] px-2 py-1.5 text-ink/70">
+                <Folder className="size-3 text-ink/40" />
                 <span className="mono truncate">nikhil/nmemo</span>
-                <ChevronDown className="ml-auto size-3 text-white/30" />
+                <ChevronDown className="ml-auto size-3 text-ink/30" />
               </div>
 
-              <p className="px-3 pb-1.5 text-[8.5px] font-medium tracking-widest text-white/25">
+              <p className="px-3 pb-1.5 text-[8.5px] font-medium tracking-widest text-ink/25">
                 EPISODES
               </p>
               <div className="space-y-px px-2">
@@ -122,42 +142,42 @@ export function AgentWindow() {
                   <div
                     key={s.title}
                     className={`flex items-center gap-2 rounded-md px-2 py-1.5 ${
-                      s.live ? "bg-white/[0.06] text-white/85" : "text-white/45"
+                      s.live ? "bg-ink/[0.06] text-ink/85" : "text-ink/45"
                     }`}
                   >
-                    <Branch className="size-3 shrink-0 text-white/30" />
+                    <Branch className="size-3 shrink-0 text-ink/30" />
                     <span className="truncate">{s.title}</span>
-                    <span className="mono ml-auto shrink-0 text-white/25">
+                    <span className="mono ml-auto shrink-0 text-ink/25">
                       {s.meta}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-auto border-t border-white/[0.07] px-3 py-2 tabular-nums text-white/30">
+              <div className="mt-auto border-t border-ink/[0.07] px-3 py-2 tabular-nums text-ink/30">
                 18 facts · 4 episodes
               </div>
             </aside>
 
             {/* transcript */}
-            <section className="flex min-w-0 flex-1 flex-col bg-[#141312]">
-              <header className="flex items-center gap-2 border-b border-white/[0.07] px-3 py-2.5">
-                <span className="truncate text-white/80">
+            <section className="flex min-w-0 flex-1 flex-col bg-surface">
+              <header className="flex items-center gap-2 border-b border-ink/[0.07] px-3 py-2.5">
+                <span className="truncate text-ink/80">
                   Add retry handling to the GitHub sync worker
                 </span>
-                <span className="ml-auto hidden rounded border border-white/10 px-1.5 py-0.5 text-[8.5px] text-white/40 sm:block">
+                <span className="ml-auto hidden rounded border border-ink/10 px-1.5 py-0.5 text-[8.5px] text-ink/40 sm:block">
                   memory: on
                 </span>
               </header>
 
               <div className="min-h-0 flex-1 space-y-2.5 overflow-hidden px-3 py-3">
-                <p className="tabular-nums text-white/30">
+                <p className="tabular-nums text-ink/30">
                   Worked for 41s · 6 steps
                 </p>
 
                 <div>
-                  <p className="font-medium text-white/80">Agent plan</p>
-                  <ol className="mt-1 space-y-0.5 text-white/50">
+                  <p className="font-medium text-ink/80">Agent plan</p>
+                  <ol className="mt-1 space-y-0.5 text-ink/50">
                     <li>1. Identify repository and open a task session</li>
                     <li>2. Recall prior ingestion decisions for this repo</li>
                     <li>3. Read the queue and worker conventions</li>
@@ -165,8 +185,8 @@ export function AgentWindow() {
                   </ol>
                 </div>
 
-                <div className="rounded-md border border-white/[0.07] bg-white/[0.02] p-2">
-                  <p className="mb-1 text-white/45">Context selected</p>
+                <div className="rounded-md border border-ink/[0.07] bg-ink/[0.02] p-2">
+                  <p className="mb-1 text-ink/45">Context selected</p>
                   <ul className="space-y-0.5">
                     {[
                       { kind: "Decision", text: "background work uses BullMQ" },
@@ -183,9 +203,9 @@ export function AgentWindow() {
                       },
                     ].map(({ kind, text, code }) => (
                       <li key={text} className="flex items-start gap-1.5">
-                        <Check className="mt-[3px] size-2.5 shrink-0 text-emerald-400/80" />
-                        <span className="text-white/35">
-                          <span className="font-medium text-white/65">
+                        <Check className="mt-[3px] size-2.5 shrink-0 text-status-ok/80" />
+                        <span className="text-ink/35">
+                          <span className="font-medium text-ink/65">
                             {kind}:
                           </span>{" "}
                           <span className={code ? "mono" : undefined}>
@@ -200,7 +220,7 @@ export function AgentWindow() {
                 {/* Label in Inter, call in mono — the split that teaches the
                     reader that mono means "literal" within a few rows. The
                     tools shown are the read-only set: v1 gates writes. */}
-                <div className="space-y-0.5 text-white/45">
+                <div className="space-y-0.5 text-ink/45">
                   {[
                     'search_files("BullMQ")',
                     'read_file("apps/api/src/queue.ts")',
@@ -208,41 +228,41 @@ export function AgentWindow() {
                     "git_state()",
                   ].map((call) => (
                     <p key={call}>
-                      <span className="text-white/25">Tool</span>{" "}
+                      <span className="text-ink/25">Tool</span>{" "}
                       <span className="mono">{call}</span>
                     </p>
                   ))}
                 </div>
 
-                <div className="rounded-md border border-white/[0.07] bg-white/[0.02]">
-                  <div className="flex items-center gap-2 border-b border-white/[0.07] px-2 py-1.5">
-                    <span className="text-white/60">Working state</span>
-                    <span className="mono text-white/30">step 6</span>
-                    <span className="ml-auto rounded border border-white/10 px-1.5 py-0.5 text-[8.5px] text-white/45">
+                <div className="rounded-md border border-ink/[0.07] bg-ink/[0.02]">
+                  <div className="flex items-center gap-2 border-b border-ink/[0.07] px-2 py-1.5">
+                    <span className="text-ink/60">Working state</span>
+                    <span className="mono text-ink/30">step 6</span>
+                    <span className="ml-auto rounded border border-ink/10 px-1.5 py-0.5 text-[8.5px] text-ink/45">
                       checkpointed
                     </span>
                   </div>
-                  <div className="space-y-1 px-2 py-1.5 text-white/40">
+                  <div className="space-y-1 px-2 py-1.5 text-ink/40">
                     <div className="flex gap-2">
-                      <span className="w-16 shrink-0 text-white/25">read</span>
+                      <span className="w-16 shrink-0 text-ink/25">read</span>
                       <span className="mono truncate">
                         queue.ts · workers/github.ts
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="w-16 shrink-0 text-white/25">avoid</span>
-                      <span className="text-rose-300/70">
+                      <span className="w-16 shrink-0 text-ink/25">avoid</span>
+                      <span className="text-status-bad/70">
                         synchronous ingestion — timed out
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="w-16 shrink-0 text-white/25">next</span>
-                      <span className="text-emerald-400/75">
+                      <span className="w-16 shrink-0 text-ink/25">next</span>
+                      <span className="text-status-ok/75">
                         add backoff to the sync worker
                       </span>
                     </div>
                     <div className="flex gap-2">
-                      <span className="w-16 shrink-0 text-white/25">git</span>
+                      <span className="w-16 shrink-0 text-ink/25">git</span>
                       <span className="mono truncate">
                         task/github-retries · 3 dirty
                       </span>
@@ -250,28 +270,28 @@ export function AgentWindow() {
                   </div>
                 </div>
 
-                <div className="rounded-md border border-white/[0.07] bg-white/[0.02] px-2 py-1.5 text-white/45">
-                  <span className="text-white/25">Approval</span> patch
-                  <span className="mono text-white/60">
+                <div className="rounded-md border border-ink/[0.07] bg-ink/[0.02] px-2 py-1.5 text-ink/45">
+                  <span className="text-ink/25">Approval</span> patch
+                  <span className="mono text-ink/60">
                     {" "}
                     apps/api/src/workers/github.ts
                   </span>{" "}
-                  <span className="mono text-white/35">[y/N]</span>
+                  <span className="mono text-ink/35">[y/N]</span>
                 </div>
               </div>
 
-              <footer className="border-t border-white/[0.07] p-2.5">
-                <div className="rounded-md border border-white/[0.07] bg-white/[0.03] px-2.5 py-2 text-white/30">
+              <footer className="border-t border-ink/[0.07] p-2.5">
+                <div className="rounded-md border border-ink/[0.07] bg-ink/[0.03] px-2.5 py-2 text-ink/30">
                   Save episode and 2 proposed memories?{" "}
-                  <span className="mono text-white/45">[Y/n]</span>
+                  <span className="mono text-ink/45">[Y/n]</span>
                 </div>
               </footer>
             </section>
 
             {/* context inspector */}
-            <aside className="hidden w-[33%] shrink-0 flex-col border-l border-white/[0.07] bg-[#0c0b0a] lg:flex">
-              <header className="mono flex items-center gap-3 border-b border-white/[0.07] px-3 py-2.5 text-white/35">
-                <span className="text-white/85">/context</span>
+            <aside className="hidden w-[33%] shrink-0 flex-col border-l border-ink/[0.07] bg-rail-deep lg:flex">
+              <header className="mono flex items-center gap-3 border-b border-ink/[0.07] px-3 py-2.5 text-ink/35">
+                <span className="text-ink/85">/context</span>
                 <span>/memory</span>
                 <span>/resume</span>
               </header>
@@ -280,37 +300,37 @@ export function AgentWindow() {
                 <div>
                   {/* A sentence, so Inter with tabular figures — not mono.
                       The column below is the opposite case. */}
-                  <p className="tabular-nums text-white/30">
+                  <p className="tabular-nums text-ink/30">
                     prompt budget 8,000 · used 5,412
                   </p>
-                  <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                    <span className="w-[22%] bg-amber-400/70" />
-                    <span className="w-[17%] bg-sky-400/60" />
-                    <span className="w-[24%] bg-emerald-400/60" />
-                    <span className="w-[5%] bg-violet-400/60" />
+                  <div className="mt-1.5 flex h-1.5 overflow-hidden rounded-full bg-ink/[0.06]">
+                    <span className="w-[22%] bg-status-warn/70" />
+                    <span className="w-[17%] bg-status-info/60" />
+                    <span className="w-[24%] bg-status-ok/60" />
+                    <span className="w-[5%] bg-status-alt/60" />
                   </div>
                 </div>
 
-                <ul className="space-y-1 text-white/40">
+                <ul className="space-y-1 text-ink/40">
                   {[
-                    ["system + rules", "612", "bg-white/25"],
-                    ["working state", "1,760", "bg-amber-400/70"],
-                    ["long-term memory", "1,344", "bg-sky-400/60"],
-                    ["repository evidence", "1,296", "bg-emerald-400/60"],
-                    ["recent messages", "400", "bg-violet-400/60"],
+                    ["system + rules", "612", "bg-ink/25"],
+                    ["working state", "1,760", "bg-status-warn/70"],
+                    ["long-term memory", "1,344", "bg-status-info/60"],
+                    ["repository evidence", "1,296", "bg-status-ok/60"],
+                    ["recent messages", "400", "bg-status-alt/60"],
                   ].map(([label, tokens, color]) => (
                     <li key={label} className="flex items-center gap-2">
                       <span className={`size-1.5 rounded-full ${color}`} />
                       <span>{label}</span>
-                      <span className="mono ml-auto text-white/25">
+                      <span className="mono ml-auto text-ink/25">
                         {tokens}
                       </span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="border-t border-white/[0.07] pt-2.5">
-                  <p className="text-white/30">top recall</p>
+                <div className="border-t border-ink/[0.07] pt-2.5">
+                  <p className="text-ink/30">top recall</p>
                   <div className="mt-1.5 space-y-2">
                     {[
                       {
@@ -333,18 +353,18 @@ export function AgentWindow() {
                         <div className="flex items-start gap-2">
                           {/* Memory statements stay Inter everywhere — they are
                               knowledge, not log output. */}
-                          <span className="text-white/60">{m.text}</span>
-                          <span className="mono ml-auto shrink-0 text-emerald-400/70">
+                          <span className="text-ink/60">{m.text}</span>
+                          <span className="mono ml-auto shrink-0 text-status-ok/70">
                             {m.score}
                           </span>
                         </div>
-                        <p className="mono text-white/25">{m.src}</p>
+                        <p className="mono text-ink/25">{m.src}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="rounded-md border border-amber-400/20 bg-amber-400/[0.06] p-2 text-amber-200/70">
+                <div className="rounded-md border border-status-warn/20 bg-status-warn/[0.06] p-2 text-status-warn/70">
                   1 memory superseded · &quot;ingestion runs inline&quot;
                 </div>
               </div>
@@ -386,55 +406,55 @@ function Plate({
 /** A memory's receipt: why it was selected, on what evidence, how fresh. */
 export function ReceiptPlate() {
   const rows: [string, string, string, string][] = [
-    ["semantic", "0.40", "w-[88%]", "bg-sky-400/70"],
-    ["keyword", "0.20", "w-[64%]", "bg-amber-400/70"],
-    ["recency", "0.15", "w-[41%]", "bg-emerald-400/60"],
-    ["importance", "0.15", "w-[72%]", "bg-violet-400/60"],
-    ["scope", "0.10", "w-full", "bg-rose-400/60"],
+    ["semantic", "0.40", "w-[88%]", "bg-status-info/70"],
+    ["keyword", "0.20", "w-[64%]", "bg-status-warn/70"],
+    ["recency", "0.15", "w-[41%]", "bg-status-ok/60"],
+    ["importance", "0.15", "w-[72%]", "bg-status-alt/60"],
+    ["scope", "0.10", "w-full", "bg-status-bad/60"],
   ];
 
   return (
     <Plate>
       <Panel className="w-full max-w-md p-4 text-[10.5px] leading-relaxed sm:text-[11.5px]">
-        <div className="flex items-center gap-2 pb-3 text-white/40">
-          <span className="mono text-white/85">/context</span>
+        <div className="flex items-center gap-2 pb-3 text-ink/40">
+          <span className="mono text-ink/85">/context</span>
           <span className="ml-auto tabular-nums">rank #1 of 214</span>
         </div>
-        <p className="text-white/80">
+        <p className="text-ink/80">
           &quot;GitHub sync uses BullMQ — retries max three&quot;
         </p>
-        <p className="mono pb-3 pt-1 text-white/30">
+        <p className="mono pb-3 pt-1 text-ink/30">
           decision · repo-scoped · adr/0007.md · confidence 0.94
         </p>
-        <div className="space-y-1.5 border-t border-white/[0.07] pt-3">
+        <div className="space-y-1.5 border-t border-ink/[0.07] pt-3">
           {rows.map(([label, weight, width, color]) => (
             <div key={label} className="flex items-center gap-2">
-              <span className="w-20 shrink-0 text-white/45">{label}</span>
-              <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+              <span className="w-20 shrink-0 text-ink/45">{label}</span>
+              <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-ink/[0.06]">
                 <span className={`block h-full ${width} ${color}`} />
               </span>
-              <span className="mono w-8 shrink-0 text-right text-white/25">
+              <span className="mono w-8 shrink-0 text-right text-ink/25">
                 ×{weight}
               </span>
             </div>
           ))}
         </div>
-        <div className="mt-3 space-y-1 border-t border-white/[0.07] pt-2.5">
+        <div className="mt-3 space-y-1 border-t border-ink/[0.07] pt-2.5">
           <div className="flex gap-3">
-            <span className="w-20 shrink-0 text-white/30">Evidence</span>
-            <span className="mono text-white/55">
+            <span className="w-20 shrink-0 text-ink/30">Evidence</span>
+            <span className="mono text-ink/55">
               docs/adr/0007.md · commit 2ab83c
             </span>
           </div>
           <div className="flex gap-3">
-            <span className="w-20 shrink-0 text-white/30">Freshness</span>
-            <span className="text-emerald-400/75">
+            <span className="w-20 shrink-0 text-ink/30">Freshness</span>
+            <span className="text-status-ok/75">
               confirmed against current repo
             </span>
           </div>
           <div className="flex gap-3">
-            <span className="w-20 shrink-0 text-white/30">Final score</span>
-            <span className="mono text-emerald-400/80">0.91</span>
+            <span className="w-20 shrink-0 text-ink/30">Final score</span>
+            <span className="mono text-status-ok/80">0.91</span>
           </div>
         </div>
       </Panel>
@@ -448,14 +468,14 @@ export function ReceiptPlate() {
  */
 export function ResumePacketPanel({ className = "" }: { className?: string }) {
   const rows: [string, string, string][] = [
-    ["Task", "OAuth middleware validation", "text-white/70"],
-    ["Status", "In progress · 2 days idle", "text-amber-300/75"],
-    ["Last attempt", "Added session validation", "text-white/60"],
-    ["Files touched", "auth.ts · middleware.ts", "text-white/60"],
-    ["Tests", "2 failing", "text-rose-300/70"],
-    ["Decision", "Better Auth handles session lookup", "text-white/60"],
-    ["Next step", "Repair invalid-session fixture", "text-emerald-400/75"],
-    ["Evidence", "commit abc123 · test output", "text-white/40"],
+    ["Task", "OAuth middleware validation", "text-ink/70"],
+    ["Status", "In progress · 2 days idle", "text-status-warn/75"],
+    ["Last attempt", "Added session validation", "text-ink/60"],
+    ["Files touched", "auth.ts · middleware.ts", "text-ink/60"],
+    ["Tests", "2 failing", "text-status-bad/70"],
+    ["Decision", "Better Auth handles session lookup", "text-ink/60"],
+    ["Next step", "Repair invalid-session fixture", "text-status-ok/75"],
+    ["Evidence", "commit abc123 · test output", "text-ink/40"],
   ];
 
   return (
@@ -463,20 +483,20 @@ export function ResumePacketPanel({ className = "" }: { className?: string }) {
       className={`w-full max-w-md p-4 text-[10.5px] leading-relaxed sm:text-[11.5px] ${className}`}
     >
       <div className="flex items-center gap-2 pb-3">
-        <span className="mono text-white/85">nmemo resume --print</span>
-        <span className="ml-auto rounded border border-white/10 px-1.5 py-0.5 text-[8.5px] text-white/40">
+        <span className="mono text-ink/85">nmemo resume --print</span>
+        <span className="ml-auto rounded border border-ink/10 px-1.5 py-0.5 text-[8.5px] text-ink/40">
           copied
         </span>
       </div>
       <dl className="space-y-2">
         {rows.map(([label, value, tone]) => (
           <div key={label} className="flex gap-3">
-            <dt className="w-[5.5rem] shrink-0 text-white/30">{label}</dt>
+            <dt className="w-[5.5rem] shrink-0 text-ink/30">{label}</dt>
             <dd className={tone}>{value}</dd>
           </div>
         ))}
       </dl>
-      <div className="mt-3 border-t border-white/[0.07] pt-2.5 tabular-nums text-white/25">
+      <div className="mt-3 border-t border-ink/[0.07] pt-2.5 tabular-nums text-ink/25">
         validated against current git state · 0 stale memories included
       </div>
     </Panel>
@@ -496,7 +516,7 @@ export function ProjectsPlate() {
   const projects = [
     {
       name: "nmemo",
-      dot: "bg-emerald-400",
+      dot: "bg-status-ok",
       items: [
         ["Retry policy for GitHub sync", "2h"],
         ["Rank memories by scope", "5h"],
@@ -504,7 +524,7 @@ export function ProjectsPlate() {
     },
     {
       name: "remodex",
-      dot: "bg-white/20",
+      dot: "bg-ink/20",
       items: [
         ["Startup performance audit", "6d"],
         ["Migrate to Postgres", "7d"],
@@ -512,7 +532,7 @@ export function ProjectsPlate() {
     },
     {
       name: "dpcode-website",
-      dot: "bg-amber-400",
+      dot: "bg-status-warn",
       items: [
         ["Testimonials section", "4h"],
         ["Check Linear issue", "4d"],
@@ -523,27 +543,27 @@ export function ProjectsPlate() {
   return (
     <Plate>
       <Panel className="w-full max-w-sm p-3 text-[10.5px] leading-relaxed sm:text-[11.5px]">
-        <div className="flex items-center gap-2 px-1 pb-2.5 text-white/40">
-          <span className="font-medium text-white/80">workspace</span>
+        <div className="flex items-center gap-2 px-1 pb-2.5 text-ink/40">
+          <span className="font-medium text-ink/80">workspace</span>
           <span className="ml-auto tabular-nums">3 repos</span>
         </div>
         <div className="space-y-2.5">
           {projects.map((p) => (
             <div key={p.name}>
-              <div className="flex items-center gap-2 px-1 text-white/60">
+              <div className="flex items-center gap-2 px-1 text-ink/60">
                 <span className={`size-1.5 rounded-full ${p.dot}`} />
-                <Folder className="size-3 text-white/30" />
+                <Folder className="size-3 text-ink/30" />
                 <span className="mono">{p.name}</span>
               </div>
               <div className="mt-1 space-y-px">
                 {p.items.map(([title, age]) => (
                   <div
                     key={title}
-                    className="flex items-center gap-2 rounded px-1.5 py-1 text-white/40"
+                    className="flex items-center gap-2 rounded px-1.5 py-1 text-ink/40"
                   >
-                    <Branch className="size-3 shrink-0 text-white/20" />
+                    <Branch className="size-3 shrink-0 text-ink/20" />
                     <span className="truncate">{title}</span>
-                    <span className="mono ml-auto shrink-0 text-white/20">
+                    <span className="mono ml-auto shrink-0 text-ink/20">
                       {age}
                     </span>
                   </div>
@@ -552,7 +572,7 @@ export function ProjectsPlate() {
             </div>
           ))}
         </div>
-        <p className="mt-3 border-t border-white/[0.07] px-1 pt-2.5 text-white/25">
+        <p className="mt-3 border-t border-ink/[0.07] px-1 pt-2.5 text-ink/25">
           memory scoped per repo · no cross-recall
         </p>
       </Panel>
@@ -574,29 +594,29 @@ export function HandoffPlate() {
   return (
     <Plate>
       <Panel className="w-full max-w-sm p-2 text-[10.5px] leading-relaxed sm:text-[11.5px]">
-        <div className="flex items-center gap-2 rounded-lg bg-white/[0.05] px-3 py-2 text-white/80">
-          <Branch className="size-3.5 text-white/45" />
+        <div className="flex items-center gap-2 rounded-lg bg-ink/[0.05] px-3 py-2 text-ink/80">
+          <Branch className="size-3.5 text-ink/45" />
           <span className="mono">nmemo resume --print</span>
-          <ChevronDown className="ml-auto size-3 text-white/35" />
+          <ChevronDown className="ml-auto size-3 text-ink/35" />
         </div>
         <div className="mt-1.5 space-y-px">
           {targets.map(([name, model], i) => (
             <div
               key={name}
               className={`flex items-center gap-2.5 rounded-md px-3 py-1.5 ${
-                i === 0 ? "bg-white/[0.06] text-white/85" : "text-white/45"
+                i === 0 ? "bg-ink/[0.06] text-ink/85" : "text-ink/45"
               }`}
             >
               <span className="size-1.5 shrink-0 rounded-full bg-current opacity-40" />
               <span>Paste into {name}</span>
               {/* Model ids are literals you'd type, not names you'd read. */}
-              <span className="mono ml-auto shrink-0 text-white/20">
+              <span className="mono ml-auto shrink-0 text-ink/20">
                 {model}
               </span>
             </div>
           ))}
         </div>
-        <p className="mt-2 border-t border-white/[0.07] px-3 pb-1 pt-2 tabular-nums text-white/25">
+        <p className="mt-2 border-t border-ink/[0.07] px-3 pb-1 pt-2 tabular-nums text-ink/25">
           carries 5,412 tokens of context · 18 memories · receipts intact
         </p>
       </Panel>
@@ -615,7 +635,7 @@ export function ProcessPlate() {
     ],
     [
       "task",
-      <span key="task" className="text-white/70">
+      <span key="task" className="text-ink/70">
         Add retry handling to the GitHub sync worker
       </span>,
     ],
@@ -633,7 +653,7 @@ export function ProcessPlate() {
     ],
     [
       "next step",
-      <span key="next" className="text-emerald-400/75">
+      <span key="next" className="text-status-ok/75">
         add backoff to the sync worker
       </span>,
     ],
@@ -642,21 +662,21 @@ export function ProcessPlate() {
   return (
     <Plate ratio="aspect-[16/7]">
       <Panel className="w-full max-w-lg overflow-hidden text-[10.5px] leading-relaxed sm:text-[11.5px]">
-        <div className="flex items-center gap-2 border-b border-white/[0.07] px-3 py-2 text-white/35">
-          <span className="size-1.5 rounded-full bg-emerald-400/80" />
-          <span className="mono text-white/80">nmemo status</span>
+        <div className="flex items-center gap-2 border-b border-ink/[0.07] px-3 py-2 text-ink/35">
+          <span className="size-1.5 rounded-full bg-status-ok/80" />
+          <span className="mono text-ink/80">nmemo status</span>
           <span className="ml-auto">task session · open</span>
         </div>
-        <div className="space-y-1.5 px-3 py-3 text-white/45">
+        <div className="space-y-1.5 px-3 py-3 text-ink/45">
           {rows.map(([label, value]) => (
             <div key={label} className="flex gap-3">
-              <span className="w-[4.75rem] shrink-0 text-white/25">
+              <span className="w-[4.75rem] shrink-0 text-ink/25">
                 {label}
               </span>
               {value}
             </div>
           ))}
-          <p className="mono pt-1.5 text-white/25">
+          <p className="mono pt-1.5 text-ink/25">
             resume it anywhere: nmemo resume --print
           </p>
         </div>
@@ -717,26 +737,26 @@ export function FreshnessReport() {
   ];
 
   const tone = {
-    kept: ["text-emerald-400/80", "kept"],
-    stale: ["text-amber-300/80", "stale"],
-    rejected: ["text-rose-300/75", "rejected"],
+    kept: ["text-status-ok/80", "kept"],
+    stale: ["text-status-warn/80", "stale"],
+    rejected: ["text-status-bad/75", "rejected"],
   } as const;
 
   return (
     <Frame>
-      <div className="bg-[#0e0d0c] p-4 text-[11px] leading-relaxed sm:p-6 sm:text-[12px]">
-        <div className="flex items-center gap-2 pb-4 text-white/40">
-          <span className="font-medium text-white/85">Freshness check</span>
+      <div className="bg-plate p-4 text-[11px] leading-relaxed sm:p-6 sm:text-[12px]">
+        <div className="flex items-center gap-2 pb-4 text-ink/40">
+          <span className="font-medium text-ink/85">Freshness check</span>
           <span className="ml-auto hidden tabular-nums sm:inline">
             recall <span className="mono">0c41</span> · 18 candidates · 6 shown
           </span>
         </div>
 
-        <div className="divide-y divide-white/[0.06]">
+        <div className="divide-y divide-ink/[0.06]">
           {rows.map(([claim, why, state]) => (
             <div key={claim} className="flex items-baseline gap-3 py-2.5">
-              <span className="min-w-0 flex-1 text-white/65">{claim}</span>
-              <span className="hidden min-w-0 flex-1 truncate text-white/30 sm:block">
+              <span className="min-w-0 flex-1 text-ink/65">{claim}</span>
+              <span className="hidden min-w-0 flex-1 truncate text-ink/30 sm:block">
                 {why}
               </span>
               <span className={`mono shrink-0 ${tone[state][0]}`}>
@@ -746,9 +766,9 @@ export function FreshnessReport() {
           ))}
         </div>
 
-        <div className="mt-4 space-y-1 rounded-md border border-white/[0.07] bg-white/[0.02] p-3">
-          <p className="text-white/35">Policy</p>
-          <p className="text-white/65">
+        <div className="mt-4 space-y-1 rounded-md border border-ink/[0.07] bg-ink/[0.02] p-3">
+          <p className="text-ink/35">Policy</p>
+          <p className="text-ink/65">
             Live repository evidence ranks above anything memory claims about the
             code. Conflicts are marked stale and superseded, not deleted.
           </p>
@@ -772,24 +792,24 @@ export function CommandBlock() {
   ];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0e0d0c]">
-      <div className="flex items-center gap-2 border-b border-white/[0.07] px-4 py-2.5">
+    <div className="overflow-hidden rounded-[20px] bg-plate shadow-[var(--bezel-shadow)]">
+      <div className="flex items-center gap-2 border-b border-ink/[0.07] px-4 py-2.5">
         <TrafficLights />
-        <span className="mono ml-2 text-[12px] text-white/30">
+        <span className="mono ml-2 text-[12px] text-ink/30">
           ~/Developer/nmemo
         </span>
       </div>
-      <div className="divide-y divide-white/[0.05]">
+      <div className="divide-y divide-ink/[0.05]">
         {lines.map(([cmd, note]) => (
           <div
             key={cmd}
             className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4"
           >
-            <p className="mono min-w-0 text-[13px] text-white/80">
-              <span className="text-white/25">$ </span>
+            <p className="mono min-w-0 text-[13px] text-ink/80">
+              <span className="text-ink/25">$ </span>
               {cmd}
             </p>
-            <p className="text-[13px] text-white/35 sm:ml-auto sm:text-right">
+            <p className="text-[13px] text-ink/35 sm:ml-auto sm:text-right">
               {note}
             </p>
           </div>
