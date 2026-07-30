@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const protectedPrefixes = [
+  "/dashboard",
   "/home",
   "/playground",
   "/sources",
@@ -8,16 +9,12 @@ const protectedPrefixes = [
   "/keys",
   "/settings",
   // legacy
-  "/dashboard",
   "/chat",
 ];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
-    return NextResponse.redirect(new URL("/home", request.url));
-  }
   if (pathname === "/chat" || pathname.startsWith("/chat/")) {
     return NextResponse.redirect(new URL("/playground", request.url));
   }

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { ComingSoonBanner } from "@/components/app/coming-soon-banner";
 import { GitHub } from "@/components/landing/icons";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -30,6 +29,7 @@ export function SiteHeader() {
     pathname === "/sign-up" ||
     pathname === "/create-workspace";
   const isAppShell =
+    pathname.startsWith("/dashboard") ||
     pathname === "/home" ||
     pathname.startsWith("/playground") ||
     pathname.startsWith("/sources") ||
@@ -43,7 +43,6 @@ export function SiteHeader() {
   return (
     // Sits in flow, not fixed — it scrolls away with the page.
     <div className="relative z-50 w-full">
-      <ComingSoonBanner storageKey="nmemo:dismiss-coming-soon-banner-site" />
       <header className="bg-background">
         <div className="mx-auto flex h-14 w-full max-w-[1180px] items-center gap-6 px-6">
           <Link
@@ -72,7 +71,7 @@ export function SiteHeader() {
               // One pill resolves here either way, so the placeholder is one pill.
               <Skeleton className="h-8 w-24 rounded-full" aria-hidden />
             ) : loggedIn ? (
-              <CtaButton href="/create-workspace" size="compact">
+              <CtaButton href="/dashboard" size="compact">
                 Open the workspace
               </CtaButton>
             ) : (

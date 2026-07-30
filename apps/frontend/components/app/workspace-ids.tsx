@@ -57,7 +57,9 @@ export function IdRow({
         <p
           className={cn(
             "break-all text-sm font-semibold text-foreground",
-            mono && "font-mono text-xs font-medium",
+            /* IDs stay in Inter like the rest of the app — tabular figures and
+               a tighter size carry the "this is a literal" signal instead. */
+            mono && "text-xs font-medium tabular-nums tracking-[0.01em]",
           )}
         >
           {value}

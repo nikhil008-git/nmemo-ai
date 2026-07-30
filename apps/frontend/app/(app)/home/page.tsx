@@ -7,28 +7,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth-client";
 import { useConnectors } from "@/lib/connectors-store";
 
+/** Only steps that work today — each one lands on a page that does something. */
 const steps = [
   {
     href: "/connectors",
-    label: "Connect your sources",
-    description:
-      "Bring Slack, Notion, GitHub, memory, and more into one place.",
+    label: "Connect memory and sources",
+    description: "Memory, Slack, Notion, and GitHub are live today.",
   },
   {
     href: "/sources",
     label: "Add workspace knowledge",
-    description:
-      "Give your agents the docs and knowledge they should reason over.",
+    description: "Upload the documents your agents should reason over.",
   },
   {
     href: "/playground",
-    label: "See context in action",
-    description: "Ask a question and see which context gets used.",
+    label: "Run a question",
+    description: "See which context gets selected, and what it costs.",
   },
   {
     href: "/keys",
-    label: "Ship it to your agents",
-    description: "Use the same context in whatever agents you already run.",
+    label: "Create an API key",
+    description: "Call getContext() from the agents you already run.",
   },
 ] as const;
 
@@ -49,10 +48,10 @@ export function HomeView() {
     <div className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center gap-5 px-1 py-4 sm:gap-6 sm:px-0 sm:py-6">
       <div className="space-y-3 text-center">
         <h1 className="font-heading text-[1.5rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-[1.75rem] md:text-3xl">
-          {user?.name ? `Hey, ${user.name}` : "Your workspace"}
+          {user?.name ? `Set up, ${user.name}` : "Set up your workspace"}
         </h1>
         <p className="px-1 text-sm font-semibold leading-relaxed text-neutral-500">
-          Orchestrate the right context for your agents, across every source.
+          Four steps to a workspace that hands your agents verified context.
         </p>
         {showSkeleton ? (
           <div className="flex justify-center">
@@ -70,8 +69,8 @@ export function HomeView() {
       </div>
 
       <div className="flex flex-col gap-2 sm:flex-row">
-        <CtaButton href="/playground" fullWidth>
-          Open chat
+        <CtaButton href="/dashboard" fullWidth>
+          Open the dashboard
         </CtaButton>
         <CtaButton href="/connectors" variant="outline" fullWidth>
           Connect sources
