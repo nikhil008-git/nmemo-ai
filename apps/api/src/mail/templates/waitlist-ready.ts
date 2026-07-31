@@ -7,67 +7,74 @@ export type WaitlistEmailVars = {
   creatorUrl?: string;
 };
 
-/** Same mark as apps/frontend/components/logo.tsx, black tile, white squircle, capsule bar. */
-function nmemoLogoMark(size = 26): string {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="nmemo" style="display:block;width:${size}px;height:${size}px;">
-  <rect width="100" height="100" rx="22" fill="#000000"/>
-  <rect x="11" y="11" width="78" height="78" rx="20" fill="#FFFFFF"/>
-  <rect x="30" y="64" width="40" height="9" rx="4.5" fill="#000000"/>
-</svg>`;
-}
-
-/** Minimal HTML email, orange mesh stage from landing CTA. */
+/**
+ * Waitlist access email using the same dusk, warm-ink, and amber palette as
+ * the product. The layout stays table-based and keeps every critical style
+ * inline so it survives conservative email clients.
+ */
 export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
   const greeting = vars.name?.trim()
     ? `Hey ${escapeHtml(vars.name.trim())},`
     : "Hey,";
+  const appUrl = escapeHtml(vars.appUrl.replace(/\/$/, ""));
   const signUpUrl = escapeHtml(vars.signUpUrl);
-  const siteLabel = escapeHtml(
-    vars.signUpUrl.replace(/^https?:\/\//, "").replace(/\/$/, ""),
-  );
+  const docsUrl = escapeHtml(vars.docsUrl);
+  const logoDataUri =
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAQKADAAQAAAABAAAAQAAAAABGUUKwAAAEpElEQVRoBe2aTU8aQRjHF1uT0gtvrW8RrXqlTVovAnql+DmU6EFjPNmKknjxqKYoauqHsHrRi540JloPLVFRJEqML/EFb14U+l8GAXV2docuL4fdw7o785/n+T3PwwzEGV08HheyLp1Oh7eLi4vfv7e2t7fnfs4dR6NlZWWJRCJLVYhHgMTjibq6Oo+n8/PnL83NzVVVVWnH4AGRCIsAyJVsSoRCoe7u7mxpekxxHyorK7u6uoBHONPMqQBI68zMjMViKS4o2zvwAJkdQyYAn8/HHlw6vb5hH2IgRRADwMvs7Gzp8CkhIXUAvAD6/f19o9GoZFjpaAAcCu0DXgwAk6N0yJSTdHZ6AK87Pz+32WxXV1fskVjOXC6X0+n88KFBr3/DFufQi/UQ6/Td3d3R0dH6+vry8nI0GmXbwYQOBoPC4uIiW4f1a2JiAhEi3IJdcDc+Pg7XbLaFhQVheHiIIXI4HM+WXjL3830nmYJru93OwBscHBQqKiqkFHa7gyQ+37hS9hHG5eUlI4b3795JwQsoXzgchgkp64VpB0D4IMz4LL2SimB0dLS9vR3jpQQFazdbzOXl5UtLSxwerbXWWCxW9PSTIgPjNhazWq3UAMqore52N74pSiH9wAOGwWh0u91UVHoAWO+p6iI2SiHRA6ivqy8iK9V1fT0diR6A/q2eaqWIjXo9HYkeQBFBeV1rAfBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG39a7I9mJtZcjIkt7HZo/7n//ivc96BAX0kEhkbG8NdSJ4bEZnEsy4vLuLjRRe4Gxsb+/v7m5qaZGOQFTzxurq6igGMXTD0Ygvn06ePT4bl9PLRZru5uZF1t7KyQjVPn8Sym8ywtbm5+efPX6pRrsa/weDW1pbsECkkegBra2uyFk0mk6xGocBsNssqlSBljOBgwe3tLbus9/f3fX19OMyVGcb/hOEwAlPsjytggEQ1/2JmPar8fn9PTw9ieGx4/pcsQRsbGycnJ2IfhEljqZNgz+VP3h+1Qm1tbUtLizia6WhycrK3t/eJCdkXnDqLHEbYRUCvKhc7/YeHh6wjcIxN8NbW1uvrayAyHOS1C64B4HRIbplaLGZhZGSEUY22tjZy4KDAYZDCHhwcIIkMvIGBAUE8scK8ampqMB/IUk3sFuAOd/4f/urqaiaaMD//S3d2doYDT6gUW9rQ0PDV5XI4ndivxY4nmcGIBA/knhqenp7i5M9MTKJPNqWGEH26nXThwNPx8TFWTBx4wsknopG6W8wWfIeI07+jo0NKJNUOxwovWFCo1NF/h0ghCMAGvBjA3t6ewWCQFJZkh9FgALYYAJYR/AkEAiXJKQk1PT0NbMBnDr56vV5JeYl1DHm9oCereyYAtExNTan4CycfUZtNpsBUQKRP8Sc/QuTLiLTu7Ox4PB7GQbp8YCmxCSSA7e7uEs40sxB/IM/x5MMD6T49PcVxTO+QV8nvRCXuc9YYTaZv378DBkgZ9IckdPL+D5S9E/ffyUdsAAAAAElFTkSuQmCC";
   const creatorName = escapeHtml(vars.creatorName || "Nikhil Rajpurohit");
   const creatorUrl = escapeHtml(vars.creatorUrl || "https://nikhilwho.in");
-  const font =
-    "ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif";
-
-  // Dot mesh as repeating background (email-safe approx of landing grain)
-  const meshBg = `
-    background-color:#ea580c;
-    background-image:
-      radial-gradient(ellipse 90% 70% at 12% 20%, rgba(255,190,120,0.95) 0%, transparent 55%),
-      radial-gradient(ellipse 70% 55% at 88% 18%, rgba(255,150,80,0.85) 0%, transparent 50%),
-      radial-gradient(ellipse 85% 55% at 45% 100%, rgba(249,115,22,0.7) 0%, transparent 55%),
-      radial-gradient(circle, rgba(0,0,0,0.22) 0.6px, transparent 0.7px),
-      linear-gradient(165deg, #fff7ed 0%, #ffedd5 35%, #fb923c 72%, #ea580c 100%);
-    background-size: auto, auto, auto, 6px 6px, auto;
-  `;
+  const creatorLabel = escapeHtml(
+    displayUrl(vars.creatorUrl || "https://nikhilwho.in"),
+  );
+  const font = "Inter,Arial,sans-serif";
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light" />
-  <title>nmemo is ready</title>
+  <meta name="color-scheme" content="dark" />
+  <meta name="supported-color-schemes" content="dark" />
+  <title>Your nmemo access is ready</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+    :root { color-scheme: dark; supported-color-schemes: dark; }
+    @media only screen and (max-width: 600px) {
+      .page-pad { padding: 28px 18px !important; }
+      .hero-title { font-size: 31px !important; }
+      .footer-copy { display: block !important; padding-bottom: 8px !important; }
+      .footer-links { display: block !important; text-align: left !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#ffffff;color:#000000;-webkit-text-size-adjust:100%;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">
-    You're in nmemo is open.
+<body style="margin:0;padding:0;background-color:#121110;color:#e7e4e0;-webkit-text-size-adjust:100%;word-spacing:normal;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+    You're off the waitlist. Your nmemo workspace is ready.
   </div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#121110;">
     <tr>
-      <td align="center" style="padding:40px 16px;">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;margin:0 auto;">
-
+      <td class="page-pad" align="center" style="padding:48px 24px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px;margin:0 auto;">
           <tr>
-            <td style="padding:0 0 20px 0;">
-              <table role="presentation" cellpadding="0" cellspacing="0">
+            <td style="padding:0 0 38px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="vertical-align:middle;padding:0 8px 0 0;line-height:0;">
-                    ${nmemoLogoMark(26)}
+                  <td style="vertical-align:middle;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="vertical-align:middle;padding:0 9px 0 0;line-height:0;">
+                          <a href="${appUrl}" style="display:inline-block;text-decoration:none;">
+                            <img src="${logoDataUri}" width="20" height="20" alt="nmemo" style="display:block;width:20px;height:20px;border:0;border-radius:5px;" />
+                          </a>
+                        </td>
+                        <td style="vertical-align:middle;font-family:${font};font-size:13px;font-weight:500;letter-spacing:-0.01em;color:#f2efec;">
+                          <a href="${appUrl}" style="color:#f2efec;text-decoration:none;">nmemo</a>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
-                  <td style="vertical-align:middle;font-family:${font};font-size:15px;font-weight:600;letter-spacing:-0.02em;color:#000000;">
-                    nmemo
+                  <td align="right" style="vertical-align:middle;font-family:${font};font-size:10px;font-weight:500;line-height:1.4;letter-spacing:0.08em;color:#d99a55;">
+                    ACCESS READY
                   </td>
                 </tr>
               </table>
@@ -75,37 +82,32 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
           </tr>
 
           <tr>
-            <td style="padding:0 0 8px 0;font-family:${font};font-size:26px;font-weight:600;letter-spacing:-0.03em;line-height:1.15;color:#000000;">
-              Context your agents
-              <br />
-              <span style="color:#a3a3a3;">actually need.</span>
+            <td style="padding:0 0 12px 0;font-family:${font};font-size:11px;font-weight:500;line-height:1.5;letter-spacing:0.04em;color:#7e7b78;">
+              waitlist / confirmed
             </td>
           </tr>
-
           <tr>
-            <td style="padding:0 0 28px 0;font-family:${font};font-size:14px;font-weight:600;line-height:1.5;color:#737373;">
-              ${greeting} You're off the waitlist & nmemo is finally open 🥳.
+            <td class="hero-title" style="padding:0 0 20px 0;font-family:${font};font-size:38px;font-weight:500;letter-spacing:-0.035em;line-height:1.08;color:#f2efec;">
+              You&rsquo;re in.<br />
+              <span style="color:#99958f;">Memory with receipts.</span>
             </td>
           </tr>
-
-          <!-- Mesh stage -->
           <tr>
-            <td style="padding:0 0 28px 0;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-radius:4px;overflow:hidden;">
+            <td style="padding:0 0 28px 0;font-family:${font};font-size:16px;font-weight:400;line-height:1.65;color:#99958f;">
+              <span style="color:#e7e4e0;">${greeting}</span> Your workspace is ready. nmemo keeps your repository&rsquo;s decisions, dead ends, and unfinished work close to the next agent that needs them.
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 0 38px 0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td align="center" style="padding:48px 24px;${meshBg}">
-                    <p style="margin:0 0 10px 0;font-family:${font};font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#0a0a0a;">
-                      / You're in
-                    </p>
-                    <p style="margin:0 0 22px 0;font-family:${font};font-size:22px;font-weight:600;letter-spacing:-0.03em;line-height:1.2;color:#0a0a0a;">
-                      Give every agent<br />the context it needs
-                    </p>
-                    <a href="${signUpUrl}" style="display:inline-block;background:#ffffff;color:#171717;text-decoration:none;font-family:${font};font-size:14px;font-weight:600;padding:11px 16px;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,0.12);">
-                      Get started →
+                  <td style="border-radius:999px;background-color:#ffffff;">
+                    <a href="${signUpUrl}" style="display:inline-block;padding:12px 20px;font-family:${font};font-size:14px;font-weight:500;line-height:1.2;color:#121110;text-decoration:none;border-radius:999px;">
+                      Open the workspace&nbsp;&nbsp;&rarr;
                     </a>
-                    <p style="margin:14px 0 0 0;font-family:${font};font-size:12px;font-weight:600;color:#0a0a0a;">
-                      <a href="${signUpUrl}" style="color:#0a0a0a;text-decoration:underline;">${siteLabel}</a>
-                    </p>
+                  </td>
+                  <td style="padding-left:16px;font-family:${font};font-size:13px;line-height:1.4;">
+                    <a href="${docsUrl}" style="color:#99958f;text-decoration:underline;text-decoration-color:#56504b;text-underline-offset:3px;">Read the docs</a>
                   </td>
                 </tr>
               </table>
@@ -113,11 +115,19 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
           </tr>
 
           <tr>
-            <td style="padding:0;font-family:${font};font-size:12px;font-weight:600;line-height:1.5;color:#a3a3a3;">
-              Creator
-              <a href="${creatorUrl}" style="color:#000000;text-decoration:none;">${creatorName}</a>
-              ·
-              <a href="${creatorUrl}" style="color:#000000;text-decoration:none;">nikhilwho.in</a>
+            <td style="border-top:1px solid #201e1c;padding:22px 0 0 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td class="footer-copy" style="font-family:${font};font-size:12px;line-height:1.55;color:#7e7b78;">
+                    nmemo &mdash; a project continuity layer for AI coding
+                  </td>
+                  <td class="footer-links" align="right" style="font-family:${font};font-size:12px;line-height:1.55;color:#7e7b78;white-space:nowrap;">
+                    By <a href="${creatorUrl}" style="color:#b0aca7;text-decoration:none;">${creatorName}</a>
+                    &nbsp;&middot;&nbsp;
+                    <a href="${creatorUrl}" style="color:#b0aca7;text-decoration:none;">${creatorLabel}</a>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
         </table>
@@ -132,14 +142,22 @@ export function waitlistReadyText(vars: WaitlistEmailVars): string {
   const greeting = vars.name?.trim() ? `Hey ${vars.name.trim()},` : "Hey,";
   return `${greeting}
 
-You're off the waitlist, nmemo is open.
+Your nmemo workspace is ready.
 
-Context your agents actually need.
+Memory with receipts.
 
-Get started: ${vars.signUpUrl}
+nmemo keeps your repository's decisions, dead ends, and unfinished work close to the next agent that needs them.
 
-Creator ${vars.creatorName || "Nikhil Rajpurohit"} · ${vars.creatorUrl || "https://nikhilwho.in"}
+Open the workspace: ${vars.signUpUrl}
+Read the docs: ${vars.docsUrl}
+
+nmemo — a project continuity layer for AI coding
+By ${vars.creatorName || "Nikhil Rajpurohit"} · ${vars.creatorUrl || "https://nikhilwho.in"}
 `;
+}
+
+function displayUrl(value: string) {
+  return value.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }
 
 function escapeHtml(value: string) {
