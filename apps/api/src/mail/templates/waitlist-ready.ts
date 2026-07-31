@@ -5,7 +5,12 @@ export type WaitlistEmailVars = {
   docsUrl: string;
   creatorName?: string;
   creatorUrl?: string;
+  logoSrc?: string;
 };
+
+/** Tiny embedded mark for the local preview; delivered email uses the same PNG as a CID attachment. */
+export const NMEMO_LOGO_DATA_URI =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAQKADAAQAAAABAAAAQAAAAABGUUKwAAAEpElEQVRoBe2aTU8aQRjHF1uT0gtvrW8RrXqlTVovAnql+DmU6EFjPNmKknjxqKYoauqHsHrRi540JloPLVFRJEqML/EFb14U+l8GAXV2docuL4fdw7o785/n+T3PwwzEGV08HheyLp1Oh7eLi4vfv7e2t7fnfs4dR6NlZWWJRCJLVYhHgMTjibq6Oo+n8/PnL83NzVVVVWnH4AGRCIsAyJVsSoRCoe7u7mxpekxxHyorK7u6uoBHONPMqQBI68zMjMViKS4o2zvwAJkdQyYAn8/HHlw6vb5hH2IgRRADwMvs7Gzp8CkhIXUAvAD6/f19o9GoZFjpaAAcCu0DXgwAk6N0yJSTdHZ6AK87Pz+32WxXV1fskVjOXC6X0+n88KFBr3/DFufQi/UQ6/Td3d3R0dH6+vry8nI0GmXbwYQOBoPC4uIiW4f1a2JiAhEi3IJdcDc+Pg7XbLaFhQVheHiIIXI4HM+WXjL3830nmYJru93OwBscHBQqKiqkFHa7gyQ+37hS9hHG5eUlI4b3795JwQsoXzgchgkp64VpB0D4IMz4LL2SimB0dLS9vR3jpQQFazdbzOXl5UtLSxwerbXWWCxW9PSTIgPjNhazWq3UAMqore52N74pSiH9wAOGwWh0u91UVHoAWO+p6iI2SiHRA6ivqy8iK9V1fT0diR6A/q2eaqWIjXo9HYkeQBFBeV1rAfBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG39a7I9mJtZcjIkt7HZo/7n//ivc96BAX0kEhkbG8NdSJ4bEZnEsy4vLuLjRRe4Gxsb+/v7m5qaZGOQFTzxurq6igGMXTD0Ygvn06ePT4bl9PLRZru5uZF1t7KyQjVPn8Sym8ywtbm5+efPX6pRrsa/weDW1pbsECkkegBra2uyFk0mk6xGocBsNssqlSBljOBgwe3tLbus9/f3fX19OMyVGcb/hOEwAlPsjytggEQ1/2JmPar8fn9PTw9ieGx4/pcsQRsbGycnJ2IfhEljqZNgz+VP3h+1Qm1tbUtLizia6WhycrK3t/eJCdkXnDqLHEbYRUCvKhc7/YeHh6wjcIxN8NbW1uvrayAyHOS1C64B4HRIbplaLGZhZGSEUY22tjZy4KDAYZDCHhwcIIkMvIGBAUE8scK8ampqMB/IUk3sFuAOd/4f/urqaiaaMD//S3d2doYDT6gUW9rQ0PDV5XI4ndivxY4nmcGIBA/knhqenp7i5M9MTKJPNqWGEH26nXThwNPx8TFWTBx4wsknopG6W8wWfIeI07+jo0NKJNUOxwovWFCo1NF/h0ghCMAGvBjA3t6ewWCQFJZkh9FgALYYAJYR/AkEAiXJKQk1PT0NbMBnDr56vV5JeYl1DHm9oCereyYAtExNTan4CycfUZtNpsBUQKRP8Sc/QuTLiLTu7Ox4PB7GQbp8YCmxCSSA7e7uEs40sxB/IM/x5MMD6T49PcVxTO+QV8nvRCXuc9YYTaZv378DBkgZ9IckdPL+D5S9E/ffyUdsAAAAAElFTkSuQmCC";
 
 /**
  * Waitlist access email using the same dusk, warm-ink, and amber palette as
@@ -19,8 +24,7 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
   const appUrl = escapeHtml(vars.appUrl.replace(/\/$/, ""));
   const signUpUrl = escapeHtml(vars.signUpUrl);
   const docsUrl = escapeHtml(vars.docsUrl);
-  const logoDataUri =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAQKADAAQAAAABAAAAQAAAAABGUUKwAAAEpElEQVRoBe2aTU8aQRjHF1uT0gtvrW8RrXqlTVovAnql+DmU6EFjPNmKknjxqKYoauqHsHrRi540JloPLVFRJEqML/EFb14U+l8GAXV2docuL4fdw7o785/n+T3PwwzEGV08HheyLp1Oh7eLi4vfv7e2t7fnfs4dR6NlZWWJRCJLVYhHgMTjibq6Oo+n8/PnL83NzVVVVWnH4AGRCIsAyJVsSoRCoe7u7mxpekxxHyorK7u6uoBHONPMqQBI68zMjMViKS4o2zvwAJkdQyYAn8/HHlw6vb5hH2IgRRADwMvs7Gzp8CkhIXUAvAD6/f19o9GoZFjpaAAcCu0DXgwAk6N0yJSTdHZ6AK87Pz+32WxXV1fskVjOXC6X0+n88KFBr3/DFufQi/UQ6/Td3d3R0dH6+vry8nI0GmXbwYQOBoPC4uIiW4f1a2JiAhEi3IJdcDc+Pg7XbLaFhQVheHiIIXI4HM+WXjL3830nmYJru93OwBscHBQqKiqkFHa7gyQ+37hS9hHG5eUlI4b3795JwQsoXzgchgkp64VpB0D4IMz4LL2SimB0dLS9vR3jpQQFazdbzOXl5UtLSxwerbXWWCxW9PSTIgPjNhazWq3UAMqore52N74pSiH9wAOGwWh0u91UVHoAWO+p6iI2SiHRA6ivqy8iK9V1fT0diR6A/q2eaqWIjXo9HYkeQBFBeV1rAfBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG29VgG1M8prT6sAb8bU1msVUDujvPa0CvBmTG39a7I9mJtZcjIkt7HZo/7n//ivc96BAX0kEhkbG8NdSJ4bEZnEsy4vLuLjRRe4Gxsb+/v7m5qaZGOQFTzxurq6igGMXTD0Ygvn06ePT4bl9PLRZru5uZF1t7KyQjVPn8Sym8ywtbm5+efPX6pRrsa/weDW1pbsECkkegBra2uyFk0mk6xGocBsNssqlSBljOBgwe3tLbus9/f3fX19OMyVGcb/hOEwAlPsjytggEQ1/2JmPar8fn9PTw9ieGx4/pcsQRsbGycnJ2IfhEljqZNgz+VP3h+1Qm1tbUtLizia6WhycrK3t/eJCdkXnDqLHEbYRUCvKhc7/YeHh6wjcIxN8NbW1uvrayAyHOS1C64B4HRIbplaLGZhZGSEUY22tjZy4KDAYZDCHhwcIIkMvIGBAUE8scK8ampqMB/IUk3sFuAOd/4f/urqaiaaMD//S3d2doYDT6gUW9rQ0PDV5XI4ndivxY4nmcGIBA/knhqenp7i5M9MTKJPNqWGEH26nXThwNPx8TFWTBx4wsknopG6W8wWfIeI07+jo0NKJNUOxwovWFCo1NF/h0ghCMAGvBjA3t6ewWCQFJZkh9FgALYYAJYR/AkEAiXJKQk1PT0NbMBnDr56vV5JeYl1DHm9oCereyYAtExNTan4CycfUZtNpsBUQKRP8Sc/QuTLiLTu7Ox4PB7GQbp8YCmxCSSA7e7uEs40sxB/IM/x5MMD6T49PcVxTO+QV8nvRCXuc9YYTaZv378DBkgZ9IckdPL+D5S9E/ffyUdsAAAAAElFTkSuQmCC";
+  const logoSrc = escapeHtml(vars.logoSrc || NMEMO_LOGO_DATA_URI);
   const creatorName = escapeHtml(vars.creatorName || "Nikhil Rajpurohit");
   const creatorUrl = escapeHtml(vars.creatorUrl || "https://nikhilwho.in");
   const creatorLabel = escapeHtml(
@@ -64,7 +68,7 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
                       <tr>
                         <td style="vertical-align:middle;padding:0 9px 0 0;line-height:0;">
                           <a href="${appUrl}" style="display:inline-block;text-decoration:none;">
-                            <img src="${logoDataUri}" width="20" height="20" alt="nmemo" style="display:block;width:20px;height:20px;border:0;border-radius:5px;" />
+                            <img src="${logoSrc}" width="20" height="20" alt="nmemo" style="display:block;width:20px;height:20px;border:0;border-radius:5px;" />
                           </a>
                         </td>
                         <td style="vertical-align:middle;font-family:${font};font-size:13px;font-weight:500;letter-spacing:-0.01em;color:#f2efec;">

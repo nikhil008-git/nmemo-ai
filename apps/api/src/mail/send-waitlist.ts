@@ -18,6 +18,7 @@
   loadEnv({ path: resolve(process.cwd(), ".env") });
 
   import {
+    NMEMO_LOGO_DATA_URI,
     waitlistReadyHtml,
     waitlistReadyText,
   } from "./templates/waitlist-ready.js";
@@ -112,6 +113,7 @@
       `"nmemo" <${process.env.SMTP_USER || "hello@nmemo.app"}>`;
 
     const preview = hasFlag("--preview");
+    const logoCid = "nmemo-logo@nmemo";
 
     console.log(`Recipients: ${recipients.length}`);
     console.log(`From: ${from}`);
@@ -157,6 +159,7 @@
         docsUrl,
         creatorName,
         creatorUrl,
+        ...(preview ? {} : { logoSrc: `cid:${logoCid}` }),
       };
       const subject = "You're in! nmemo is finally open";
       const html = waitlistReadyHtml(vars);
@@ -187,6 +190,14 @@
         subject,
         html,
         text,
+        attachments: [
+          {
+            filename: "nmemo-logo.png",
+            content: NMEMO_LOGO_DATA_URI.replace("data:image/png;base64,", ""),
+            encoding: "base64",
+            cid: logoCid,
+          },
+        ],
       });
       sent += 1;
       console.log(`sent → ${r.email}`);
