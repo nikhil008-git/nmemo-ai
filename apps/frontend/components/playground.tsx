@@ -512,7 +512,7 @@ export function Playground() {
                 onFocus={() => {
                   if (groqReady === false) openKeyModal();
                 }}
-                placeholder="Ask something your sources should know…"
+                placeholder="Ask anything…"
                 disabled={busy}
                 rows={3}
                 className="min-h-[5rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed text-foreground outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[7.5rem] sm:pr-12 sm:text-[15px]"
@@ -704,7 +704,7 @@ export function Playground() {
                   onFocus={() => {
                     if (groqReady === false) openKeyModal();
                   }}
-                  placeholder="Ask anything across connected sources…"
+                  placeholder="Ask anything…"
                   disabled={busy}
                   rows={2}
                   className="min-h-[2.75rem] w-full resize-none bg-transparent pr-10 text-[13px] font-medium leading-relaxed outline-none placeholder:text-neutral-400 disabled:opacity-50 sm:min-h-[3.25rem] sm:pr-12 sm:text-[15px]"

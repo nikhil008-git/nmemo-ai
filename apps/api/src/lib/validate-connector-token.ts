@@ -33,7 +33,7 @@ export async function validateConnectorToken(
     });
     if (!res.ok) {
       throw new Error(
-        "GitHub token rejected. Use a classic PAT with repo scope (or fine-grained Issues read).",
+        "GitHub token rejected. Use a classic PAT with repo scope, or a fine-grained token with Metadata, Contents, Pull requests, and Issues read access.",
       );
     }
     const user = (await res.json()) as { login?: string };

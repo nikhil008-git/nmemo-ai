@@ -67,7 +67,7 @@ function SectionHeading({
 }) {
   return (
     <h2
-      className={`text-balance text-[28px] font-medium leading-[1.12] tracking-[-0.02em] text-ink sm:text-[38px] ${className}`}
+      className={`text-balance text-[25px] font-medium leading-[1.16] tracking-[-0.02em] text-ink md:text-[38px] md:leading-[1.12] ${className}`}
     >
       {children}
     </h2>
@@ -76,7 +76,7 @@ function SectionHeading({
 
 function Lede({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-4 max-w-[52ch] text-pretty text-[16px] leading-relaxed text-ink/50 sm:text-[17px]">
+    <p className="mt-4 max-w-[52ch] text-pretty text-[15px] leading-relaxed text-ink/50 md:text-[17px]">
       {children}
     </p>
   );
@@ -126,7 +126,7 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         <section className="pt-6 sm:pt-10">
           <Container className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-14">
-            <h1 className="max-w-xs text-balance text-[19px] font-medium leading-[1.2] tracking-[-0.015em] text-ink sm:text-[21px]">
+            <h1 className="max-w-xs text-balance text-[18px] font-medium leading-[1.2] tracking-[-0.015em] text-ink md:text-[21px]">
               Context with receipts.
             </h1>
 
@@ -285,11 +285,11 @@ export default function LandingPage() {
                 className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_115%,var(--stage-glow),transparent_68%)]"
               />
               <div className="relative">
-                <h2 className="mx-auto max-w-3xl text-balance text-[28px] font-medium leading-[1.1] tracking-[-0.02em] text-white sm:text-[44px]">
+                <h2 className="mx-auto max-w-3xl text-balance text-[26px] font-medium leading-[1.14] tracking-[-0.02em] text-white md:text-[44px] md:leading-[1.1]">
                   Give every agent the context it needs. None of the context it
                   doesn&apos;t.
                 </h2>
-                <p className="mx-auto mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-white/55 sm:mt-5 sm:text-[17px]">
+                <p className="mx-auto mt-4 max-w-xl text-pretty text-[14px] leading-relaxed text-white/55 md:mt-5 md:text-[17px]">
                   Connect your sources, inspect the context package, then keep
                   building with the model and framework you already use.
                 </p>

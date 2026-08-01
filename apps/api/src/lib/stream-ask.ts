@@ -22,12 +22,15 @@ export type AskStreamMeta = {
 };
 
 const PLAYGROUND_SYSTEM_PREFIX = [
-  "You are a concise assistant for a context-engine playground.",
-  "Answer the user's question using ONLY the context that follows.",
+  "You are a concise, helpful assistant for a context-engine playground.",
+  "Use connected context as the source of truth when it is relevant.",
+  "Never claim a fact came from connected sources unless the provided context supports it.",
+  "For greetings and general questions without relevant context, answer naturally.",
+  "Evidence-only instructions in the supplied context apply to source claims, not to casual conversation.",
+  "For workspace-specific questions without grounded context, say you do not have enough connected context rather than inventing workspace facts.",
   "Write a short, natural reply in plain language.",
   "Do NOT dump, quote, or restate the full context.",
   "Do NOT invent Notion/GitHub/Slack sections or numbered source reports.",
-  "If the context does not contain the answer, reply with one short sentence that you don't know.",
 ].join(" ");
 
 function groqProvider(apiKey: string) {
@@ -43,19 +46,9 @@ export function pipeAskStream(opts: {
   question: string;
   groqKey: string;
   context: GetContextResult;
-  hasContext: boolean;
-  fallbackText: string;
   onFinishText?: (text: string) => void;
 }) {
-  const {
-    res,
-    question,
-    groqKey,
-    context,
-    hasContext,
-    fallbackText,
-    onFinishText,
-  } = opts;
+  const { res, question, groqKey, context, onFinishText } = opts;
 
   const avgScore =
     context.documents.length === 0
@@ -90,19 +83,9 @@ export function pipeAskStream(opts: {
           data: meta,
         });
 
-        if (!hasContext) {
-          const id = crypto.randomUUID();
-          writer.write({ type: "text-start", id });
-          writer.write({ type: "text-delta", id, delta: fallbackText });
-          writer.write({ type: "text-end", id });
-          writer.write({ type: "finish" });
-          onFinishText?.(fallbackText);
-          return;
-        }
-
         const result = streamText({
           model: groq.chat("llama-3.3-70b-versatile"),
-          system: `${PLAYGROUND_SYSTEM_PREFIX}\n\n${context.prompt}`,
+          system: `${context.prompt}\n\n${PLAYGROUND_SYSTEM_PREFIX}`,
           prompt: question,
           onFinish: ({ text }) => {
             onFinishText?.(text);

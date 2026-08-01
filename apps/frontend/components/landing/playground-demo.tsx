@@ -59,7 +59,7 @@ export function PlaygroundDemo() {
 
   return (
     <Frame bezel>
-      <div className="relative aspect-[16/10] w-full">
+      <div className="relative aspect-[4/3] w-full md:aspect-[16/10]">
         <WallpaperPlate>
           <div
             role="group"
@@ -77,7 +77,7 @@ export function PlaygroundDemo() {
             }}
             className="product-shell landing-demo-shell absolute flex cursor-pointer overflow-hidden rounded-lg border border-ink/10 bg-surface shadow-[var(--panel-shadow)] outline-none transition-[border-color,box-shadow] duration-200 hover:border-ink/20 focus-visible:ring-2 focus-visible:ring-ink/25"
           >
-            <aside className="flex w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4">
+            <aside className="hidden w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4 md:flex">
               <p className="truncate rounded-md px-2 py-1 text-[14px] font-semibold tracking-[-0.02em] text-ink/90 transition-colors hover:bg-ink/[0.04]">
                 Nikhil Rajpurohit
               </p>
@@ -112,7 +112,7 @@ export function PlaygroundDemo() {
                 <span className="text-[13px] font-semibold tracking-[-0.015em] text-ink/80">
                   Playground
                 </span>
-                <span className="flex h-7 shrink-0 items-center gap-2 rounded-sm border border-border bg-surface px-2 text-[11px] font-semibold text-neutral-400 transition-colors hover:bg-ink/[0.04] hover:text-ink/70">
+                <span className="hidden h-7 shrink-0 items-center gap-2 rounded-sm border border-border bg-surface px-2 text-[11px] font-semibold text-neutral-400 transition-colors hover:bg-ink/[0.04] hover:text-ink/70 md:flex">
                   <Search size={12} strokeWidth={1.75} />
                   Search
                   <span className="rounded-[3px] bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500">

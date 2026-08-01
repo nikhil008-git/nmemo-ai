@@ -4,15 +4,15 @@ Primary developer surface for Context Engine.
 
 ## Where it lives
 
-| What | Path |
-|------|------|
-| Package | [`packages/sdk`](../../packages/sdk) |
-| Package README | [`packages/sdk/README.md`](../../packages/sdk/README.md) |
-| Source | [`packages/sdk/src/index.ts`](../../packages/sdk/src/index.ts) |
-| Shared types | [`packages/retriever-interface`](../../packages/retriever-interface) |
-| Engine (server-side) | [`packages/core`](../../packages/core) |
-| HTTP API | [`apps/api`](../../apps/api) — `POST /context` |
-| Create keys | Dashboard → [Keys](../../apps/frontend/docs/pages/keys.md) |
+| What                 | Path                                                                 |
+| -------------------- | -------------------------------------------------------------------- |
+| Package              | [`packages/sdk`](../../packages/sdk)                                 |
+| Package README       | [`packages/sdk/README.md`](../../packages/sdk/README.md)             |
+| Source               | [`packages/sdk/src/index.ts`](../../packages/sdk/src/index.ts)       |
+| Shared types         | [`packages/retriever-interface`](../../packages/retriever-interface) |
+| Engine (server-side) | [`packages/core`](../../packages/core)                               |
+| HTTP API             | [`apps/api`](../../apps/api) — `POST /context`                       |
+| Create keys          | Dashboard → [Keys](../../apps/frontend/docs/pages/keys.md)           |
 
 ## Install
 
@@ -23,7 +23,7 @@ npm install nmemo-sdk
 ```
 
 ```ts
-import { createEngine } from "nmemo-sdk"
+import { createEngine } from "nmemo-sdk";
 ```
 
 ## End-to-end flow (SaaS user)
@@ -47,33 +47,55 @@ Users never set `GITHUB_CLIENT_*` etc. Those are platform secrets for the SaaS d
 ## Usage
 
 ```ts
-import { createEngine } from "nmemo-sdk"
+import { createEngine } from "nmemo-sdk";
 
 const engine = createEngine({
   apiKey: process.env.NMEMO_API_KEY!,
-})
+});
 
 const context = await engine.getContext({
   query: "What is our refund policy?",
   userId: "user_123",
   workspaceId: "ws_123",
-})
+});
 
 // Feed into any LLM
 const messages = [
   { role: "system", content: context.prompt },
   { role: "user", content: "What is our refund policy?" },
-]
+];
 
-console.log(context.prompt)
-console.log(context.citations)
-console.log(context.diagnostics)
+console.log(context.prompt);
+console.log(context.citations);
+console.log(context.diagnostics);
 ```
+
+### GitHub activity and receipts
+
+GitHub is a workspace connector, not a separate SDK client. Once the workspace
+has connected GitHub, call `getContext()` with a repository and (when needed) a
+GitHub login:
+
+```ts
+const context = await engine.getContext({
+  query: "Show merged PRs and changed files by @alex in acme/web-app",
+  userId: "user_123",
+  workspaceId: "ws_123",
+});
+```
+
+The context can include repository metadata, README/docs/code matches, commits,
+pull requests and reviews, issues and comments, discussions, releases,
+branches, tags, and direct GitHub receipt URLs. Use `owner/repo`, a GitHub URL,
+or an explicit short-name phrase such as `for web-app` to identify a repo.
+
+`getContextFast()` skips live connectors by design; use `getContext()` for
+fresh GitHub evidence.
 
 ### Fast path
 
 ```ts
-await engine.getContextFast({ query, userId, workspaceId })
+await engine.getContextFast({ query, userId, workspaceId });
 ```
 
 Use this endpoint for latency-sensitive turns such as voice or live assistance.

@@ -14,7 +14,7 @@ const demoSources = [
 
 export function HomeDemo() {
   return (
-    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[16px] shadow-[var(--bezel-shadow)] sm:rounded-[20px] lg:aspect-[5/2]">
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[16px] shadow-[var(--bezel-shadow)] sm:rounded-[20px] md:aspect-[16/10] lg:aspect-[5/2]">
       <WallpaperPlate>
         <div className="product-shell absolute left-1/2 top-1/2 h-[90%] w-[94%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-border bg-surface text-foreground shadow-[var(--panel-shadow)] md:w-[82%] lg:w-[62%]">
           <div className="landing-home-demo-canvas flex">

@@ -224,10 +224,6 @@ async function prepareAsk(req: express.Request, question: string) {
   }
 
   const connectorRefs = await connectorsForContext(workspace.connectors);
-  const connected = connectorRefs
-    .filter((c) => c.status === "connected")
-    .map((c) => c.type);
-
   const groq = connectorRefs.find(
     (c) => c.type === "groq" && c.status === "connected",
   );
@@ -248,24 +244,11 @@ async function prepareAsk(req: express.Request, question: string) {
     connectors: connectorRefs.filter((c) => c.type !== "groq"),
   });
 
-  const hasContext =
-    context.documents.length > 0 || context.memories.length > 0;
-  const discarded = context.diagnostics.discarded
-    .map((d) => `${d.id}: ${d.reason}`)
-    .join("; ");
-  const sourcesLabel =
-    connected.filter((t) => t !== "groq").join(", ") || "none";
-  const fallbackText = discarded
-    ? `No context retrieved from connected sources (${sourcesLabel}). Errors — ${discarded}`
-    : `No context retrieved. Connected: ${sourcesLabel}. Upload docs and/or reconnect GitHub/Slack/Notion with a live token.`;
-
   return {
     workspace,
     connectorRefs,
     groqKey,
     context,
-    hasContext,
-    fallbackText,
   } as const;
 }
 
@@ -283,14 +266,15 @@ app.post("/ask", requireSession, contextLimiter, async (req, res) => {
       return;
     }
 
-    const { workspace, connectorRefs, groqKey, context, hasContext, fallbackText } =
-      prepared;
+    const { workspace, connectorRefs, groqKey, context } = prepared;
 
-    const answer = hasContext
-      ? await completeFromPrompt(context.prompt, groqKey, question.trim())
-      : fallbackText;
+    const answer = await completeFromPrompt(
+      context.prompt,
+      groqKey,
+      question.trim(),
+    );
 
-    if (hasContext) {
+    if (answer.trim()) {
       writeMemoryAsync({
         userId: req.user!.id,
         messages: [
@@ -354,8 +338,7 @@ app.post("/ask/stream", requireSession, contextLimiter, async (req, res) => {
       return;
     }
 
-    const { workspace, connectorRefs, groqKey, context, hasContext, fallbackText } =
-      prepared;
+    const { workspace, connectorRefs, groqKey, context } = prepared;
 
     recordUsageAsync({
       workspaceId: workspace.id,
@@ -370,10 +353,8 @@ app.post("/ask/stream", requireSession, contextLimiter, async (req, res) => {
       question,
       groqKey,
       context,
-      hasContext,
-      fallbackText,
       onFinishText: (text) => {
-        if (!hasContext || !text.trim()) return;
+        if (!text.trim()) return;
         writeMemoryAsync({
           userId: req.user!.id,
           messages: [

@@ -41,6 +41,27 @@ console.log(context.citations);
 console.log(context.diagnostics);
 ```
 
+### GitHub context and receipts
+
+After the workspace owner connects GitHub in nmemo, the same `getContext()`
+call can retrieve repository evidence. Mention a repository as `owner/repo`, a
+GitHub URL, or an explicit short name such as `for cal.diy`.
+
+```ts
+const context = await engine.getContext({
+  query: "What did @contributor contribute to acme/cal.diy this month?",
+  userId: "user_123",
+  workspaceId: "ws_123",
+});
+
+// Commits, PRs, issues, README/docs/code matches, releases, refs, and
+// discussion records are returned as context items when the question asks for them.
+console.log(context.citations); // GitHub commit / PR / issue / repository URLs
+```
+
+Use `getContext()` for GitHub activity. `getContextFast()` deliberately skips
+live connectors, so it cannot retrieve fresh GitHub data.
+
 ### Fast path
 
 ```ts
@@ -68,10 +89,10 @@ await engine.writeMemory({
 
 ### `createEngine(options)`
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `apiKey` | `string` | required | Bearer key from the dashboard |
-| `baseUrl` | `string` | `https://api.nmemo.cloud` | API origin |
+| Option    | Type     | Default                   | Description                   |
+| --------- | -------- | ------------------------- | ----------------------------- |
+| `apiKey`  | `string` | required                  | Bearer key from the dashboard |
+| `baseUrl` | `string` | `https://api.nmemo.cloud` | API origin                    |
 
 ### Return shape
 
@@ -79,10 +100,34 @@ await engine.writeMemory({
 type GetContextResult = {
   prompt: string;
   memories: { id: string; text: string; score: number }[];
-  documents: { id: string; text: string; source: string; title?: string; score: number }[];
-  sources: { id: string; name: string; queried: boolean; responded: boolean; latencyMs: number }[];
-  citations: { id: string; source: string; title: string; url?: string; snippet: string }[];
-  tokenUsage: { total: number; memory: number; documents: number; workspace: number; instructions: number };
+  documents: {
+    id: string;
+    text: string;
+    source: string;
+    title?: string;
+    score: number;
+  }[];
+  sources: {
+    id: string;
+    name: string;
+    queried: boolean;
+    responded: boolean;
+    latencyMs: number;
+  }[];
+  citations: {
+    id: string;
+    source: string;
+    title: string;
+    url?: string;
+    snippet: string;
+  }[];
+  tokenUsage: {
+    total: number;
+    memory: number;
+    documents: number;
+    workspace: number;
+    instructions: number;
+  };
   diagnostics: {
     rankingScores: { id: string; score: number; reason: string }[];
     discarded: { id: string; reason: string }[];
