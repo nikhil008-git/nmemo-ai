@@ -20,9 +20,9 @@ A multi-source context orchestration engine for AI agents. One call replaces cus
 ## What it does
 
 ```ts
-import { createEngine } from "@contextengine/sdk"
+import { createEngine } from "nmemo-sdk"
 
-const engine = createEngine({ apiKey: process.env.CONTEXT_ENGINE_API_KEY! })
+const engine = createEngine({ apiKey: process.env.NMEMO_API_KEY! })
 const context = await engine.getContext({
   userId,
   workspaceId,
@@ -73,7 +73,7 @@ MVP today: router → RAG retriever → prompt + diagnostics. Full modules: [PRO
 | `apps/dashboard` | `apps/frontend` | API keys, connectors, chat, sources — live |
 | `apps/api` | `apps/api` | `POST /context`, `/ask`, `/ingest`, workspace routes |
 | `apps/worker` | — | Not started |
-| `packages/sdk` | `packages/sdk` | `@contextengine/sdk` — live (workspace) |
+| `packages/sdk` | `packages/sdk` | [`nmemo-sdk`](https://www.npmjs.com/package/nmemo-sdk) — published |
 | `packages/core` | `packages/core` | MVP `getContext` |
 | `packages/rag-retriever` | `packages/rag-retriever` | Live |
 | `packages/db` | `packages/database` | Workspace, ApiKey, Connector |

@@ -16,7 +16,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   createApiKey,
   getWorkspace,
-  listApiKeys,
   revokeApiKey,
   type ApiKeyRow,
 } from "@/lib/api";
@@ -30,10 +29,10 @@ function formatDate(iso: string) {
   });
 }
 
-const sdkSnippet = `import { createEngine } from "@contextengine/sdk"
+const sdkSnippet = `import { createEngine } from "nmemo-sdk"
 
 const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
+  apiKey: process.env.NMEMO_API_KEY!,
 })
 
 const context = await engine.getContext({
@@ -58,9 +57,9 @@ export function KeysView({ preview = false }: { preview?: boolean }) {
 
   useEffect(() => {
     if (preview) return;
-    void Promise.all([listApiKeys(), getWorkspace()])
-      .then(([keysRes, ws]) => {
-        setKeys(keysRes.apiKeys);
+    void getWorkspace()
+      .then((ws) => {
+        setKeys(ws.apiKeys);
         setWorkspaceId(ws.id);
       })
       .catch((err: unknown) =>
@@ -133,7 +132,9 @@ export function KeysView({ preview = false }: { preview?: boolean }) {
       />
 
       {error && !preview ? (
-        <p className="break-words text-sm font-semibold text-red-500">{error}</p>
+        <p className="break-words text-sm font-semibold text-red-500">
+          {error}
+        </p>
       ) : null}
 
       {!preview && loading ? (

@@ -1,30 +1,11 @@
 "use client";
 
-/**
- * The app chrome: an icon rail, a tab row, and the page.
- *
- * There used to be a second 14rem sidebar here listing an Inbox, a catalog of
- * ten sources, a "View" group, and a pipeline roadmap — all of it from the
- * Context Engine era, most of it duplicating /connectors or naming things that
- * do not exist. It is gone. Navigation is now the real routes only, and the
- * dashboard's own sessions rail is the only rail on the dashboard.
- */
+/** The logged-in workspace chrome: one useful sidebar and the current page. */
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import {
-  BookOpen,
-  ChevronDown,
-  KeyRound,
-  LayoutDashboard,
-  ListChecks,
-  Plug,
-  Settings,
-  Terminal,
-  FileText,
-  X,
-} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, X } from "lucide-react";
 
 import { ReactLenis } from "lenis/react";
 
@@ -33,9 +14,23 @@ import {
   SearchTrigger,
   type CommandItem,
 } from "@/components/app/command-search";
+import { LayeredRoleLogo } from "@/components/layered-role-logo";
+import {
+  ConnectorsRoleIcon,
+  DocsRoleIcon,
+  KeysRoleIcon,
+  PlaygroundRoleIcon,
+  SettingsRoleIcon,
+  SourcesRoleIcon,
+} from "@/components/layered-role-icons";
 import { AppShellSkeleton } from "@/components/ui/loading-states";
-import { ConnectorsProvider } from "@/lib/connectors-store";
-import { getWorkspace } from "@/lib/api";
+import { ConnectorsProvider, useConnectors } from "@/lib/connectors-store";
+import {
+  ApiError,
+  prefetchAuthenticatedData,
+  setApiCacheScope,
+  type Workspace,
+} from "@/lib/api";
 import { signOut, useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -46,57 +41,51 @@ import { cn } from "@/lib/utils";
  */
 const nav = [
   {
-    href: "/dashboard",
-    icon: LayoutDashboard,
+    href: "/home",
+    icon: LayeredRoleLogo,
     label: "Dashboard",
-    hint: "Sessions, task, and the context behind it",
+    hint: "Workspace setup and context status",
   },
   {
     href: "/playground",
-    icon: Terminal,
+    icon: PlaygroundRoleIcon,
     label: "Playground",
     hint: "Ask a question and watch context get selected",
   },
   {
     href: "/sources",
-    icon: FileText,
+    icon: SourcesRoleIcon,
     label: "Sources",
     hint: "Documents and workspace knowledge",
   },
   {
     href: "/connectors",
-    icon: Plug,
+    icon: ConnectorsRoleIcon,
     label: "Connectors",
     hint: "Memory, Slack, Notion, GitHub",
   },
   {
     href: "/keys",
-    icon: KeyRound,
+    icon: KeysRoleIcon,
     label: "API keys",
-    hint: "Keys for the SDK and the CLI",
-  },
-  {
-    href: "/home",
-    icon: ListChecks,
-    label: "Setup",
-    hint: "Onboarding checklist for this workspace",
+    hint: "Keys for the SDK and Context API",
   },
   {
     href: "/docs/sdk",
-    icon: BookOpen,
+    icon: DocsRoleIcon,
     label: "Docs",
     hint: "SDK, connectors, and API reference",
   },
   {
     href: "/settings",
-    icon: Settings,
+    icon: SettingsRoleIcon,
     label: "Settings",
     hint: "Workspace, IDs, and account",
   },
 ] as const;
 
 /** Routes that own their own scrolling — the shell must not pad or Lenis them. */
-const FULL_BLEED = ["/dashboard", "/playground"];
+const FULL_BLEED = ["/playground"];
 
 function navActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -110,6 +99,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, isPending } = useSession();
+  const [workspaceReadyFor, setWorkspaceReadyFor] = useState<string | null>(
+    null,
+  );
+  const [workspace, setWorkspace] = useState<Workspace | null>(null);
+  const checkingUser = useRef<string | null>(null);
+
+  const userId = session?.user?.id ?? null;
+  if (userId) setApiCacheScope(userId);
 
   useEffect(() => {
     if (!isPending && !session?.user) {
@@ -118,29 +115,48 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isPending, session, router, pathname]);
 
   useEffect(() => {
-    if (isPending || !session?.user) return;
-    if (pathname === "/create-workspace") return;
+    if (isPending || !userId || checkingUser.current === userId) return;
+
+    checkingUser.current = userId;
+    setWorkspace(null);
 
     let cancelled = false;
-    void getWorkspace()
-      .then(() => {
-        /* workspace exists */
+    void prefetchAuthenticatedData()
+      .then((nextWorkspace) => {
+        if (!cancelled) {
+          setWorkspace(nextWorkspace);
+          setWorkspaceReadyFor(userId);
+        }
       })
-      .catch(() => {
-        if (!cancelled) router.replace("/create-workspace");
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        const missing =
+          (err instanceof ApiError && err.status === 404) ||
+          (err instanceof Error && /no workspace/i.test(err.message));
+        if (missing) {
+          router.replace("/create-workspace");
+          return;
+        }
+
+        // A temporary API failure must not misclassify an existing user as new.
+        // Let the destination render its own useful error state.
+        setWorkspaceReadyFor(userId);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [isPending, session, router, pathname]);
+  }, [isPending, userId, router]);
 
-  if (isPending || !session?.user) {
+  if (isPending || !session?.user || workspaceReadyFor !== session.user.id) {
     return <AppShellSkeleton />;
   }
 
   return (
-    <ConnectorsProvider userId={session.user.id}>
+    <ConnectorsProvider
+      userId={session.user.id}
+      initialConnectors={workspace?.connectors}
+    >
       <AppShellChrome
         userName={session.user.name || "Workspace"}
         pathname={pathname}
@@ -162,6 +178,11 @@ function AppShellChrome({
 }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { connectors } = useConnectors();
+  const connectedTypes = connectors
+    .filter((connector) => connector.status === "connected")
+    .map((connector) => connector.type);
+  const connectedCount = new Set(connectedTypes).size;
 
   useEffect(() => {
     setMenuOpen(false);
@@ -192,40 +213,14 @@ function AppShellChrome({
   const title = pageTitle(pathname);
 
   return (
-    <div className="product-shell fixed inset-0 z-40 flex flex-col overflow-hidden bg-surface text-foreground">
+    <div className="product-shell app-shell-zoom fixed inset-0 z-40 flex flex-col overflow-hidden bg-surface text-foreground">
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* Icon rail. `bg-rail`, not a neutral step — the ramp inverts in dark,
-            the rail doesn't. */}
-        <aside className="hidden w-12 shrink-0 flex-col items-center gap-2 bg-rail py-3 md:flex">
-          {nav.map((item) => {
-            const Icon = item.icon;
-            const active = navActive(pathname, item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "flex size-8 items-center justify-center rounded-sm transition-colors",
-                  active
-                    ? "bg-ink/15 text-ink"
-                    : "text-neutral-400 hover:bg-ink/10 hover:text-ink",
-                )}
-                aria-label={item.label}
-                title={item.label}
-              >
-                <Icon size={16} strokeWidth={1.75} />
-              </Link>
-            );
-          })}
-
-          <button
-            type="button"
-            onClick={() => void signOut()}
-            className="mt-auto w-full border-t border-ink/10 pt-3 text-[0.5625rem] font-semibold uppercase tracking-widest text-neutral-500 transition-colors hover:text-ink"
-          >
-            Out
-          </button>
-        </aside>
+        <WorkspaceSidebar
+          userName={userName}
+          pathname={pathname}
+          connectedTypes={connectedTypes}
+          connectedCount={connectedCount}
+        />
 
         <div className="flex min-w-0 flex-1 flex-col bg-surface">
           {/* Mobile header — tap the title to open the nav drawer */}
@@ -259,29 +254,10 @@ function AppShellChrome({
             </div>
           </div>
 
-          {/* Desktop tabs */}
-          <div className="hidden items-center justify-between gap-2 border-b border-border px-3 py-2 sm:px-4 md:flex">
-            <div className="flex items-center gap-4 overflow-x-auto">
-              {nav.map((item) => {
-                const active = navActive(pathname, item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "shrink-0 pb-2 pt-1 font-heading text-xs font-semibold tracking-[-0.01em] transition-colors",
-                      active
-                        ? "border-b-2 border-foreground text-foreground"
-                        : "text-neutral-500 hover:text-foreground",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
-            <SearchTrigger onClick={() => setSearchOpen(true)} />
-          </div>
+          <WorkspacePageHeader
+            title={title}
+            onSearch={() => setSearchOpen(true)}
+          />
 
           <div className="relative min-h-0 flex-1">
             {fullBleed ? (
@@ -333,7 +309,10 @@ function AppShellChrome({
               </button>
             </div>
 
-            <nav className="min-h-0 flex-1 overflow-auto p-2" data-lenis-prevent>
+            <nav
+              className="min-h-0 flex-1 overflow-auto p-2"
+              data-lenis-prevent
+            >
               <ul className="space-y-0.5">
                 {nav.map((item) => {
                   const Icon = item.icon;
@@ -344,15 +323,10 @@ function AppShellChrome({
                         onClick={() => setMenuOpen(false)}
                         className={cn(
                           "flex items-start gap-2.5 rounded-sm px-2 py-2 text-left hover:bg-foreground/5",
-                          navActive(pathname, item.href) &&
-                            "bg-foreground/10",
+                          navActive(pathname, item.href) && "bg-foreground/10",
                         )}
                       >
-                        <Icon
-                          size={14}
-                          strokeWidth={1.75}
-                          className="mt-0.5 shrink-0 text-neutral-500"
-                        />
+                        <Icon className="mt-0.5 shrink-0 text-neutral-500" />
                         <span className="min-w-0">
                           <span className="block text-xs font-semibold">
                             {item.label}
@@ -390,5 +364,174 @@ function AppShellChrome({
         items={commandItems}
       />
     </div>
+  );
+}
+
+export function WorkspaceSidebar({
+  userName,
+  pathname,
+  connectedTypes,
+  connectedCount,
+  demo = false,
+}: {
+  userName: string;
+  pathname: string;
+  connectedTypes: readonly string[];
+  connectedCount: number;
+  demo?: boolean;
+}) {
+  return (
+    <aside className="hidden w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4 md:flex">
+      <Link href="/settings" className="px-2">
+        <p className="truncate text-[14px] font-semibold tracking-[-0.02em] text-ink/90">
+          {userName}
+        </p>
+        <p className="mt-0.5 text-[11px] font-medium text-ink/35">
+          Workspace &amp; IDs →
+        </p>
+      </Link>
+
+      <SidebarGroup label="Inbox" className="mt-7">
+        <SidebarLink
+          href="/home"
+          label="All sources"
+          pathname={pathname}
+          count={connectedCount || undefined}
+        />
+      </SidebarGroup>
+
+      <SidebarGroup label="Sources" className="mt-6">
+        <SidebarLink
+          href="/sources"
+          label="Documents"
+          pathname={pathname}
+          dot="bg-status-warn"
+        />
+        <SidebarLink
+          href="/connectors"
+          label="Slack"
+          pathname={pathname}
+          dot="bg-status-bad"
+          connected={connectedTypes.includes("slack")}
+        />
+        <SidebarLink
+          href="/connectors"
+          label="Notion"
+          pathname={pathname}
+          dot="bg-status-info"
+          connected={connectedTypes.includes("notion")}
+        />
+        <SidebarLink
+          href="/connectors"
+          label="GitHub"
+          pathname={pathname}
+          dot="bg-status-ok"
+          connected={connectedTypes.includes("github")}
+        />
+        <SidebarLink
+          href="/connectors"
+          label="Memory"
+          pathname={pathname}
+          dot="bg-status-alt"
+          connected={connectedTypes.includes("mem0")}
+        />
+      </SidebarGroup>
+
+      <SidebarGroup label="View" className="mt-6">
+        <SidebarLink
+          href="/playground"
+          label="Playground"
+          pathname={pathname}
+        />
+        <SidebarLink href="/keys" label="Keys" pathname={pathname} />
+        <SidebarLink href="/docs/sdk" label="Docs" pathname={pathname} />
+      </SidebarGroup>
+
+      <div className="mt-auto space-y-1 border-t border-ink/[0.07] pt-3">
+        <SidebarLink href="/settings" label="Settings" pathname={pathname} />
+        <button
+          type="button"
+          onClick={() => {
+            if (!demo) void signOut();
+          }}
+          className="w-full rounded-md px-2 py-1.5 text-left text-[12px] font-medium text-ink/35 transition-colors hover:bg-ink/[0.04] hover:text-ink/70"
+        >
+          Sign out
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+export function WorkspacePageHeader({
+  title,
+  onSearch,
+}: {
+  title: string;
+  onSearch?: () => void;
+}) {
+  return (
+    <div className="hidden h-12 items-center justify-between gap-2 border-b border-border px-5 md:flex">
+      <p className="text-[13px] font-semibold tracking-[-0.015em] text-ink/80">
+        {title}
+      </p>
+      <SearchTrigger onClick={onSearch ?? (() => undefined)} />
+    </div>
+  );
+}
+
+function SidebarGroup({
+  label,
+  className,
+  children,
+}: {
+  label: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={className}>
+      <p className="px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink/25">
+        {label}
+      </p>
+      <div className="mt-2 space-y-0.5">{children}</div>
+    </section>
+  );
+}
+
+function SidebarLink({
+  href,
+  label,
+  pathname,
+  count,
+  dot,
+  connected,
+}: {
+  href: string;
+  label: string;
+  pathname: string;
+  count?: number;
+  dot?: string;
+  connected?: boolean;
+}) {
+  const active = !dot && navActive(pathname, href);
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-[12px] font-medium transition-colors",
+        active
+          ? "bg-ink/[0.07] text-ink/90"
+          : "text-ink/50 hover:bg-ink/[0.04] hover:text-ink/80",
+      )}
+    >
+      {dot ? <span className={cn("size-1.5 rounded-full", dot)} /> : null}
+      <span>{label}</span>
+      {typeof count === "number" ? (
+        <span className="ml-auto text-[11px] text-ink/30">{count}</span>
+      ) : connected ? (
+        <span className="ml-auto text-[10px] text-status-ok/70">on</span>
+      ) : null}
+    </Link>
   );
 }

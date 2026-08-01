@@ -2,13 +2,19 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { VECTOR_SIZE } from "./embed.js";
 
 export const COLLECTION = process.env.QDRANT_COLLECTION ?? "documents";
+const configuredTimeout = Number(process.env.QDRANT_TIMEOUT_MS ?? 5000);
 
 export const qdrant = new QdrantClient({
   url: process.env.QDRANT_URL ?? "http://localhost:6333",
+  // The client defaults to five minutes. A missing vector service should fail
+  // quickly enough for the UI to show a useful source error instead of a
+  // seemingly endless page loader.
+  timeout:
+    Number.isFinite(configuredTimeout) && configuredTimeout > 0
+      ? configuredTimeout
+      : 5000,
   checkCompatibility: false,
-  ...(process.env.QDRANT_API_KEY
-    ? { apiKey: process.env.QDRANT_API_KEY }
-    : {}),
+  ...(process.env.QDRANT_API_KEY ? { apiKey: process.env.QDRANT_API_KEY } : {}),
 });
 
 function qdrantUnreachableMessage(err: unknown) {

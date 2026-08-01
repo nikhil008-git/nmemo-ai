@@ -1,6 +1,6 @@
 # Context Engine API
 
-Express backend for dashboard + `@contextengine/sdk`.
+Express backend for dashboard + `nmemo-sdk`.
 
 ## Docs
 

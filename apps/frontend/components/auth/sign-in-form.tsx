@@ -9,10 +9,11 @@ import { cn } from "@/lib/utils";
 
 function safeNext(raw: string | null) {
   if (!raw || !raw.startsWith("/") || raw.startsWith("//")) {
-    return "/create-workspace";
+    return "/home";
   }
-  // New sign-ins land on workspace naming first (skips /home flash).
-  if (raw === "/" || raw === "/home") return "/create-workspace";
+  // The authenticated shell checks workspace membership once. Returning users
+  // stay on their destination; only brand-new users see workspace setup.
+  if (raw === "/") return "/home";
   return raw;
 }
 

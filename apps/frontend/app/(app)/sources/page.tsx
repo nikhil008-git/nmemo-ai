@@ -34,11 +34,11 @@ export default function SourcesPage() {
   const [deletingSource, setDeletingSource] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (fresh = true) => {
     setLoading(true);
     setError(null);
     try {
-      const { documents } = await listDocuments();
+      const { documents } = await listDocuments({ fresh });
       setDocs(documents);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load documents");
@@ -48,7 +48,7 @@ export default function SourcesPage() {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    void refresh(false);
   }, [refresh]);
 
   const filtered = useMemo(() => {
@@ -56,8 +56,7 @@ export default function SourcesPage() {
     if (!q) return docs;
     return docs.filter(
       (d) =>
-        d.title.toLowerCase().includes(q) ||
-        d.source.toLowerCase().includes(q),
+        d.title.toLowerCase().includes(q) || d.source.toLowerCase().includes(q),
     );
   }, [docs, filter]);
 
@@ -104,8 +103,7 @@ export default function SourcesPage() {
           ),
         );
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : "Ingest failed";
+        const message = err instanceof Error ? err.message : "Ingest failed";
         setError(message);
         setDocs((prev) =>
           prev.map((d) =>
@@ -117,7 +115,7 @@ export default function SourcesPage() {
       }
     }
 
-    void refresh();
+    void refresh(true);
   }
 
   async function removeDocument(doc: IngestedDocument) {
@@ -165,7 +163,9 @@ export default function SourcesPage() {
       />
 
       {error && (
-        <p className="break-words text-sm font-semibold text-red-500">{error}</p>
+        <p className="break-words text-sm font-semibold text-red-500">
+          {error}
+        </p>
       )}
 
       <section
@@ -230,7 +230,7 @@ export default function SourcesPage() {
             ) : null}
             <button
               type="button"
-              onClick={() => void refresh()}
+              onClick={() => void refresh(true)}
               disabled={loading}
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-500 underline-offset-4 hover:text-foreground hover:underline disabled:opacity-50"
             >

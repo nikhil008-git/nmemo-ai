@@ -1,11 +1,13 @@
-# `@contextengine/sdk`
+# `nmemo-sdk`
 
 Official client for **nmemo** (Context Engine). Call `getContext()` from any agent or app — route, rank, and budget multi-source context in one request.
+
+[View `nmemo-sdk` on npm](https://www.npmjs.com/package/nmemo-sdk)
 
 ## Install
 
 ```bash
-npm install @contextengine/sdk
+npm install nmemo-sdk
 ```
 
 ## Quick start
@@ -15,7 +17,7 @@ npm install @contextengine/sdk
 3. Call the SDK:
 
 ```ts
-import { createEngine } from "@contextengine/sdk";
+import { createEngine } from "nmemo-sdk";
 
 const engine = createEngine({
   apiKey: process.env.NMEMO_API_KEY!,

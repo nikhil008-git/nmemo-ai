@@ -100,4 +100,4 @@ Single index for specs, SDK, API, and dashboard docs.
 
 **Documented & live (MVP):** SDK, `/context`, RAG ingest/ask, connectors (Qdrant), API keys, dashboard pages.
 
-**Spec only (not built):** ranking/dedup/conflict packages, OAuth connectors, mem0, worker, npm publish — see [PROJECT_SPEC.md](./PROJECT_SPEC.md).
+**Spec only (not built):** ranking/dedup/conflict packages and the worker runtime — see [PROJECT_SPEC.md](./PROJECT_SPEC.md).

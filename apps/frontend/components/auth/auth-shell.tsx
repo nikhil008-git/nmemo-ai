@@ -1,8 +1,18 @@
 import Link from "next/link";
 
-import { ResumePacketPanel } from "@/components/landing/mockups";
-import { WallpaperPlate } from "@/components/landing/wallpaper";
+import {
+  WorkspacePageHeader,
+  WorkspaceSidebar,
+} from "@/components/app/app-shell";
+import { HomeDashboard } from "@/components/app/home-dashboard";
 import { Logo } from "@/components/logo";
+
+const previewSources = [
+  { type: "documents" },
+  { type: "slack" },
+  { type: "notion" },
+  { type: "github" },
+] as const;
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
   return (
@@ -26,21 +36,31 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         </p>
       </div>
 
-      {/*
-        Product half. The same wallpaper the landing mockups sit on, carrying the
-        one artefact that explains nmemo at a glance: the resume packet.
-      */}
-      <div className="dark-island relative hidden min-h-screen w-1/2 border-l border-border lg:block">
-        <WallpaperPlate>
-          <div className="flex h-full w-full flex-col items-center justify-center gap-6 px-10 xl:px-16">
-            <ResumePacketPanel className="max-w-[26rem]" />
-            <p className="max-w-[26rem] text-[13px] leading-relaxed text-ink/40">
-              Pick an unfinished task back up in any coding agent — decisions,
-              dead ends, and the next step already verified against the
-              repository.
-            </p>
+      {/* Product half: the real workspace, oversized and clipped like a crop. */}
+      <div className="auth-light-preview relative hidden min-h-screen w-1/2 overflow-hidden border-l border-border bg-[#f4f5f6] lg:block">
+        <div className="pointer-events-none absolute left-[12%] top-[17%] h-[89%] w-[132%] select-none overflow-hidden rounded-[18px] border border-ink/10 bg-surface shadow-[0_28px_80px_-30px_rgba(15,23,42,0.3)]">
+          <div className="product-shell auth-light-preview flex h-full w-full bg-surface text-foreground">
+            <WorkspaceSidebar
+              userName="Nikhil Rajpurohit"
+              pathname="/home"
+              connectedTypes={previewSources.map((source) => source.type)}
+              connectedCount={previewSources.length}
+              demo
+            />
+
+            <div className="flex min-w-0 flex-1 flex-col bg-surface">
+              <WorkspacePageHeader title="Dashboard" />
+              <div className="relative min-h-0 flex-1 overflow-hidden bg-transparent p-6">
+                <HomeDashboard
+                  userName="Nikhil Rajpurohit"
+                  connectedSources={previewSources}
+                />
+              </div>
+            </div>
           </div>
-        </WallpaperPlate>
+        </div>
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#f4f5f6] via-[#f4f5f6]/85 to-transparent" />
       </div>
     </main>
   );

@@ -23,7 +23,6 @@ import { cn } from "@/lib/utils";
  * ------------------------------------------------------------------------- */
 
 const docsNav = [
-  { href: "/docs", label: "Overview", match: (p: string) => p === "/docs" },
   {
     href: "/docs/sdk",
     label: "SDK",
@@ -380,10 +379,7 @@ export function DocLinkList({
     <ol className="grid gap-x-12 gap-y-10 sm:grid-cols-3">
       {items.map((item) => (
         <li key={item.href}>
-          <Link
-            href={item.href}
-            className="group block h-full"
-          >
+          <Link href={item.href} className="group block h-full">
             {item.step ? (
               <p className="mono text-[13px] text-ink/30">{item.step}</p>
             ) : null}

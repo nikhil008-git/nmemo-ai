@@ -12,10 +12,10 @@ import {
   DocTable,
 } from "@/components/docs/docs-shell";
 
-const CORE_PATTERN = `import { createEngine } from "@contextengine/sdk"
+const CORE_PATTERN = `import { createEngine } from "nmemo-sdk"
 
 const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
+  apiKey: process.env.NMEMO_API_KEY!,
 })
 
 // 1. Get context for this turn
@@ -72,18 +72,41 @@ const RETURN_SHAPE = `type GetContextResult = {
 export default function DocsSdkPage() {
   return (
     <DocsShell
-      title="We give context. Your agent does the rest."
-      subtitle="nmemo decides what the agent should know for this turn. You pass that context into whatever agent or model you already run."
+      title="One context call. Any agent stack."
+      subtitle="Install nmemo-sdk, retrieve a grounded context package, and pass it to the model or framework you already use."
     >
       <DocCtas
         primary={{ href: "/sign-in", label: "Get an API key" }}
-        secondary={{ href: "/docs/playground", label: "Try playground" }}
+        secondary={{
+          href: "https://www.npmjs.com/package/nmemo-sdk",
+          label: "View on npm",
+        }}
       />
 
-      <DocSection
-        title="The idea"
-        muted="Context in. Agent out."
-      >
+      <DocSection title="Install" muted="Published publicly as nmemo-sdk.">
+        <DocCode caption="npm">{`npm install nmemo-sdk`}</DocCode>
+        <DocCode caption="createEngine">{`import { createEngine } from "nmemo-sdk"
+
+const engine = createEngine({
+  apiKey: process.env.NMEMO_API_KEY!,
+  // baseUrl defaults to https://api.nmemo.cloud
+})`}</DocCode>
+        <DocP>
+          Create the engine once on your server and reuse it for every turn.
+          Keep the API key out of browser code. Current release: {" "}
+          <a
+            href="https://www.npmjs.com/package/nmemo-sdk"
+            target="_blank"
+            rel="noreferrer"
+            className="text-foreground underline underline-offset-4"
+          >
+            nmemo-sdk@0.1.0
+          </a>
+          .
+        </DocP>
+      </DocSection>
+
+      <DocSection title="The idea" muted="Context in. Agent out.">
         <DocP>
           Your agent already knows how to talk, use tools, and call a model.
           What it usually lacks is the right context for this user, this
@@ -91,15 +114,12 @@ export default function DocsSdkPage() {
         </DocP>
         <DocP>
           That is what nmemo provides. One call returns a ready prompt, the
-          context your agent should see, plus citations you can show next to
-          the answer.
+          context your agent should see, plus citations you can show next to the
+          answer.
         </DocP>
       </DocSection>
 
-      <DocSection
-        title="The flow"
-        muted="General pattern for every turn."
-      >
+      <DocSection title="The flow" muted="General pattern for every turn.">
         <DocFlow
           steps={[
             {
@@ -126,10 +146,7 @@ export default function DocsSdkPage() {
         />
       </DocSection>
 
-      <DocSection
-        title="Core pattern"
-        muted="Framework-agnostic on purpose."
-      >
+      <DocSection title="Core pattern" muted="Framework-agnostic on purpose.">
         <DocCode caption="Give context to the agent">{CORE_PATTERN}</DocCode>
         <DocP>
           <code className="text-foreground">yourAgent.run</code> is a stand-in.
@@ -180,44 +197,33 @@ export default function DocsSdkPage() {
         />
       </DocSection>
 
-      <DocSection title="Install">
-        <DocCode caption="npm">{`npm install @contextengine/sdk`}</DocCode>
-        <DocCode caption="createEngine">{`import { createEngine } from "@contextengine/sdk"
-
-const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
-})`}</DocCode>
-        <DocP>
-          Create the engine once. Reuse it on every turn. Keep the API key on
-          the server.
-        </DocP>
-      </DocSection>
-
-      <DocSection
-        title="getContext"
-        muted="IDs you pass every turn."
-      >
+      <DocSection title="getContext" muted="IDs you pass every turn.">
         <DocTable
           rows={[
             {
               label: "query",
-              value: "What the user said this turn, the question the agent must answer.",
+              value:
+                "What the user said this turn, the question the agent must answer.",
             },
             {
               label: "userId",
-              value: "Who is asking in your product. Scopes personal memory, use your app’s user id.",
+              value:
+                "Who is asking in your product. Scopes personal memory, use your app’s user id.",
             },
             {
               label: "workspaceId",
-              value: "Which workspace’s sources to use. Copy it from Settings or Keys in the dashboard.",
+              value:
+                "Which workspace’s sources to use. Copy it from Settings or Keys in the dashboard.",
             },
             {
               label: "conversationId",
-              value: "Optional. One id per chat/thread/call so turns stay linked.",
+              value:
+                "Optional. One id per chat/thread/call so turns stay linked.",
             },
             {
               label: "agent",
-              value: "Optional. Name of the agent asking, useful when many agents share a workspace.",
+              value:
+                "Optional. Name of the agent asking, useful when many agents share a workspace.",
             },
           ]}
         />
@@ -232,7 +238,8 @@ const engine = createEngine({
           rows={[
             {
               label: "prompt",
-              value: "Context for the agent, pass this as instructions / system.",
+              value:
+                "Context for the agent, pass this as instructions / system.",
             },
             {
               label: "citations",
@@ -240,11 +247,13 @@ const engine = createEngine({
             },
             {
               label: "memories / documents",
-              value: "Structured hits if you want to render or debug them yourself.",
+              value:
+                "Structured hits if you want to render or debug them yourself.",
             },
             {
               label: "sources",
-              value: "Which connected sources were queried and how they performed.",
+              value:
+                "Which connected sources were queried and how they performed.",
             },
             {
               label: "tokenUsage",
@@ -252,7 +261,8 @@ const engine = createEngine({
             },
             {
               label: "diagnostics",
-              value: "Why things were kept or dropped, for you while building, not end users.",
+              value:
+                "Why things were kept or dropped, for you while building, not end users.",
             },
           ]}
         />
@@ -322,14 +332,7 @@ const engine = createEngine({
           </Link>
           , then wire the same{" "}
           <code className="text-foreground">context.prompt</code> into your
-          agent. Or start from the{" "}
-          <Link
-            href="/docs"
-            className="text-foreground underline underline-offset-4"
-          >
-            docs overview
-          </Link>
-          .
+          agent.
         </DocP>
       </DocSection>
     </DocsShell>

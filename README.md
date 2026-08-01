@@ -3,10 +3,10 @@
 A multi-source context orchestration engine for AI agents. Every serious AI application eventually connects to multiple context sources — memory, documents, CRM, Slack, Notion, GitHub, SQL databases, APIs. This engine replaces custom glue code per product with one call:
 
 ```ts
-import { createEngine } from "@contextengine/sdk"
+import { createEngine } from "nmemo-sdk"
 
 const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
+  apiKey: process.env.NMEMO_API_KEY!,
   baseUrl: "http://localhost:8080",
 })
 
@@ -33,7 +33,7 @@ const context = await engine.getContext({
 | Embeddings | Voyage |
 | LLM | Groq (OpenAI-compatible) |
 | Structured data | Prisma + PostgreSQL |
-| Engine | `@contextengine/core` + `@contextengine/sdk` |
+| Engine | `@contextengine/core` + `nmemo-sdk` |
 
 ---
 
@@ -51,7 +51,7 @@ const context = await engine.getContext({
 
 **Live docs on site:** `/docs`, `/docs/sdk`, `/docs/connectors`, `/docs/api`
 
-**Deferred:** full ranking/dedup/conflict packages, worker, npm publish.
+**Deferred:** full ranking/dedup/conflict packages and the worker runtime.
 
 ---
 
@@ -71,7 +71,7 @@ npm run dev    # frontend :3000 + api :8080
 ```bash
 # Example SDK usage (from any Node script in the monorepo)
 node --input-type=module -e "
-import { createEngine } from '@contextengine/sdk'
+import { createEngine } from 'nmemo-sdk'
 const engine = createEngine({ apiKey: 'ce_live_...', baseUrl: 'http://localhost:8080' })
 console.log(await engine.getContext({ query: 'hello', userId: 'u1', workspaceId: 'ws1' }))
 "
@@ -86,7 +86,7 @@ API key auth scopes the workspace from the key; `workspaceId` in the body is opt
 | File | Purpose |
 |------|---------|
 | **[DOCS_MAP.md](./docs/context-engine/DOCS_MAP.md)** | **Where every doc lives (start here)** |
-| [SDK.md](./docs/context-engine/SDK.md) | `@contextengine/sdk` guide |
+| [SDK.md](./docs/context-engine/SDK.md) | `nmemo-sdk` guide |
 | [packages/sdk/README.md](./packages/sdk/README.md) | SDK package README |
 | [API.md](./docs/context-engine/API.md) | HTTP API reference |
 | [PROJECT_SPEC.md](./docs/context-engine/PROJECT_SPEC.md) | Canonical full product spec |

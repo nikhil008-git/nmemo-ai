@@ -1,5 +1,5 @@
 {
-  "name": "@contextengine/sdk",
+  "name": "nmemo-sdk",
   "version": "0.1.0",
   "type": "module",
   "description": "nmemo Context Engine SDK — getContext across memory, docs, and connectors",

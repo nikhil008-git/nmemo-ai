@@ -1,23 +1,14 @@
 import type { Metadata } from "next";
-import { Geist_Mono, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
-/** The one face — headings, body, UI chrome. */
+/** Inter is the single UI voice across headings, body, and chrome. */
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
-});
-
-/**
- * Not a second voice — only literals wear it: repo paths, CLI flags, tool
- * calls, scores. Everything that reads as language stays Inter.
- */
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -105,7 +96,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${geistMono.variable} h-full antialiased bg-background text-foreground`}
+      className={`${inter.variable} h-full antialiased bg-background text-foreground`}
     >
       <head>
         <script

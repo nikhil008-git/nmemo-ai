@@ -17,7 +17,7 @@
 - `engine.getContext()` multi-source pipeline
 - Connector OAuth
 - Prisma Workspace / API keys / usage metering
-- Published `@contextengine/sdk`
+- Published `nmemo-sdk`
 
 ## Related
 

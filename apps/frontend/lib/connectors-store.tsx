@@ -10,11 +10,7 @@ import {
   useState,
 } from "react";
 
-import {
-  getConnectors,
-  updateConnector,
-  type Connector,
-} from "@/lib/api";
+import { getConnectors, updateConnector, type Connector } from "@/lib/api";
 
 const CACHE_KEY = "nmemo:connectors-v1";
 const CACHE_TTL_MS = 5 * 60_000;
@@ -69,18 +65,20 @@ function writeCache(userId: string, connectors: Connector[]) {
 
 export function ConnectorsProvider({
   userId,
+  initialConnectors,
   children,
 }: {
   userId: string;
+  initialConnectors?: Connector[];
   children: React.ReactNode;
 }) {
   const [connectors, setConnectors] = useState<Connector[]>(() => {
     if (typeof window === "undefined") return [];
-    return readCache(userId) ?? [];
+    return readCache(userId) ?? initialConnectors ?? [];
   });
   const [loading, setLoading] = useState(() => {
     if (typeof window === "undefined") return true;
-    return !readCache(userId);
+    return !readCache(userId) && !initialConnectors;
   });
   const [error, setError] = useState<string | null>(null);
   const inflight = useRef<Promise<Connector[]> | null>(null);
@@ -94,7 +92,10 @@ export function ConnectorsProvider({
 
   const upsert = useCallback((connector: Connector) => {
     setConnectors((prev) => {
-      const next = [...prev.filter((c) => c.type !== connector.type), connector];
+      const next = [
+        ...prev.filter((c) => c.type !== connector.type),
+        connector,
+      ];
       writeCache(userIdRef.current, next);
       return next;
     });
@@ -140,17 +141,18 @@ export function ConnectorsProvider({
   );
 
   useEffect(() => {
-    const cached = readCache(userId);
-    if (cached) {
-      setConnectors(cached);
+    const seeded = readCache(userId) ?? initialConnectors;
+    if (seeded) {
+      setAll(seeded);
       setLoading(false);
-    } else {
-      setLoading(true);
+      return;
     }
+
+    setLoading(true);
     void refresh().catch(() => {
       /* error already stored */
     });
-  }, [userId, refresh]);
+  }, [userId, initialConnectors, refresh, setAll]);
 
   const value = useMemo(
     () => ({

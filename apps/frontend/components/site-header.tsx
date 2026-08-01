@@ -12,13 +12,7 @@ import { useSession } from "@/lib/auth-client";
 import { REPO_URL } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-/** Anchors on the landing page, in the order the page argues them. */
-const marketingNav = [
-  { href: "/#memory", label: "Memory" },
-  { href: "/#receipts", label: "Receipts" },
-  { href: "/#resume", label: "Resume" },
-  { href: "/docs", label: "Docs" },
-] as const;
+const marketingNav = [{ href: "/docs/sdk", label: "Docs" }] as const;
 
 export function SiteHeader() {
   const { data: session, isPending } = useSession();
@@ -71,7 +65,7 @@ export function SiteHeader() {
               // One pill resolves here either way, so the placeholder is one pill.
               <Skeleton className="h-8 w-24 rounded-full" aria-hidden />
             ) : loggedIn ? (
-              <CtaButton href="/dashboard" size="compact">
+              <CtaButton href="/home" size="compact">
                 Open the workspace
               </CtaButton>
             ) : (

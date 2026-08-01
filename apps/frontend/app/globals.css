@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 /*
- * Two themes, one system. The canvas is a warm near-black (dusk) or a warm
- * paper (day), and everything above it is *ink* at an opacity — `--ink` is
- * white on dusk and near-black on paper, so a single `text-ink/45` reads
+ * Two themes, one system. The canvas is a near-black dusk or clean white,
+ * and everything above it is *ink* at an opacity — `--ink` is white on dusk
+ * and near-black on white, so a single `text-ink/45` reads
  * correctly in both. Call sites never name a literal colour.
  *
  * `:root` carries dusk; `[data-theme="light"]` overrides only what changes.
@@ -81,12 +81,13 @@
   --focus-ring: rgba(255, 255, 255, 0.55);
 
   /* One face for every word on the site. */
-  --font-body: var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system,
+  --font-body:
+    var(--font-inter), Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display-stack: var(--font-body);
   /* Reserved for literals — paths, flags, commands, scores. */
-  --font-mono-stack: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo,
-    monospace;
+  --font-mono-stack:
+    var(--font-inter), Inter, ui-sans-serif, system-ui, sans-serif;
 
   /*
    * Warm-neutral ramp, inverted for the dark canvas: `neutral-400` is dimmer
@@ -107,53 +108,41 @@
 }
 
 /*
- * Day. Same warmth, inverted: paper instead of dusk, ink instead of white.
+ * Light mode: neutral white, cool gray surfaces, and black ink.
  * Only the values that actually change are listed — the font stacks, the
  * accent, and the display scale are shared with the dark theme above.
  */
 :root[data-theme="light"] {
-  --ink: #17130f;
-
-  /*
-   * Cream, not white. A near-white canvas reads as "unstyled page" and leaves
-   * white cards with nothing to lift off of; pulling the paper down into warm
-   * cream gives the surfaces somewhere to sit and matches the dusk canvas's
-   * warmth rather than fighting it.
-   */
-  --background: #f7f2e8;
-  --background-soft: #f2ece0;
-  --background-cool: #f3eee4;
-  --background-warm: #f5efe3;
-  --foreground: #17130f;
-  --muted-foreground: #6b645d;
-  --border: rgba(23, 19, 15, 0.1);
-  --input: rgba(23, 19, 15, 0.03);
-  --primary: #17130f;
-  --primary-foreground: #fffcf6;
-  --secondary: #17130f;
-  --secondary-foreground: #fffcf6;
-  /*
-   * Cards lift *up* off the paper — a warm white, where dusk cards lift up
-   * into grey. It stays a shade above `--background`, never equal to it.
-   */
-  --surface: #fffcf6;
-  --surface-soft: #f4eee3;
-  --surface-raised: #fffcf6;
-  --panel: #f2ece0;
-  --rail: #ede6d8;
-  --grid-line: rgba(23, 19, 15, 0.05);
+  --ink: #111111;
+  --background: #ffffff;
+  --background-soft: #fafafa;
+  --background-cool: #f8f9fa;
+  --background-warm: #fafafa;
+  --foreground: #111111;
+  --muted-foreground: #6b6f76;
+  --border: rgba(17, 17, 17, 0.09);
+  --input: rgba(17, 17, 17, 0.03);
+  --primary: #111111;
+  --primary-foreground: #ffffff;
+  --secondary: #111111;
+  --secondary-foreground: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  --surface-raised: #ffffff;
+  --panel: #f5f5f5;
+  --rail: #f6f6f6;
+  --grid-line: rgba(17, 17, 17, 0.05);
   /*
    * Code stays dusk in both themes. A terminal product shows a terminal, and
    * the reference docs set code as a dark plate on paper — see `.dark-island`,
    * which every code panel wears so its contents keep dark-theme ink.
    */
-  --code-bg: #16130f;
+  --code-bg: #111111;
   --code-fg: #ededed;
-  --rail-deep: #e7dfd0;
-  --plate: #fffcf6;
-  /* Amber has to work against paper too — drop the value, keep the hue. */
-  --accent: #b3702a;
-  --stage-glow: rgba(179, 112, 42, 0.16);
+  --rail-deep: #eeeeef;
+  --plate: #ffffff;
+  --accent: #525252;
+  --stage-glow: rgba(17, 17, 17, 0.08);
 
   /*
    * The status hues, darkened for paper. Call sites use them at 70–80% alpha,
@@ -165,35 +154,29 @@
   --status-info: #0b5b85;
   --status-alt: #4c3a9e;
 
-  /* Paper casts a soft warm shadow, never a black one. */
-  --bezel-shadow: 0 30px 90px -40px rgba(23, 19, 15, 0.28);
-  --panel-shadow: 0 18px 50px -24px rgba(23, 19, 15, 0.22);
+  --bezel-shadow: 0 30px 90px -40px rgba(17, 17, 17, 0.2);
+  --panel-shadow: 0 18px 50px -24px rgba(17, 17, 17, 0.18);
 
-  --cta-primary-bg: #17130f;
-  --cta-primary-fg: #fffcf6;
-  /*
-   * On paper the primary pill is ink, so hover has to *lift the ink*, not fade
-   * to white — fading to white left a near-white label on a near-white pill.
-   */
-  --cta-primary-hover: #332d27;
-  --cta-secondary-bg: rgba(23, 19, 15, 0.03);
-  --cta-secondary-fg: #17130f;
-  --cta-secondary-border: rgba(23, 19, 15, 0.14);
-  --cta-outline-hover: rgba(23, 19, 15, 0.06);
-  --focus-ring: rgba(23, 19, 15, 0.45);
+  --cta-primary-bg: #111111;
+  --cta-primary-fg: #ffffff;
+  --cta-primary-hover: #2b2b2b;
+  --cta-secondary-bg: rgba(17, 17, 17, 0.02);
+  --cta-secondary-fg: #111111;
+  --cta-secondary-border: rgba(17, 17, 17, 0.12);
+  --cta-outline-hover: rgba(17, 17, 17, 0.05);
+  --focus-ring: rgba(17, 17, 17, 0.42);
 
-  /* The warm ramp, right way up: 50 lightest, 950 darkest. */
-  --color-neutral-50: #f7f2e8;
-  --color-neutral-100: #f2ece0;
-  --color-neutral-200: #e7dfd0;
-  --color-neutral-300: #d6ccba;
-  --color-neutral-400: #918a81;
-  --color-neutral-500: #6b645d;
-  --color-neutral-600: #565049;
-  --color-neutral-700: #423d37;
-  --color-neutral-800: #2f2b26;
-  --color-neutral-900: #201c18;
-  --color-neutral-950: #17130f;
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f4f4f5;
+  --color-neutral-200: #e4e4e7;
+  --color-neutral-300: #d4d4d8;
+  --color-neutral-400: #a1a1aa;
+  --color-neutral-500: #71717a;
+  --color-neutral-600: #52525b;
+  --color-neutral-700: #3f3f46;
+  --color-neutral-800: #27272a;
+  --color-neutral-900: #18181b;
+  --color-neutral-950: #09090b;
 }
 
 /*
@@ -254,17 +237,96 @@
   --input: rgba(255, 255, 255, 0.03);
 }
 
-/* On paper the shell inverts the same way: a hair *under* the page, not over. */
+/* Keep the logged-in workspace comfortably readable on desktop displays. */
+@media (min-width: 768px) {
+  .app-shell-zoom {
+    width: 92.5926%;
+    height: 92.5926%;
+    transform: scale(1.08);
+    transform-origin: top left;
+  }
+}
+
+/* Render a desktop-sized workspace canvas, then scale it into the landing plate. */
+.landing-demo-shell {
+  top: 3.5%;
+  left: 3.5%;
+  width: 93%;
+  height: 93%;
+}
+
+@media (min-width: 640px) {
+  .landing-demo-shell {
+    width: 116.25%;
+    height: 116.25%;
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+}
+
+/* Fit a real desktop workspace inside the smaller landing showcase window. */
+.landing-home-demo-canvas {
+  width: 175.4386%;
+  height: 175.4386%;
+  transform: scale(0.57);
+  transform-origin: top left;
+}
+
+/* The light product shell stays neutral and slightly separated from the page. */
 :root[data-theme="light"] .product-shell {
-  --surface: #fffcf6;
-  --surface-soft: #f4efe4;
-  --surface-raised: #fffcf6;
-  --panel: #f2ece0;
-  --rail: #ede6d8;
-  --foreground: #17130f;
-  --muted-foreground: #6b645d;
-  --border: rgba(23, 19, 15, 0.09);
-  --input: rgba(23, 19, 15, 0.03);
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  --surface-raised: #ffffff;
+  --panel: #f5f5f5;
+  --rail: #f6f6f6;
+  --rail-deep: #eeeeef;
+  --foreground: #111111;
+  --muted-foreground: #6b6f76;
+  --border: rgba(17, 17, 17, 0.09);
+  --input: rgba(17, 17, 17, 0.03);
+}
+
+/* A deliberately neutral product crop for auth — white, cool, and theme-proof. */
+.auth-light-preview,
+.product-shell.auth-light-preview {
+  --ink: #111111;
+  --background: #f4f5f6;
+  --background-soft: #f7f7f8;
+  --foreground: #111111;
+  --muted-foreground: #686b70;
+  --border: rgba(17, 17, 17, 0.1);
+  --input: rgba(17, 17, 17, 0.03);
+  --primary: #111111;
+  --primary-foreground: #ffffff;
+  --secondary: #111111;
+  --secondary-foreground: #ffffff;
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  --surface-raised: #ffffff;
+  --panel: #f5f5f5;
+  --rail: #f3f4f5;
+  --rail-deep: #eeeeef;
+  --plate: #ffffff;
+  --grid-line: rgba(17, 17, 17, 0.05);
+  --cta-primary-bg: #111111;
+  --cta-primary-fg: #ffffff;
+  --cta-primary-hover: #2b2b2b;
+  --cta-secondary-bg: transparent;
+  --cta-secondary-fg: #111111;
+  --cta-secondary-border: rgba(17, 17, 17, 0.12);
+  --cta-outline-hover: rgba(17, 17, 17, 0.05);
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f4f4f5;
+  --color-neutral-200: #e4e4e7;
+  --color-neutral-300: #d4d4d8;
+  --color-neutral-400: #a1a1aa;
+  --color-neutral-500: #71717a;
+  --color-neutral-600: #52525b;
+  --color-neutral-700: #3f3f46;
+  --color-neutral-800: #27272a;
+  --color-neutral-900: #18181b;
+  --color-neutral-950: #09090b;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -468,7 +530,6 @@
     align-items: center;
     gap: 0.5rem;
   }
-
 }
 
 @keyframes landing-how-bar {

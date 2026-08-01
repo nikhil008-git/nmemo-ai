@@ -1,4 +1,4 @@
-# SDK guide — `@contextengine/sdk`
+# SDK guide — `nmemo-sdk`
 
 Primary developer surface for Context Engine.
 
@@ -12,14 +12,18 @@ Primary developer surface for Context Engine.
 | Shared types | [`packages/retriever-interface`](../../packages/retriever-interface) |
 | Engine (server-side) | [`packages/core`](../../packages/core) |
 | HTTP API | [`apps/api`](../../apps/api) — `POST /context` |
-| Create keys | Dashboard → [Settings](../../apps/frontend/docs/pages/settings.md) |
+| Create keys | Dashboard → [Keys](../../apps/frontend/docs/pages/keys.md) |
 
 ## Install
 
-Workspace package (not on npm yet):
+Published publicly on npm:
+
+```bash
+npm install nmemo-sdk
+```
 
 ```ts
-import { createEngine } from "@contextengine/sdk"
+import { createEngine } from "nmemo-sdk"
 ```
 
 ## End-to-end flow (SaaS user)
@@ -29,7 +33,7 @@ Sign up → Connectors (click Connect for Slack/GitHub/Notion, paste mem0 key)
        ↓
 Sources → upload PDFs
        ↓
-Settings → create API key
+Keys → create API key
        ↓
 createEngine({ apiKey }).getContext({ query, userId, workspaceId })
        ↓
@@ -43,10 +47,10 @@ Users never set `GITHUB_CLIENT_*` etc. Those are platform secrets for the SaaS d
 ## Usage
 
 ```ts
-import { createEngine } from "@contextengine/sdk"
+import { createEngine } from "nmemo-sdk"
 
 const engine = createEngine({
-  apiKey: process.env.CONTEXT_ENGINE_API_KEY!,
+  apiKey: process.env.NMEMO_API_KEY!,
 })
 
 const context = await engine.getContext({
@@ -72,17 +76,17 @@ console.log(context.diagnostics)
 await engine.getContextFast({ query, userId, workspaceId })
 ```
 
-MVP: same RAG path as `getContext`. Later: memory + cache only (sub-300ms).
+Use this endpoint for latency-sensitive turns such as voice or live assistance.
 
 ## Auth
 
 - Header: `Authorization: Bearer <apiKey>`
-- Keys created in dashboard **Settings** (`POST /workspaces/api-keys`)
+- Keys created in dashboard **Keys** (`POST /workspaces/api-keys`)
 - Secret shown once; stored hashed in Postgres
 
 ## Errors
 
-SDK throws `Error` with the API `error` message when status is not OK (e.g. invalid key, Voyage rate limit, missing query).
+The SDK throws an `Error` with the API message when a request fails. Catch it at the agent boundary and avoid exposing internal error details to end users.
 
 ## Related docs
 

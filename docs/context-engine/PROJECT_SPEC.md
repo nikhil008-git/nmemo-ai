@@ -185,7 +185,7 @@ Same return shape, but scoped to prefetched/cached memory + hot context only —
 
 ## How a developer integrates it
 
-1. `npm i @contextengine/sdk`
+1. `npm i nmemo-sdk`
 2. Connect sources (mem0 workspace, Qdrant index, Slack/Notion/GitHub OAuth, SQL/CRM credentials, MCP servers) via dashboard or API.
 3. Replace manual prompt-building code with `engine.getContext()` (or `getContextFast()` for voice/real-time agents).
 4. Feed the returned `prompt` into the existing LLM streaming call (Vercel AI SDK or otherwise).

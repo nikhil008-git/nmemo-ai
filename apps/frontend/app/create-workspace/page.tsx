@@ -7,7 +7,12 @@ import { Link2, Plus } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { CtaButton } from "@/components/ui/cta-button";
 import { AuthFormSkeleton } from "@/components/ui/loading-states";
-import { createWorkspace, getWorkspace } from "@/lib/api";
+import {
+  ApiError,
+  createWorkspace,
+  getWorkspace,
+  setApiCacheScope,
+} from "@/lib/api";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -75,22 +80,33 @@ export default function CreateWorkspacePage() {
 
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const userId = session?.user?.id;
 
   useEffect(() => {
     if (isPending) return;
-    if (!session?.user) {
+    if (!userId) {
       router.replace("/sign-in?next=/create-workspace");
       return;
     }
+
+    setApiCacheScope(userId);
 
     void getWorkspace()
       .then(() => {
         router.replace("/home");
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        const missing =
+          (err instanceof ApiError && err.status === 404) ||
+          (err instanceof Error && /no workspace/i.test(err.message));
+        if (!missing) {
+          setError(
+            err instanceof Error ? err.message : "Could not check workspace",
+          );
+        }
         setChecking(false);
       });
-  }, [isPending, session, router]);
+  }, [isPending, userId, router]);
 
   async function onContinueDetails(e: React.FormEvent) {
     e.preventDefault();
@@ -142,7 +158,6 @@ export default function CreateWorkspacePage() {
     return (
       <AuthShell>
         <div className="relative space-y-6 text-foreground">
-
           <form onSubmit={onSendInvites} className="space-y-6">
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500">
@@ -237,7 +252,6 @@ export default function CreateWorkspacePage() {
   return (
     <AuthShell>
       <div className="relative space-y-6 text-foreground">
-
         <form onSubmit={onContinueDetails} className="space-y-5">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500">

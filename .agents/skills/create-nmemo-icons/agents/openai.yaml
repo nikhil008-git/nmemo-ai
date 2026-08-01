@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create nmemo Icons"
+  short_description: "Design minimal nmemo SVG icon variants"
+  default_prompt: "Use $create-nmemo-icons to create a minimal icon in nmemo’s visual language."
