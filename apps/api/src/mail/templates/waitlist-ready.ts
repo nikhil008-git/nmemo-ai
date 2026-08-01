@@ -53,7 +53,7 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
 </head>
 <body style="margin:0;padding:0;background-color:#121110;color:#e7e4e0;-webkit-text-size-adjust:100%;word-spacing:normal;">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
-    You're off the waitlist. Your nmemo workspace is ready.
+    Early access is ready. Your project context is waiting in nmemo.
   </div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#121110;">
     <tr>
@@ -78,7 +78,7 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
                     </table>
                   </td>
                   <td align="right" style="vertical-align:middle;font-family:${font};font-size:10px;font-weight:500;line-height:1.4;letter-spacing:0.08em;color:#d99a55;">
-                    ACCESS READY
+                    EARLY ACCESS
                   </td>
                 </tr>
               </table>
@@ -92,13 +92,13 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
           </tr>
           <tr>
             <td class="hero-title" style="padding:0 0 20px 0;font-family:${font};font-size:38px;font-weight:500;letter-spacing:-0.035em;line-height:1.08;color:#f2efec;">
-              You&rsquo;re in.<br />
-              <span style="color:#99958f;">Memory with receipts.</span>
+              Welcome in.<br />
+              <span style="color:#99958f;">Context that carries work forward.</span>
             </td>
           </tr>
           <tr>
             <td style="padding:0 0 28px 0;font-family:${font};font-size:16px;font-weight:400;line-height:1.65;color:#99958f;">
-              <span style="color:#e7e4e0;">${greeting}</span> Your workspace is ready. nmemo keeps your repository&rsquo;s decisions, dead ends, and unfinished work close to the next agent that needs them.
+              <span style="color:#e7e4e0;">${greeting}</span> Your workspace is ready. nmemo turns the decisions, dead ends, and unfinished threads across your project into verified context for the next agent.
             </td>
           </tr>
           <tr>
@@ -107,11 +107,11 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
                 <tr>
                   <td style="border-radius:999px;background-color:#ffffff;">
                     <a href="${signUpUrl}" style="display:inline-block;padding:12px 20px;font-family:${font};font-size:14px;font-weight:500;line-height:1.2;color:#121110;text-decoration:none;border-radius:999px;">
-                      Open the workspace&nbsp;&nbsp;&rarr;
+                      Open nmemo&nbsp;&nbsp;&rarr;
                     </a>
                   </td>
                   <td style="padding-left:16px;font-family:${font};font-size:13px;line-height:1.4;">
-                    <a href="${docsUrl}" style="color:#99958f;text-decoration:underline;text-decoration-color:#56504b;text-underline-offset:3px;">Read the docs</a>
+                    <a href="${docsUrl}" style="color:#99958f;text-decoration:underline;text-decoration-color:#56504b;text-underline-offset:3px;">How it works</a>
                   </td>
                 </tr>
               </table>
@@ -123,7 +123,7 @@ export function waitlistReadyHtml(vars: WaitlistEmailVars): string {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                   <td class="footer-copy" style="font-family:${font};font-size:12px;line-height:1.55;color:#7e7b78;">
-                    nmemo &mdash; a project continuity layer for AI coding
+                    nmemo &mdash; project continuity for AI coding
                   </td>
                   <td class="footer-links" align="right" style="font-family:${font};font-size:12px;line-height:1.55;color:#7e7b78;white-space:nowrap;">
                     By <a href="${creatorUrl}" style="color:#b0aca7;text-decoration:none;">${creatorName}</a>
@@ -148,14 +148,14 @@ export function waitlistReadyText(vars: WaitlistEmailVars): string {
 
 Your nmemo workspace is ready.
 
-Memory with receipts.
+Context that carries work forward.
 
-nmemo keeps your repository's decisions, dead ends, and unfinished work close to the next agent that needs them.
+nmemo turns the decisions, dead ends, and unfinished threads across your project into verified context for the next agent.
 
-Open the workspace: ${vars.signUpUrl}
-Read the docs: ${vars.docsUrl}
+Open nmemo: ${vars.signUpUrl}
+How it works: ${vars.docsUrl}
 
-nmemo — a project continuity layer for AI coding
+nmemo — project continuity for AI coding
 By ${vars.creatorName || "Nikhil Rajpurohit"} · ${vars.creatorUrl || "https://nikhilwho.in"}
 `;
 }

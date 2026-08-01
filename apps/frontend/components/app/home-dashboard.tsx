@@ -43,8 +43,15 @@ export function HomeDashboard({
   return (
     <div className="mx-auto flex min-h-full w-full max-w-md flex-col justify-center gap-5 px-1 py-4 sm:gap-6 sm:px-0 sm:py-6">
       <div className="space-y-3 text-center">
-        <h1 className="font-heading text-[1.5rem] font-semibold tracking-[-0.03em] text-balance leading-[1.15] sm:text-[1.75rem] md:text-3xl">
-          {userName ? `Welcome, ${userName}` : "Welcome to your workspace"}
+        <h1 className="font-heading inline-flex items-center gap-2 text-[1.5rem] font-semibold tracking-[-0.03em] leading-[1.15] sm:text-[1.75rem] md:text-3xl">
+          <span>{userName ? `Welcome, ${userName}` : "Welcome to your workspace"}</span>
+          <img
+            src="/marketing/nmemo-idle.gif"
+            alt="nmemo mascot idling"
+            width={1080}
+            height={1080}
+            className="size-10 shrink-0 rounded-xl object-cover sm:size-12"
+          />
         </h1>
         <p className="px-1 text-sm font-semibold leading-relaxed text-neutral-500">
           Four steps to a workspace that hands your agents verified context.

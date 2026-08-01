@@ -14,6 +14,7 @@ import {
   SearchTrigger,
   type CommandItem,
 } from "@/components/app/command-search";
+import { BetaBanner } from "@/components/beta-banner";
 import { LayeredRoleLogo } from "@/components/layered-role-logo";
 import {
   ConnectorsRoleIcon,
@@ -214,6 +215,7 @@ function AppShellChrome({
 
   return (
     <div className="product-shell app-shell-zoom fixed inset-0 z-40 flex flex-col overflow-hidden bg-surface text-foreground">
+      <BetaBanner />
       <div className="flex min-h-0 flex-1 overflow-hidden">
         <WorkspaceSidebar
           userName={userName}

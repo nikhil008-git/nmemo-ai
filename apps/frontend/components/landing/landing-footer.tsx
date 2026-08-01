@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { GitHub, XMark } from "@/components/landing/icons";
+import { GitHub } from "@/components/landing/icons";
 import { Logo } from "@/components/logo";
-import { REPO_URL, X_URL } from "@/lib/site";
+import { REPO_URL } from "@/lib/site";
 
 const footerLinks = [{ href: "/docs/sdk", label: "Docs" }] as const;
 
@@ -38,15 +38,6 @@ export function LandingFooter() {
             className="transition-colors hover:text-ink"
           >
             <GitHub className="size-[18px]" />
-          </a>
-          <a
-            href={X_URL}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="nmemo on X"
-            className="transition-colors hover:text-ink"
-          >
-            <XMark className="size-4" />
           </a>
         </div>
       </div>

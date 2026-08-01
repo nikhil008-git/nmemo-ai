@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { BetaBanner } from "@/components/beta-banner";
 import { GitHub } from "@/components/landing/icons";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -35,8 +36,8 @@ export function SiteHeader() {
   if (isAuthPage || isAppShell) return null;
 
   return (
-    // Sits in flow, not fixed — it scrolls away with the page.
-    <div className="relative z-50 w-full">
+    <div className="sticky top-0 z-50 w-full">
+      <BetaBanner />
       <header className="bg-background">
         <div className="mx-auto flex h-14 w-full min-w-0 max-w-[1180px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
           <Link

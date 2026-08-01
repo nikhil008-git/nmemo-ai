@@ -159,6 +159,18 @@ function mapCitations(
   }));
 }
 
+function PlaygroundContextNote() {
+  return (
+    <aside
+      aria-label="About the playground"
+      className="w-full rounded-2xl border border-border bg-panel px-5 py-3.5 text-center text-[13px] font-medium leading-relaxed text-neutral-500 sm:px-8 sm:py-4 sm:text-[15px]"
+    >
+      Use the playground to test how your connected sources shape context. It&apos;s
+      not intended to be a full chat app.
+    </aside>
+  );
+}
+
 export function Playground() {
   const connectorsCtx = useConnectorsOptional();
   const [input, setInput] = useState("");
@@ -486,6 +498,10 @@ export function Playground() {
           </div>
         </div>
       ) : null}
+
+      <div className="shrink-0 px-3 pt-3 sm:px-6 sm:pt-5">
+        <PlaygroundContextNote />
+      </div>
 
       {empty ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-6 sm:px-6 sm:py-10">

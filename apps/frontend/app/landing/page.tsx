@@ -126,8 +126,16 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         <section className="pt-6 sm:pt-10">
           <Container className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-14">
-            <h1 className="max-w-xs text-balance text-[18px] font-medium leading-[1.2] tracking-[-0.015em] text-ink md:text-[21px]">
-              Context with receipts.
+            <h1 className="flex items-center gap-2 text-[18px] font-medium leading-[1.2] tracking-[-0.015em] text-ink md:text-[21px]">
+              <span className="whitespace-nowrap">Context with receipts.</span>
+              {/* Use a native img so the animated GIF is never reduced to a still. */}
+              <img
+                src="/marketing/nmemo-idle.gif"
+                alt="nmemo mascot idling"
+                width={1080}
+                height={1080}
+                className="size-12 shrink-0 rounded-xl object-cover sm:size-14"
+              />
             </h1>
 
             <div>
