@@ -1,4 +1,4 @@
-# Context Engine API
+# nmemo API
 
 Express backend for dashboard + `nmemo-sdk`.
 
@@ -22,15 +22,21 @@ Express backend for dashboard + `nmemo-sdk`.
 | `/workspaces/*` | workspace, connectors, API keys |
 | `GET /health` | health check |
 
-## Run
+## Local setup
 
 ```bash
 # from repo root
+cp .env.example .env
+npm run db:generate -w @repo/db
+npm run db:migrate -w @repo/db
 npm run dev
-# API → http://localhost:8080
 ```
 
-Requires env: `DATABASE_URL`, `VOYAGE_API_KEY`, `GROQ_API_KEY`, `QDRANT_URL` (see root `.env.example`).
+The API listens on `http://localhost:8080`; `GET /health` returns `ok` when the process is up.
+
+Required service configuration: `DATABASE_URL`, `QDRANT_URL`, `VOYAGE_API_KEY`, and `GROQ_API_KEY`. Authentication also needs secure values for `BETTER_AUTH_SECRET` and `TOKEN_ENCRYPTION_KEY`. Start with the root [`.env.example`](../../.env.example); OAuth connector credentials are optional.
+
+For production, set `FRONTEND_URL`, `API_PUBLIC_URL`, and `CORS_ORIGINS` to the public origins. Never use the development secrets from `.env.example` in production.
 
 ## Stack
 

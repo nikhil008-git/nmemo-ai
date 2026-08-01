@@ -1,95 +1,101 @@
-# Context Engine
+# nmemo
 
-A multi-source context orchestration engine for AI agents. Every serious AI application eventually connects to multiple context sources — memory, documents, CRM, Slack, Notion, GitHub, SQL databases, APIs. This engine replaces custom glue code per product with one call:
+Open-source context orchestration for AI applications and agents. nmemo retrieves relevant workspace knowledge, applies ranking and a token budget, and returns context your model can use directly.
+
+It is built for applications that need more than a vector search call: documents, connected tools, workspace boundaries, citations, and predictable context assembly.
+
+## What is included
+
+| Area | Location | Purpose |
+| --- | --- | --- |
+| Web application | `apps/frontend` | Dashboard for authentication, workspaces, sources, connectors, keys, and chat |
+| HTTP API | `apps/api` | Context retrieval, ingestion, workspace management, OAuth, and health endpoints |
+| Context engine | `packages/core` | Routing, ranking, de-duplication, conflict handling, and token budgeting |
+| RAG retriever | `packages/rag-retriever` | Qdrant-backed document ingestion and retrieval |
+| SDK | `packages/sdk` | `nmemo-sdk` client for calling the API |
+| Database | `packages/database` | Prisma schema and migrations |
+
+Some directories document planned work (CLI, MCP server, local memory, sync, and billing). See [BUILD.md](./BUILD.md) for the intended architecture and current implementation boundaries.
+
+## Quick start
+
+### Prerequisites
+
+- Node.js 18 or newer (Node 22 is used by the included Render blueprint)
+- npm 10 or newer
+- PostgreSQL and Qdrant
+- A Voyage API key for embeddings and a Groq API key for chat features
+
+### Run locally
+
+```bash
+git clone https://github.com/nikhil008-git/Orques-AI.git nmemo
+cd nmemo
+npm install
+cp .env.example .env
+```
+
+Update `.env` with your database, Qdrant, and provider credentials, then prepare Prisma and start the apps:
+
+```bash
+npm run db:generate -w @repo/db
+npm run db:migrate -w @repo/db
+npm run dev
+```
+
+The frontend runs at [http://localhost:3000](http://localhost:3000) and the API at [http://localhost:8080](http://localhost:8080). Verify the API with `curl http://localhost:8080/health`.
+
+`npm run dev` runs all workspace development tasks. To run only the API after its dependencies are built, use `npm run start:api`.
+
+## Use the SDK
 
 ```ts
-import { createEngine } from "nmemo-sdk"
+import { createEngine } from "nmemo-sdk";
 
 const engine = createEngine({
   apiKey: process.env.NMEMO_API_KEY!,
   baseUrl: "http://localhost:8080",
-})
+});
 
 const context = await engine.getContext({
   query: "What is our refund policy?",
   userId: "user_123",
   workspaceId: "ws_123",
-})
-// context.prompt → feed your LLM
+});
+
+console.log(context.prompt);
+console.log(context.citations);
 ```
 
-**Philosophy:** existing tools answer "where is my data?" Context Engine answers "what should the model actually see?"
+When using a bearer API key, its workspace scopes the request and `workspaceId` is optional.
 
----
-
-## Current stack
-
-| Layer | Choice |
-|-------|--------|
-| Monorepo | Turborepo |
-| Frontend | Next.js (`apps/frontend`) |
-| Backend | Node/Express (`apps/api`) |
-| Vector store | Qdrant |
-| Embeddings | Voyage |
-| LLM | Groq (OpenAI-compatible) |
-| Structured data | Prisma + PostgreSQL |
-| Engine | `@contextengine/core` + `nmemo-sdk` |
-
----
-
-## MVP status
-
-| Path | Status |
-|------|--------|
-| `apps/frontend` | Dashboard — ingest, chat, connectors, API keys |
-| `apps/api` | `POST /context`, `/context/fast`, `/ask`, `/ingest`, workspace routes |
-| `packages/retriever-interface` | Shared `Retriever` + contract types |
-| `packages/rag-retriever` | Qdrant + Voyage RAG |
-| `packages/core` | `getContext()` / `getContextFast()` (RAG path) |
-| `packages/sdk` | `createEngine().getContext()` HTTP client |
-| `packages/database` | Workspace, ApiKey, Connector models |
-
-**Live docs on site:** `/docs`, `/docs/sdk`, `/docs/connectors`, `/docs/api`
-
-**Deferred:** full ranking/dedup/conflict packages and the worker runtime.
-
----
-
-## Quickstart
+## Development
 
 ```bash
-npm install
-npm run dev    # frontend :3000 + api :8080
+npm run check-types
+npm run lint
+npm test
+npm run build
 ```
 
-1. Sign up at http://localhost:3000  
-2. Connectors → ensure Qdrant is connected  
-3. Sources → upload a PDF  
-4. Settings → create an API key  
-5. Chat — or call the SDK with that key  
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for contribution expectations. Do not commit `.env` files, OAuth credentials, or user data.
 
-```bash
-# Example SDK usage (from any Node script in the monorepo)
-node --input-type=module -e "
-import { createEngine } from 'nmemo-sdk'
-const engine = createEngine({ apiKey: 'ce_live_...', baseUrl: 'http://localhost:8080' })
-console.log(await engine.getContext({ query: 'hello', userId: 'u1', workspaceId: 'ws1' }))
-"
-```
+## Deployment
 
-API key auth scopes the workspace from the key; `workspaceId` in the body is optional when using a Bearer key.
-
----
+The included [render.yaml](./render.yaml) deploys the API from this monorepo. Set the required environment variables in Render, run the frontend separately, and set its `NEXT_PUBLIC_API_URL` to the deployed API origin.
 
 ## Documentation
 
-| File | Purpose |
-|------|---------|
-| **[DOCS_MAP.md](./docs/context-engine/DOCS_MAP.md)** | **Where every doc lives (start here)** |
-| [SDK.md](./docs/context-engine/SDK.md) | `nmemo-sdk` guide |
-| [packages/sdk/README.md](./packages/sdk/README.md) | SDK package README |
-| [API.md](./docs/context-engine/API.md) | HTTP API reference |
-| [PROJECT_SPEC.md](./docs/context-engine/PROJECT_SPEC.md) | Canonical full product spec |
-| [docs/context-engine/README.md](./docs/context-engine/README.md) | Context Engine doc hub |
-| [apps/frontend/docs/README.md](./apps/frontend/docs/README.md) | Dashboard UI docs |
-| [apps/api/README.md](./apps/api/README.md) | API app README |
+- [Documentation map](./docs/context-engine/DOCS_MAP.md)
+- [HTTP API reference](./docs/context-engine/API.md)
+- [SDK guide](./docs/context-engine/SDK.md)
+- [Architecture and build plan](./BUILD.md)
+- [API application guide](./apps/api/README.md)
+
+## Security
+
+Please report vulnerabilities privately; see [SECURITY.md](./SECURITY.md). For general questions and bugs, use GitHub Issues.
+
+## License
+
+[MIT](./LICENSE) © nmemo contributors.

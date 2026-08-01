@@ -11,6 +11,8 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
+.env.*.local
+!.env.example
 
 # Testing
 coverage
@@ -38,6 +40,7 @@ yarn-error.log*
 *.pem
 
 waitlist-*.csv
+waitlist.csv
 
 # Personal study / hand-code guides (local only)
 docs/private/

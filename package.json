@@ -1,12 +1,24 @@
 {
-  "name": "riftnew",
+  "name": "nmemo",
+  "version": "0.1.0",
   "private": true,
+  "description": "Open-source context orchestration for AI applications and agents.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikhil008-git/Orques-AI.git"
+  },
+  "homepage": "https://github.com/nikhil008-git/Orques-AI#readme",
+  "bugs": {
+    "url": "https://github.com/nikhil008-git/Orques-AI/issues"
+  },
   "scripts": {
     "build": "turbo run build",
     "build:api": "turbo run build --filter=api...",
     "start:api": "npm run start -w api",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "test": "npm run test -w frontend && npm run test -w @contextengine/core",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types"
   },
