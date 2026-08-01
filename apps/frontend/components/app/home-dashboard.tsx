@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { CtaButton } from "@/components/ui/cta-button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 const steps = [
   {
@@ -30,10 +31,12 @@ export function HomeDashboard({
   userName,
   connectedSources,
   loading = false,
+  forceDesktop = false,
 }: {
   userName?: string | null;
   connectedSources: readonly { type: string }[];
   loading?: boolean;
+  forceDesktop?: boolean;
 }) {
   const showSkeleton = loading && connectedSources.length === 0;
 
@@ -61,7 +64,12 @@ export function HomeDashboard({
         )}
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div
+        className={cn(
+          "flex flex-col gap-2 sm:flex-row",
+          forceDesktop && "flex-row",
+        )}
+      >
         <CtaButton href="/playground" fullWidth>
           See it work
         </CtaButton>

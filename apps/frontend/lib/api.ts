@@ -27,6 +27,11 @@ export function getApiBaseUrl() {
   return apiBase();
 }
 
+/** Direct public backend URL for calls that must bypass the Next.js proxy. */
+export function getDirectApiBaseUrl() {
+  return DIRECT_API_URL;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,

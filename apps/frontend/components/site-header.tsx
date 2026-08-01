@@ -38,7 +38,7 @@ export function SiteHeader() {
     // Sits in flow, not fixed — it scrolls away with the page.
     <div className="relative z-50 w-full">
       <header className="bg-background">
-        <div className="mx-auto flex h-14 w-full max-w-[1180px] items-center gap-6 px-6">
+        <div className="mx-auto flex h-14 w-full min-w-0 max-w-[1180px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
           <Link
             href="/"
             className="flex shrink-0 items-center gap-2 text-[13px] font-medium tracking-tight text-ink"
@@ -65,15 +65,22 @@ export function SiteHeader() {
               // One pill resolves here either way, so the placeholder is one pill.
               <Skeleton className="h-8 w-24 rounded-full" aria-hidden />
             ) : loggedIn ? (
-              <CtaButton href="/home" size="compact">
-                Open the workspace
-              </CtaButton>
+              <span className="contents" data-backend-warmup>
+                <CtaButton href="/home" size="compact">
+                  <span className="hidden min-[420px]:inline">
+                    Open the workspace
+                  </span>
+                  <span className="min-[420px]:hidden">Open</span>
+                </CtaButton>
+              </span>
             ) : (
               // Auth is OAuth only and `/sign-up` redirects to `/sign-in`, so
               // signing in and signing up are the same click. One pill.
-              <CtaButton href="/sign-in" size="compact">
-                Get started
-              </CtaButton>
+              <span className="contents" data-backend-warmup>
+                <CtaButton href="/sign-in" size="compact">
+                  Get started
+                </CtaButton>
+              </span>
             )}
           </div>
 

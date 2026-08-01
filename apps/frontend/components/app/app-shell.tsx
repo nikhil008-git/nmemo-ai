@@ -373,15 +373,22 @@ export function WorkspaceSidebar({
   connectedTypes,
   connectedCount,
   demo = false,
+  forceDesktop = false,
 }: {
   userName: string;
   pathname: string;
   connectedTypes: readonly string[];
   connectedCount: number;
   demo?: boolean;
+  forceDesktop?: boolean;
 }) {
   return (
-    <aside className="hidden w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4 md:flex">
+    <aside
+      className={cn(
+        "hidden w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4 md:flex",
+        forceDesktop && "flex",
+      )}
+    >
       <Link href="/settings" className="px-2">
         <p className="truncate text-[14px] font-semibold tracking-[-0.02em] text-ink/90">
           {userName}
@@ -466,12 +473,19 @@ export function WorkspaceSidebar({
 export function WorkspacePageHeader({
   title,
   onSearch,
+  forceDesktop = false,
 }: {
   title: string;
   onSearch?: () => void;
+  forceDesktop?: boolean;
 }) {
   return (
-    <div className="hidden h-12 items-center justify-between gap-2 border-b border-border px-5 md:flex">
+    <div
+      className={cn(
+        "hidden h-12 items-center justify-between gap-2 border-b border-border px-5 md:flex",
+        forceDesktop && "flex",
+      )}
+    >
       <p className="text-[13px] font-semibold tracking-[-0.015em] text-ink/80">
         {title}
       </p>

@@ -9,9 +9,12 @@ const footerLinks = [{ href: "/docs/sdk", label: "Docs" }] as const;
 export function LandingFooter() {
   return (
     <footer className="py-10">
-      <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start gap-6 px-6 sm:flex-row sm:items-center">
-        <Link href="/" className="flex items-center gap-2.5">
-          <Logo size={22} className="rounded-[5px]" />
+      <div className="mx-auto flex w-full max-w-[1180px] flex-col items-start gap-6 px-4 sm:flex-row sm:items-center sm:px-6">
+        <Link
+          href="/"
+          className="flex min-w-0 items-start gap-2.5 sm:items-center"
+        >
+          <Logo size={22} className="shrink-0 rounded-[5px]" />
           <span className="text-[14px] text-ink/45">
             nmemo: the context layer for AI agents
           </span>

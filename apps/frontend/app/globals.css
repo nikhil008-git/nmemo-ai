@@ -247,29 +247,63 @@
   }
 }
 
-/* Render a desktop-sized workspace canvas, then scale it into the landing plate. */
+/* Render the full desktop playground, then scale it into every landing plate. */
 .landing-demo-shell {
   top: 3.5%;
   left: 3.5%;
-  width: 93%;
-  height: 93%;
+  width: 232.5%;
+  height: 232.5%;
+  transform: scale(0.4);
+  transform-origin: top left;
 }
 
 @media (min-width: 640px) {
   .landing-demo-shell {
+    width: 169.0909%;
+    height: 169.0909%;
+    transform: scale(0.55);
+    transform-origin: top left;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-demo-shell {
     width: 116.25%;
     height: 116.25%;
     transform: scale(0.8);
-    transform-origin: top left;
   }
 }
 
 /* Fit a real desktop workspace inside the smaller landing showcase window. */
 .landing-home-demo-canvas {
-  width: 175.4386%;
-  height: 175.4386%;
-  transform: scale(0.57);
+  width: 285.7143%;
+  height: 285.7143%;
+  transform: scale(0.35);
   transform-origin: top left;
+}
+
+@media (min-width: 640px) {
+  .landing-home-demo-canvas {
+    width: 175.4386%;
+    height: 175.4386%;
+    transform: scale(0.57);
+  }
+}
+
+/* Keep feature mockups landscape on phones without cropping their panels. */
+.landing-feature-plate-canvas {
+  width: 153.8462%;
+  height: 153.8462%;
+  transform: scale(0.65);
+  transform-origin: center;
+}
+
+@media (min-width: 640px) {
+  .landing-feature-plate-canvas {
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
 }
 
 /* The light product shell stays neutral and slightly separated from the page. */

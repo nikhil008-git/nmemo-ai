@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowDownTray, GitHub } from "@/components/landing/icons";
+import { BackendWarmup } from "@/components/landing/backend-warmup";
 import { FaqAccordion } from "@/components/landing/faq-accordion";
 import { HomeDemo } from "@/components/landing/home-demo";
 import { LandingFooter } from "@/components/landing/landing-footer";
@@ -29,7 +30,9 @@ function Container({
   className?: string;
 }) {
   return (
-    <div className={`mx-auto w-full max-w-[1180px] px-6 ${className}`}>
+    <div
+      className={`mx-auto w-full min-w-0 max-w-[1180px] px-4 sm:px-6 ${className}`}
+    >
       {children}
     </div>
   );
@@ -48,7 +51,7 @@ function Section({
   return (
     <section
       id={id}
-      className={`${id ? "scroll-mt-24 " : ""}pt-32 sm:pt-48 ${className}`}
+      className={`${id ? "scroll-mt-20 sm:scroll-mt-24 " : ""}pt-20 sm:pt-32 lg:pt-48 ${className}`}
     >
       {children}
     </section>
@@ -64,7 +67,7 @@ function SectionHeading({
 }) {
   return (
     <h2
-      className={`text-balance text-[30px] font-medium leading-[1.12] tracking-[-0.02em] text-ink sm:text-[38px] ${className}`}
+      className={`text-balance text-[28px] font-medium leading-[1.12] tracking-[-0.02em] text-ink sm:text-[38px] ${className}`}
     >
       {children}
     </h2>
@@ -73,7 +76,7 @@ function SectionHeading({
 
 function Lede({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mt-4 max-w-[52ch] text-pretty text-[17px] leading-relaxed text-ink/50">
+    <p className="mt-4 max-w-[52ch] text-pretty text-[16px] leading-relaxed text-ink/50 sm:text-[17px]">
       {children}
     </p>
   );
@@ -101,9 +104,9 @@ function Showcase({
   return (
     <Section id={id}>
       <Container>
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-20">
-          <div className={flip ? "lg:order-2" : undefined}>{media}</div>
-          <div className={flip ? "lg:order-1" : undefined}>
+        <div className="grid items-center gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-20">
+          <div className={`min-w-0 ${flip ? "lg:order-2" : ""}`}>{media}</div>
+          <div className={`min-w-0 ${flip ? "lg:order-1" : ""}`}>
             <SectionHeading>{title}</SectionHeading>
             <Lede>{body}</Lede>
           </div>
@@ -116,11 +119,12 @@ function Showcase({
 export default function LandingPage() {
   return (
     <>
-      <main className="flex-1">
+      <BackendWarmup />
+      <main className="min-w-0 flex-1 overflow-x-clip">
         {/* ---------------------------------------------------------------- */}
         {/* Hero                                                             */}
         {/* ---------------------------------------------------------------- */}
-        <section className="pt-8 sm:pt-10">
+        <section className="pt-6 sm:pt-10">
           <Container className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-14">
             <h1 className="max-w-xs text-balance text-[19px] font-medium leading-[1.2] tracking-[-0.015em] text-ink sm:text-[21px]">
               Context with receipts.
@@ -135,16 +139,18 @@ export default function LandingPage() {
               <div className="mt-4 flex flex-row items-center gap-2">
                 <Link
                   href="/sign-in"
-                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-background transition-colors hover:bg-ink/85"
+                  data-backend-warmup
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-4 py-2 text-[13px] font-medium text-background transition-colors hover:bg-ink/85"
                 >
                   Get started
                   <ArrowDownTray className="size-3.5 -rotate-90" />
                 </Link>
                 <a
                   href={REPO_URL}
+                  data-backend-warmup
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-ink/[0.12] bg-ink/[0.03] px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-ink/[0.07]"
+                  className="inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-ink/[0.12] bg-ink/[0.03] px-4 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-ink/[0.07]"
                 >
                   <GitHub className="size-3.5" />
                   Star on GitHub
@@ -153,7 +159,7 @@ export default function LandingPage() {
             </div>
           </Container>
 
-          <Container className="pt-8 sm:pt-10">
+          <Container className="pt-6 sm:pt-10">
             <PlaygroundDemo />
           </Container>
         </section>
@@ -172,7 +178,7 @@ export default function LandingPage() {
               fits it to the budget, and gives your agent one grounded package.
             </Lede>
 
-            <div className="mt-16 grid gap-12 sm:grid-cols-2 sm:gap-20">
+            <div className="mt-10 grid gap-10 sm:mt-16 sm:grid-cols-2 sm:gap-20">
               <div className="max-w-[40ch]">
                 <p className="mono text-[13px] text-ink/30">
                   connected sources
@@ -252,7 +258,7 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         <Section id="faq">
           <Container>
-            <div className="grid gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
+            <div className="grid gap-8 sm:gap-12 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24">
               <div className="max-w-sm lg:pt-2">
                 <SectionHeading>The practical bits, answered.</SectionHeading>
                 <Lede>
@@ -269,9 +275,9 @@ export default function LandingPage() {
         {/* ---------------------------------------------------------------- */}
         {/* Final CTA                                                        */}
         {/* ---------------------------------------------------------------- */}
-        <Section className="pb-32 sm:pb-48">
+        <Section className="pb-20 sm:pb-32 lg:pb-48">
           <Container>
-            <div className="relative overflow-hidden rounded-[28px] px-8 py-20 text-center sm:px-16 sm:py-28">
+            <div className="relative overflow-hidden rounded-[22px] px-5 py-16 text-center sm:rounded-[28px] sm:px-16 sm:py-28">
               <Wallpaper className="absolute inset-[-8%] h-[116%] w-[116%] scale-110 opacity-75 blur-2xl" />
               <div aria-hidden className="absolute inset-0 bg-[#0b0a09]/60" />
               <div
@@ -279,29 +285,31 @@ export default function LandingPage() {
                 className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_115%,var(--stage-glow),transparent_68%)]"
               />
               <div className="relative">
-                <h2 className="mx-auto max-w-3xl text-balance text-[32px] font-medium leading-[1.1] tracking-[-0.02em] text-white sm:text-[44px]">
+                <h2 className="mx-auto max-w-3xl text-balance text-[28px] font-medium leading-[1.1] tracking-[-0.02em] text-white sm:text-[44px]">
                   Give every agent the context it needs. None of the context it
                   doesn&apos;t.
                 </h2>
-                <p className="mx-auto mt-5 max-w-xl text-pretty text-[17px] leading-relaxed text-white/50">
+                <p className="mx-auto mt-4 max-w-xl text-pretty text-[15px] leading-relaxed text-white/55 sm:mt-5 sm:text-[17px]">
                   Connect your sources, inspect the context package, then keep
                   building with the model and framework you already use.
                 </p>
-                <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+                <div className="mt-7 flex flex-row items-center justify-center gap-2 sm:mt-9 sm:gap-3">
                   <Link
                     href="/sign-in"
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[15px] font-medium text-[#0b0a09] transition-colors hover:bg-white/85"
+                    data-backend-warmup
+                    className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-full bg-white px-3 py-2 text-[12px] font-medium text-[#0b0a09] transition-colors hover:bg-white/85 sm:gap-2 sm:px-6 sm:py-3 sm:text-[15px]"
                   >
                     Get started
-                    <ArrowDownTray className="size-[18px] -rotate-90" />
+                    <ArrowDownTray className="size-4 -rotate-90 sm:size-[18px]" />
                   </Link>
                   <a
                     href={REPO_URL}
+                    data-backend-warmup
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-white/[0.08]"
+                    className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-full border border-white/15 bg-white/[0.04] px-3 py-2 text-[12px] font-medium text-white transition-colors hover:bg-white/[0.08] sm:gap-2.5 sm:px-6 sm:py-3 sm:text-[15px]"
                   >
-                    <GitHub className="size-[18px]" />
+                    <GitHub className="size-4 sm:size-[18px]" />
                     Read the source
                   </a>
                 </div>

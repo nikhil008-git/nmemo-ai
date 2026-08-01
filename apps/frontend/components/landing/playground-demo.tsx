@@ -77,7 +77,7 @@ export function PlaygroundDemo() {
             }}
             className="product-shell landing-demo-shell absolute flex cursor-pointer overflow-hidden rounded-lg border border-ink/10 bg-surface shadow-[var(--panel-shadow)] outline-none transition-[border-color,box-shadow] duration-200 hover:border-ink/20 focus-visible:ring-2 focus-visible:ring-ink/25"
           >
-            <aside className="hidden w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4 sm:flex">
+            <aside className="flex w-56 shrink-0 flex-col border-r border-ink/[0.07] bg-rail px-3 py-4">
               <p className="truncate rounded-md px-2 py-1 text-[14px] font-semibold tracking-[-0.02em] text-ink/90 transition-colors hover:bg-ink/[0.04]">
                 Nikhil Rajpurohit
               </p>
@@ -112,7 +112,7 @@ export function PlaygroundDemo() {
                 <span className="text-[13px] font-semibold tracking-[-0.015em] text-ink/80">
                   Playground
                 </span>
-                <span className="hidden h-7 shrink-0 items-center gap-2 rounded-sm border border-border bg-surface px-2 text-[11px] font-semibold text-neutral-400 transition-colors hover:bg-ink/[0.04] hover:text-ink/70 md:flex">
+                <span className="flex h-7 shrink-0 items-center gap-2 rounded-sm border border-border bg-surface px-2 text-[11px] font-semibold text-neutral-400 transition-colors hover:bg-ink/[0.04] hover:text-ink/70">
                   <Search size={12} strokeWidth={1.75} />
                   Search
                   <span className="rounded-[3px] bg-neutral-100 px-1.5 py-0.5 text-[10px] text-neutral-500">
@@ -135,9 +135,9 @@ export function PlaygroundDemo() {
                   }}
                 />
               ) : (
-                <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-6 sm:px-6 sm:py-10">
+                <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-3 py-4 sm:px-6 sm:py-10">
                   <div className="flex w-full max-w-2xl flex-col items-center">
-                    <h2 className="text-balance text-center font-heading text-[1.45rem] font-semibold leading-[1.15] tracking-[-0.035em] text-foreground sm:text-[2.35rem] md:text-[2.6rem]">
+                    <h2 className="text-balance text-center font-heading text-[1.875rem] font-semibold leading-[1.15] tracking-[-0.035em] text-foreground sm:text-[2.35rem] md:text-[2.6rem]">
                       See what context your agents get
                     </h2>
                     <p className="mt-2 max-w-md text-center text-[12px] font-medium leading-relaxed text-neutral-500 sm:mt-3 sm:text-[13px]">
@@ -371,7 +371,7 @@ function AnsweredDemo({
               className="min-h-[3.25rem] w-full resize-none bg-transparent pr-12 text-[15px] font-medium leading-relaxed text-foreground outline-none placeholder:text-neutral-400"
             />
             <div className="flex items-center justify-between gap-3">
-              <div className="flex min-w-0 items-center gap-1.5 text-neutral-400">
+              <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1 text-neutral-400">
                 <DemoActionIcon icon={Mic} label="Voice" />
                 <DemoActionIcon icon={AudioLines} label="Real-time" />
                 <DemoActionIcon icon={Languages} label="Languages" />

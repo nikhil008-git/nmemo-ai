@@ -37,9 +37,9 @@ export function Frame({
   if (bezel) {
     return (
       <div
-        className={`rounded-[20px] border border-border bg-ink/[0.03] p-2 shadow-[var(--bezel-shadow)] ${className}`}
+        className={`rounded-[16px] border border-border bg-ink/[0.03] p-1.5 shadow-[var(--bezel-shadow)] sm:rounded-[20px] sm:p-2 ${className}`}
       >
-        <div className="overflow-hidden rounded-xl border border-ink/[0.06]">
+        <div className="overflow-hidden rounded-[10px] border border-ink/[0.06] sm:rounded-xl">
           {children}
         </div>
       </div>
@@ -48,7 +48,7 @@ export function Frame({
 
   return (
     <div
-      className={`overflow-hidden rounded-[20px] shadow-[var(--bezel-shadow)] ${className}`}
+      className={`overflow-hidden rounded-[16px] shadow-[var(--bezel-shadow)] sm:rounded-[20px] ${className}`}
     >
       {children}
     </div>
@@ -394,8 +394,10 @@ function Plate({
     <Frame className={className}>
       <div className={`relative w-full ${ratio}`}>
         <WallpaperPlate>
-          <div className="flex h-full w-full items-center justify-center p-5 sm:p-8">
-            {children}
+          <div className="flex h-full w-full items-center justify-center p-4 sm:p-8">
+            <div className="landing-feature-plate-canvas flex h-full w-full shrink-0 items-center justify-center">
+              {children}
+            </div>
           </div>
         </WallpaperPlate>
       </div>

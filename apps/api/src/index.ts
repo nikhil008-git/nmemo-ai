@@ -73,11 +73,11 @@ app.use(
 );
 
 app.get("/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    time: new Date().toISOString(),
-    env: process.env.NODE_ENV ?? "development",
-  });
+  res
+    .status(200)
+    .set("Cache-Control", "no-store")
+    .type("text/plain")
+    .send("ok");
 });
 
 app.use(apiLimiter);
