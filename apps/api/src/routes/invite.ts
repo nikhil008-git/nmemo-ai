@@ -38,7 +38,7 @@
             });
           }
           
-          const invite  = await prisma.WorkspaceInvite.create({
+          const invite  = await prisma.workspaceInvite.create({
             data: { 
                 workspaceId: workspace.id,
                 invitedById: req.user!.id,
@@ -54,7 +54,7 @@
     inviteRouter.get("/invites",requireSession, async (req, res) => {
         const workspace = await getWorkspaceForUser(req.user!.id);
       
-        const invites = await prisma.WorkspaceInvite.findMany({
+        const invites = await prisma.workspaceInvite.findMany({
           where: {
             workspaceId: workspace!.id,
             acceptedAt: null,
@@ -67,7 +67,7 @@
     //Accept invite
     inviteRouter.post("/:id/accept", requireSession, async (req, res) => {
 
-        const invite = await prisma.WorkspaceInvite.findUnique({
+        const invite = await prisma.workspaceInvite.findUnique({
             where: {
                 id: req.params.id as string
             }
@@ -81,7 +81,7 @@
         if (invite.expiresAt && invite.expiresAt < new Date()) {
             return res.status(400).json({ error: "Invite expired" });
         }
-        await prisma.WorkspaceInvite.update({
+        await prisma.workspaceInvite.update({
             where: { id: invite.id },
             data: { acceptedAt: new Date() }
         })
@@ -90,7 +90,7 @@
 
     //cancel invite
     inviteRouter.delete("/:id", requireSession, async (req, res) => {
-        await prisma.WorkspaceInvite.delete({
+        await prisma.workspaceInvite.delete({
             where: {
                 id: req.params.id as string
             }
