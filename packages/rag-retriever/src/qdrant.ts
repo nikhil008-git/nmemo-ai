@@ -108,17 +108,27 @@ export async function ensureCollection() {
           field_schema: "keyword",
         });
       } catch {
-        /* index may already exist on retry */
+          /* index may already exist on retry */
+        }
+    } else {
+      const info = await qdrant.getCollection(COLLECTION);
+      const size = vectorSizeFromCollection(info);
+      if (size != null && size !== VECTOR_SIZE) {
+        throw new Error(
+          `Qdrant collection "${COLLECTION}" has vector size ${size}, but Voyage embeddings need ${VECTOR_SIZE}. Delete that collection in Qdrant (or set QDRANT_COLLECTION to a new empty name) and upload again.`,
+        );
       }
-      return;
-    }
 
-    const info = await qdrant.getCollection(COLLECTION);
-    const size = vectorSizeFromCollection(info);
-    if (size != null && size !== VECTOR_SIZE) {
-      throw new Error(
-        `Qdrant collection "${COLLECTION}" has vector size ${size}, but Voyage embeddings need ${VECTOR_SIZE}. Delete that collection in Qdrant (or set QDRANT_COLLECTION to a new empty name) and upload again.`,
-      );
+      // Older collections were created before workspace scoping. Make their
+      // site_id filter usable without requiring manual dashboard repair.
+      try {
+        await qdrant.createPayloadIndex(COLLECTION, {
+          field_name: "site_id",
+          field_schema: "keyword",
+        });
+      } catch {
+        /* Qdrant reports an existing index on some versions. */
+      }
     }
   } catch (err) {
     if (
