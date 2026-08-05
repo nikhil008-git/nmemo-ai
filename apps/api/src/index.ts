@@ -56,6 +56,16 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 },
 });
 
+function isPdfUpload(file: Express.Multer.File): boolean {
+  // Some browsers label legitimate PDFs as application/octet-stream or leave
+  // the MIME type blank. Verify the file header instead of relying on that
+  // browser-provided metadata alone.
+  return (
+    file.mimetype === "application/pdf" ||
+    file.buffer.subarray(0, 5).toString("ascii") === "%PDF-"
+  );
+}
+
 const port = Number(process.env.PORT ?? 8080);
 
 const corsOrigins = (process.env.CORS_ORIGINS ?? process.env.FRONTEND_URL ?? "http://localhost:3000")
@@ -155,7 +165,7 @@ app.post(
       const siteId = workspace.id;
 
       if (req.file) {
-        if (req.file.mimetype !== "application/pdf") {
+        if (!isPdfUpload(req.file)) {
           res.status(400).json({ error: "Only PDF uploads are supported" });
           return;
         }
