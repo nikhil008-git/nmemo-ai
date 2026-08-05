@@ -91,6 +91,19 @@ function vectorSizeFromCollection(info: {
   return null;
 }
 
+async function ensurePayloadIndexes() {
+  for (const fieldName of ["site_id", "source"]) {
+    try {
+      await qdrant.createPayloadIndex(COLLECTION, {
+        field_name: fieldName,
+        field_schema: "keyword",
+      });
+    } catch {
+      /* Qdrant reports an existing index on some versions. */
+    }
+  }
+}
+
 export async function ensureCollection() {
   try {
     const { collections } = await qdrant.getCollections();
@@ -102,14 +115,6 @@ export async function ensureCollection() {
           distance: "Cosine",
         },
       });
-      try {
-        await qdrant.createPayloadIndex(COLLECTION, {
-          field_name: "site_id",
-          field_schema: "keyword",
-        });
-      } catch {
-          /* index may already exist on retry */
-        }
     } else {
       const info = await qdrant.getCollection(COLLECTION);
       const size = vectorSizeFromCollection(info);
@@ -118,18 +123,11 @@ export async function ensureCollection() {
           `Qdrant collection "${COLLECTION}" has vector size ${size}, but Voyage embeddings need ${VECTOR_SIZE}. Delete that collection in Qdrant (or set QDRANT_COLLECTION to a new empty name) and upload again.`,
         );
       }
-
-      // Older collections were created before workspace scoping. Make their
-      // site_id filter usable without requiring manual dashboard repair.
-      try {
-        await qdrant.createPayloadIndex(COLLECTION, {
-          field_name: "site_id",
-          field_schema: "keyword",
-        });
-      } catch {
-        /* Qdrant reports an existing index on some versions. */
-      }
     }
+
+    // Older collections were created before workspace scoping and document
+    // deletion. Repair both filter indexes without manual dashboard work.
+    await ensurePayloadIndexes();
   } catch (err) {
     if (
       err instanceof Error &&
