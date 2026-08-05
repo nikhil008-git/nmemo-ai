@@ -23,14 +23,13 @@ Types come from `@contextengine/retriever-interface`: `GetContextResult`, `Conte
 route → retrieve → rank → dedupe → resolve conflicts → budget → prompt
 ```
 
-Each stage is a pure function over the previous stage's output, which is why the whole thing
-is testable without a network and replayable in `evals/`.
+Each stage is a pure function over the previous stage's output, which keeps ranking and
+budgeting testable without a network.
 
 ## Role in nmemo
 
-`@repo/memory` decides *what is eligible* for recall; core decides *what fits*. Keep that
-line — eligibility is domain logic about projects and branches, budgeting is arithmetic about
-tokens and scores.
+Retrievers decide what context is eligible; core decides what fits. Eligibility is source
+logic, while budgeting is arithmetic over tokens and scores.
 
 ## Rules
 
@@ -42,4 +41,4 @@ tokens and scores.
 
 ## Depends on
 
-`@contextengine/retriever-interface`, `@repo/shared`.
+`@contextengine/retriever-interface`, `@contextengine/rag-retriever`.

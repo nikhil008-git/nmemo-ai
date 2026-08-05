@@ -12,9 +12,6 @@ business logic, no Prisma queries inline.
 | `invite.ts`    | live    | Workspace invites |
 | `oauth.ts`     | live    | Provider auth callbacks |
 | `projects.ts`  | planned | Projects behind the Project Brain dashboard |
-| `episodes.ts`  | planned | Read and write session memory (`@repo/memory`) |
-| `sync.ts`      | planned | Push/pull endpoints for `@repo/sync` |
-| `billing.ts`   | planned | Plans, entitlements, usage (`@repo/billing`) |
 
 ## Rules
 

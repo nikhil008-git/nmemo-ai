@@ -15,7 +15,6 @@ It is built for applications that need more than a vector search call: documents
 | SDK | `packages/sdk` | `nmemo-sdk` client for calling the API |
 | Database | `packages/database` | Prisma schema and migrations |
 
-Some directories document planned work (CLI, MCP server, local memory, sync, and billing). See [BUILD.md](./BUILD.md) for the intended architecture and current implementation boundaries.
 
 ## Quick start
 
@@ -89,7 +88,6 @@ The included [render.yaml](./render.yaml) deploys the API from this monorepo. Se
 - [Documentation map](./docs/context-engine/DOCS_MAP.md)
 - [HTTP API reference](./docs/context-engine/API.md)
 - [SDK guide](./docs/context-engine/SDK.md)
-- [Architecture and build plan](./BUILD.md)
 - [API application guide](./apps/api/README.md)
 
 ## Security

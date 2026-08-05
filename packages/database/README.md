@@ -20,9 +20,6 @@ Auth and tenancy: `User`, `Session`, `Account`, `Verification`, `Workspace`,
 `WorkspaceMember`, `WorkspaceInvite`, `ApiKey`.
 Product: `Connector`, `UsageEvent`.
 
-nmemo's project and episode models land here as the memory write path is built — see
-`../memory/README.md` and step 2 of `../../BUILD.md`.
-
 ## Workflow
 
 ```bash
