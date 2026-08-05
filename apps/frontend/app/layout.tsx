@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -107,6 +108,7 @@ export default function RootLayout({
           <NavigationProgress />
           <SiteHeader />
           {children}
+          <Analytics />
         </SmoothScroll>
       </body>
     </html>
